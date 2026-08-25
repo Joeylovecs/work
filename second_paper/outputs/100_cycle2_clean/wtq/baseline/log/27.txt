@@ -1,0 +1,63 @@
+===================Title===================
+List of storms on the Great Lakes
+===================Table===================
+| Ship | Type of Vessel | Lake | Location | Lives lost |
+| Argus | Steamer | Lake Huron | 25 miles off Kincardine, Ontario | 25 lost |
+| James Carruthers | Steamer | Lake Huron | near Kincardine | 18 lost |
+| Hydrus | Steamer | Lake Huron | near Lexington, Michigan | 28 lost |
+| Leafield | Steamer | Lake Superior |  | all hands |
+| John A. McGean | Steamer | Lake Huron | near Goderich, Ontario | 28 lost |
+| Plymouth | Barge | Lake Michigan |  | 7 lost |
+| Charles S. Price | Steamer | Lake Huron | near Port Huron, Michigan | 28 lost |
+| Regina | Steamer | Lake Huron | near Harbor Beach, Michigan |  |
+| Issac M. Scott | Steamer | Lake Huron | near Port Elgin, Ontario | 28 lost |
+| Henry B. Smith | Steamer | Lake Superior |  | all hands |
+| Wexford | Steamer | Lake Huron | north of Grand Bend, Ontario | all hands |
+| Lightship No. 82 | Lightship | Lake Erie | Point Albino (near Buffalo) | 6 lost |
+===================Question===================
+which ship lost over 5 lives but was a barge?
+===================Text===================
+~~~python~~~
+# Filter for rows where 'Type of Vessel' is 'Barge' and 'Lives lost' contains a number greater than 5
+# First, extract numeric part from 'Lives lost' column, handling 'all hands' and empty strings
+def extract_lives(lost_str):
+    if isinstance(lost_str, str):
+        # Remove any leading/trailing whitespace
+        lost_str = lost_str.strip()
+        if lost_str == '' or lost_str.lower() == 'all hands':
+            return None
+        # Extract the first number found
+        import re
+        match = re.search(r'(\d+)', lost_str)
+        if match:
+            return int(match.group(1))
+    return None
+
+df['numeric_lives'] = df['Lives lost'].apply(extract_lives)
+
+# Filter for barges with numeric_lives > 5
+barge_df = df[(df['Type of Vessel'] == 'Barge') & (df['numeric_lives'] > 5)]
+
+# Get the ship name(s)
+answer = barge_df['Ship'].tolist()
+~~~
+===================Answer===================
+['Plymouth']
+===================Execution Result===================
+["Plymouth"]
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+['Plymouth']

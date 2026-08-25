@@ -1,0 +1,180 @@
+python evaluate.py output/wtq_dp/result.jsonl
+python evaluate.py output/qwen3_8b_train/result.jsonl 
+python evaluate.py output/qwen3_sikao/result.jsonl 
+python evaluate.py output/train/dp/result.jsonl
+
+python evaluate.py   --checkpoints="output/wtq_dp/result.jsonl"   --n_times=100
+
+export LD_LIBRARY_PATH="/data/amax/home/E23101002/.conda/envs/rethinking/lib:$LD_LIBRARY_PATH"
+export PATH="/data/amax/home/E23101002/.conda/envs/rethinking/bin:$PATH"
+export PATH="/data/amax/home/E23101002/.conda/envs/causal/bin:$PATH"
+
+创建了新目录 output/detailed_reasoning_steps/agent 和 output/detailed_reasoning_steps/cot 来存储详细的推理步骤。
+修改了 prompt/wtq/agent.py，在提示中添加了生成详细推理步骤的指令。
+修改了 prompt/wtq/cot.py，在提示中添加了生成详细推理步骤的指令。
+修改了 run_agent.py，添加了代码来捕获和存储详细的推理步骤到单独的文件中。
+修改了 run_cot.py，添加了代码来捕获和存储详细的推理步骤到单独的文件中
+
+
+1：用DeepSeek调用api跑train.json表格问答训练集，跑从0到3950这些数据集得到他的推理步骤。
+2：用开源模型qwen3-8B也跑train.json，跑从0到3950这些数据集得到他的推理步骤。
+3：因为DeepSeek比qwen回答问题的准确率更高，所以单独找出DeepSeek回答正确，但是qwen回答错误的json推理步骤。
+4：然后把上面得到的3的结果去调用DeepSeek的api来分析3的推理步骤的原因。根据推理步骤分析原因，如果是答案正确，就默认所有推理步骤都正确，然后对每一个步骤进行分析和解释。如果答案错误，依然对每一个步骤进行分析，直到分析到第一个错误的推理步骤，正确的步骤进行解释和分析。错误的步骤同样进行解释和分析。
+5：把3的推理步骤、表格、问题，作为instruct，把4的对推理步骤的解释作为response，构建微调数据集。
+6：lora qwen3_8B，就是用上述数据集微调qwen3_8B模型，得到分析师模型。
+7：接下来就是验证实验结果，在测试集wtq上跑。表格和问题传入基座模型qwen3-8B,让基座模型产生3次推理路径，我要求每一次基座模型产生路径时都是一次新的窗口，也就是说。表格问题传入基座模型，产生第一条推理路径。然后清空窗口后，表格，问题，传入基座模型产生第二条推理路径。然后继续清空窗口，产生第三条推理路径。
+8：然后把表格，问题（因为都是同一个表格和问题，所以只记录一次）和三条完整的推理路径传入分析师模型。
+分析师模型并行开启3个窗口，分别对路径1、路径2、路径3进行独立分析。（理由：降低分析师的认知负载，保证分析的准确性。最后在外部（代码层面）汇总分析师对这3条路径的评价。）分析师模型对这三条推理路径进行分析，如果分析师模型认为这三条推理路径都正确并且答案都相同。则分析师模型输出任意一条推理路径和答案。如果分析师模型认为有推理路径出错，则对出错的推理路径进行分析，输出该推理路径第一个出错的步骤的分析。如果认为三条推理路径都出错了，则对每条出错的推理路径第一个出错的推理步骤进行分析。
+9：分析模型要把表格，问题，基座模型产生的推理路径中分析师认为错误的第一条推理步骤以及分析师对这个错误的推理步骤的分析（最多是三条推理路径都错了，然后传三个错误的推理步骤和三个对这个错误步骤的分析）传到基座模型。此时要求基座模型必须先读取表格，问题，错误的推理步骤和分析模型（认为出错的）分析解释，然后基座模型产生该问题的第四条推理路径。然后清空对话窗口，再次要求分析模型要把表格，问题，基座模型产生的推理路径中分析师认为错误的第一条推理步骤以及分析师对这个错误的推理步骤的分析传到基座模型。此时一样要求基座模型必须先读取表格，问题，错误的推理步骤和分析模型（认为出错的）分析解释，然后基座模型产生该问题的第五条推理路径。然后同样清空窗口，产生第六条推理路径。
+10：基座模型把第四条，第五条，第六条推理路径和表格，问题一起再次传入分析师模型（此时的分析师模型是一个全新的对话窗口没有历史对话）。分析师模型并行开启3个窗口，分别对路径4、路径5、路径6进行独立分析。然后进行第2次迭代分析。按照第8步的要求进行分析。
+11：按照第9步的要求让基座模型产生推理路径。然后同上面一样让分析师模型进行第三次迭代分析。分析师模型如果认为这三次的推理路径有正确答案且唯一，则输出该正确答案的基座模型推理路径和答案作为最终的推理步骤和答案。如果分析师模型认为这三次推理路径都不对，则根据前两轮产生的六条推理路径的分析结果，分析师模型认为推理正确的答案进行投票，选出最终答案。如果前面六条推理路径，分析师都判断错误了，此时把产生的九条推理路径所产生的答案进行一个投票。如果多个答案出现次数一样，取出现答案最近的推理步骤。
+【优先级 1（当前最优）： 如果第三轮（Path 7,8,9）中有被分析师判定为“正确”的路径，直接输出（如果有多个正确且答案不同，取置信度高或出现次数多的）。
+优先级 2（历史回溯）： 如果第三轮全军覆没，回看第一轮（Path 1,2,3）和第二轮（Path 4,5,6）。如果这前6条里，曾经有被分析师判定为“正确”的路径（当时可能因为没达成一致所以继续迭代了），那么在这些“曾被判定为正确”的答案里进行投票。
+优先级 3（强制兜底）： 如果 9 条路径（1-9）全部被分析师判定为“错误”，则无视分析师的意见，统计这 9 个答案的词频，输出出现次数最多的答案（多数投票）。】
+
+第一个研究思路就是上面的流程，第二个研究思路是在第一个思路的基础上进行修改的。此时除了基座模型和分析师模型之外还有一个调度agent。表格和问题会传入这个调度agent。然后这个调度agent会查看表格和问题，判断要选择的调用工具形式（sql、Python代码、原来第一个研究思路中的文本推理）。然后让基座模型调用选择的工具进行推理。按照第一个研究思路中的迭代形式进行推理。然后产生答案。
+请深度思考并解决我的开题困扰：第一个问题我想的是往去偏推理，幻觉，推理上面凑。不太想用蒸馏的思路，感觉蒸馏太简单了，容易被老师瞧不上。第二个问题就是往agent智能体上去凑。
+
+
+
+
+
+注意当前的环境一定要是：conda activate rethinking，最好export PATH="/data/amax/home/E23101002/.conda/envs/rethinking/bin:$PATH"
+来确保环境正确。
+python scripts/split_correct_incorrect.py result.jsonl #把jsonl文件分成正确和错误的jsonl文件
+bash scripts/build_training_quick.sh #生成训练集
+接下来我的思路是用上述得到的两个数据集微调qwen3-8B，然后我在网上搜到的微调的参考都在/外部参考资料/里面，你也可以用你自己的知识来帮我进行微调。
+主要微调思路是：Instruction要包括任务的描述、表格和问题，然后Response要包括模型的推理步骤（为什么推理要这样推理以及推理的原因）和最终结果。
+
+下一步是要对qwen3-8b进行微调。
+微调需要instruction和response，
+instruction包括提示词（大概意思是我给你了表格和问题和对这个问题回答的详细推理步骤，你给我回答每一步的推理步骤的原因和依据，意思是你为什么要这样推理）表格，问题。
+response包括推理步骤的原因（如果是最终回答正确，那就对每一个推理步骤都进行解释，如果最终回答错误，前面回答正确的每一步都进行解释，开始出错的那一步也进行解释，出错下一步就不解释了）还有最终的结果final answer
+我现在training_data里面有了正向和负向的训练集，但是训练集json文件不符合要求，需要你进行修改：
+因为我要给每一步推理步骤进行解释，推理步骤应该以累积的方式呈现，即Step 1, Step 1 Step 2, Step 1 Step 2 Step 3等，有连贯性。然后像是与微调无关的干扰信息都要去掉。所以当前请去掉transpose，resort，question_id，title，pred_extracted，gold_joined，sample_type，source的相关内容。
+我需要拿符合上面要求的json文件让DeepSeek对每一步推理步骤进行解释，从而完善最终微调的json文件。
+现在请帮我完成工作。
+
+# 创建输出目录
+mkdir -p /root/shared-nvme/wangjie/Rethinking\ Tabular\ DeepSeek\ new/fenxishi/output/final_5090_feisikao_wtq
+nohup bash /root/shared-nvme/wangjie/Rethinking\ Tabular\ DeepSeek\ new/fenxishi/run_voting_wtq.sh > /root/shared-nvme/wangjie/Rethinking\ Tabular\ DeepSeek\ new/fenxishi/output/final_5090_feisikao_wtq/nohup.log 2>&1 &
+
+Baseline 的公平性：你的方法用了 Qwen3-8B + LoRA (Analyst) + DeepSeek (作为老师)。对比 Baseline 时，简单的 Qwen3-8B CoT 是不够的。
+必须对比：Qwen3-8B + Self-Consistency (k=9)。因为你的方法跑了9条路径，如果只对比跑1条路径的Baseline是不公平的。必须证明你的提升不仅仅来自“生成了更多条”，而是来自“分析师的引导”。
+
+
+Priority 4: 跨模型通用性 (Generalization) - 高性价比
+实验: 用你训练好的 Analyst (Qwen-based) 去评估/纠正 Llama-3-8B 的生成结果。
+
+目的: 如果能提升 Llama 的效果，说明 Analyst 学到了通用的表格逻辑验证能力，这是一个巨大的加分项（"Plug-and-Play Agent"）。
+Tri-Agent Reasoning: Decoupling Generation, Verification, and Arbitration for Table QA (三智能体推理：解耦表格问答中的生成、验证与仲裁)
+Adversarial Analyst: Breaking the Self-Verification Loop in Table QA via Distilled Criticism (对抗性分析师：通过蒸馏批判能力打破表格问答中的自我验证循环)
+"Tri-Agent Collaborative Reasoning: Decoupling Generation, Verification, and Arbitration for Complex Table QA"
+(三元智能体协同推理：解耦生成、验证与仲裁的复杂表格问答)
+Option 5 (强调代理): Beyond Self-Correction: Decoupling Reasoning and Verification in Table QA Agents 超越自我纠错：表格问答代理中的推理与验证解耦
+
+Part 4: 论文大纲建议 (KDD Structure)
+
+Abstract
+
+背景: LLM 在表格推理中展现了潜力，但受限于幻觉和计算错误。
+
+问题: 现有的 Self-correction 依赖模型自身，存在“Self-verification Bias”（自我验证偏差），难以纠正顽固错误。
+
+方法: 提出 ADIA (Adversarial De-biasing Iterative Agent) 框架。
+
+构造对抗微调数据，训练一个能够独立审计推理轨迹的“分析师”模型。
+
+设计“生成-审计-反馈”的三元闭环。
+
+引入多优先级仲裁机制。
+
+结果: 在 WTQ 和 TabFact 上取得 SOTA 性能（e.g., WTQ +16.64%），证明了外部监督信号的重要性。
+
+1. Introduction
+
+1.1 Motivation: 表格数据在金融/工业的重要性。LLM 的 CoT 虽然有效，但在复杂逻辑（Checking, Sorting, Calculation）上不可靠。
+
+1.2 Challenge: 举一个具体的例子（Case），展示 LLM 犯错后，让他“再想一次”，他往往会编造理由支持错误的答案（Bias）。
+
+1.3 Proposal: 我们需要一个“冷面无私”的独立审计员。介绍如何利用强模型（DeepSeek）的“上帝视角”来教弱模型（Qwen）学会找茬。
+
+1.4 Contributions: 框架创新、数据构建策略、显著的实验效果。
+
+2. Related Work
+
+2.1 Table QA: Text-to-SQL vs. Text-to-Answer (Direct Reasoning). 强调 Direct Reasoning 的灵活性。
+
+2.2 LLM Reasoning & Agents: CoT, PoT, ReAct.
+
+2.3 Feedback & Correction: Self-Consistency, Self-Refine, Reflexion. 重点区分：你的方法是 Supervised External Critique，而不是 Unsupervised Self-Reflection。
+
+3. Methodology (The Core)
+
+3.1 Problem Formulation: 定义表格、问题、推理路径。
+
+3.2 Framework Overview: 放上你的 图1 和 图2。
+
+3.3 Phase 1: Analyst Construction (Adversarial Tuning):
+
+如何生成正负样本对（Data Construction Pipeline）。
+
+DeepSeek 的 Prompt 设计（如何让它生成高质量 Critique）。
+
+LoRA 微调 Qwen 的细节。
+
+3.4 Phase 2: Tri-Agent Collaborative Inference:
+
+Reasoner: 并行生成 (Parallel Generation)。
+
+Analyst: 独立审计 (Independent Audit) 与 错误快照 (Error Snapshot)。
+
+Arbiter: 决策逻辑 (Decision Logic) 与 优先级投票 (Priority Voting)。
+
+Feedback Loop: 具体的 Prompt Template，展示如何将错误信息注入下一轮。
+
+4. Experiments
+
+4.1 Setup: Datasets (WTQ, TabFact), Baselines (Vanilla CoT, Self-Consistency, Ditch-Pro, etc.), Metrics.
+
+4.2 Main Results: 展示那张 Acc 表格。对比 SOTA。
+
+4.3 Ablation Study (关键):
+
+去掉“分析师反馈”（退化为 Self-Refine）：证明是 SFT 的分析师起了作用，而不是多轮迭代本身。
+
+去掉“多路并行”（只跑1条链）：证明并行探索的必要性。
+
+不同的投票策略对比。
+
+4.4 Analysis of Critique: 分析师的准确率是多少？（Precision/Recall of error detection）。
+
+4.5 Efficiency Analysis: 探讨 Token 消耗与性能提升的 ROI。
+
+5. Qualitative Analysis (Case Study)
+
+展示一个具体的 Case：
+
+Round 1: Qwen 算错了。
+
+Analyst: 准确指出“第3步算错了，应该是X而不是Y”。
+
+Round 2: Qwen 修正了逻辑，得到正确答案。
+
+对比 Self-Correction: 展示如果只是让 Qwen 自己检查，它会说“我是对的”。
+
+6. Conclusion
+
+总结：有监督的批评（Supervised Critique）是解决 LLM 推理偏差的有效途径。
+
+下一步建议 (Next Step)
+
+你的实验数据非常漂亮（+16% 是巨大的提升），这篇论文有很大几率中 KDD 或 ACL。
+
+我现在建议你优先做**消融实验（Ablation Study）**的数据整理。因为审稿人一定会问：“如果我只用 Qwen 做 Self-Consistency (比如跑9次取众数)，效果是多少？”
+
+-> 如果你的方法（9次推理+分析引导）显著高于（9次推理+简单投票），那你的 Contribution 就立住了。
+
+你需要我帮你撰写“Methodology”章节中关于“分析师数据构建”的具体LaTeX公式或描述吗？
+
+

@@ -1,0 +1,120 @@
+===================Title===================
+Cheltenham Town F.C.
+===================Table===================
+| Year | Kit Manufacturer | Shirt Sponsor | Back of Shirt Sponsor | Short Sponsor |
+| 1977–1978 |  | National Express |  |  |
+| 1982–1985 | Umbro |  |  |  |
+| 1985–1986 | Umbro | Whitbread |  |  |
+| 1986–1988 | Henson | Duraflex |  |  |
+| 1988–1989 |  | Gulf Oil |  |  |
+| 1991–1993 | Technik | Gulf Oil |  |  |
+| 1993–1994 | Club Sport | Gulf Oil |  |  |
+| 1994–1995 | Klūb Sport | Empress |  |  |
+| 1995–1996 | Matchwinner | Empress |  |  |
+| 1996–1997 | UK | Endsleigh Insurance |  |  |
+| 1997–1999 | Errea | Endsleigh Insurance |  |  |
+| 1999–2004 | Errea | Towergate Insurance |  |  |
+| 2004–2008 | Errea | Bence Building Merchants |  |  |
+| 2008– | Errea | Mira Showers |  |  |
+| 2009–2011 | Errea | Mira Showers | PSU Technology Group |  |
+| 2011–2013 | Errea | Mira Showers | Barr Stadia | Gloucestershire Echo |
+| 2013– | Errea | Mira Showers | Gloucestershire College | Gloucestershire Echo |
+===================Question===================
+which kit manufacturer came next after umbro?
+===================Text===================
+Let’s trace the table step by step.  
+
+Umbro appears in two consecutive rows:  
+- 1982–1985: Umbro (no sponsor listed)  
+- 1985–1986: Umbro (sponsor Whitbread)  
+
+After 1985–1986, the next row is 1986–1988, which shows **Henson** as the kit manufacturer.  
+
+So the kit manufacturer after Umbro is **Henson**.  
+
+Final Answer: Henson
+---
+Let’s trace the table step by step.  
+
+Umbro appears in two consecutive rows:  
+- 1982–1985: Umbro (no sponsor listed)  
+- 1985–1986: Umbro (sponsor Whitbread)  
+
+After 1985–1986, the next row is 1986–1988, which shows **Henson** as the kit manufacturer.  
+
+So the kit manufacturer after Umbro is **Henson**.  
+
+Final Answer: Henson
+---
+Let’s trace the table step by step.  
+
+Umbro appears in two consecutive rows:  
+- 1982–1985: Umbro (no sponsor listed)  
+- 1985–1986: Umbro (sponsor Whitbread)  
+
+After 1985–1986, the next row is 1986–1988, which shows **Henson** as the kit manufacturer.  
+
+So the kit manufacturer after Umbro is **Henson**.  
+
+Final Answer: Henson
+---
+~~~python~~~
+# Find the rows where Kit Manufacturer is 'Umbro'
+umbro_rows = df[df['Kit Manufacturer'] == 'Umbro']
+
+# Get the Year values for those rows
+umbro_years = umbro_rows['Year'].tolist()
+
+# Since the years are strings like '1982–1985', we need to extract the start year for ordering
+# We'll convert the start year to integer for comparison
+def extract_start_year(year_str):
+    # Split by '–' and take the first part, convert to int
+    # Handle cases where the year might be like '2008–' (ongoing)
+    start_part = year_str.split('–')[0]
+    return int(start_part)
+
+# Apply to all rows to get a start year column for sorting
+df['Start Year'] = df['Year'].apply(extract_start_year)
+
+# Sort the dataframe by Start Year
+df_sorted = df.sort_values('Start Year')
+
+# Find the row that comes immediately after the last Umbro row
+# Get the maximum start year among Umbro rows
+max_umbro_start = df_sorted[df_sorted['Kit Manufacturer'] == 'Umbro']['Start Year'].max()
+
+# Find the next row after that start year
+next_rows = df_sorted[df_sorted['Start Year'] > max_umbro_start]
+
+# If there is at least one row after the last Umbro row, get the first one
+if not next_rows.empty:
+    next_row = next_rows.iloc[0]
+    next_kit_manufacturer = next_row['Kit Manufacturer']
+else:
+    next_kit_manufacturer = None
+
+# Clean up: remove the temporary column
+df.drop(columns=['Start Year'], inplace=True)
+
+answer = next_kit_manufacturer
+~~~
+===================Answer===================
+['Henson']
+===================Execution Result===================
+"Henson"
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+Henson

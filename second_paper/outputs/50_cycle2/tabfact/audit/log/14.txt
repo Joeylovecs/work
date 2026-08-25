@@ -1,0 +1,127 @@
+===================Title===================
+1991 toronto blue jays season
+===================Table===================
+| date | opponent | score | loss | attendance | record |
+| may 1 | rangers | 3 - 0 | key (4 - 1) | 33439 | 12 - 10 |
+| may 2 | royals | 3 - 1 | appier (1 - 4) | 22896 | 13 - 10 |
+| may 3 | royals | 5 - 1 | davis (2 - 2) | 20809 | 14 - 10 |
+| may 4 | royals | 6 - 5 | boucher (0 - 2) | 22628 | 14 - 11 |
+| may 5 | royals | 3 - 0 | gordon (1 - 2) | 22588 | 15 - 11 |
+| may 7 | rangers | 3 - 2 | key (4 - 2) | 44622 | 15 - 12 |
+| may 8 | rangers | 4 - 2 | ryan (3 - 3) | 43211 | 16 - 12 |
+| may 9 | white sox | 2 - 0 | pãrez (1 - 2) | 47236 | 17 - 12 |
+| may 10 | white sox | 5 - 3 (12) | fraser (0 - 1) | 50198 | 17 - 13 |
+| may 11 | white sox | 5 - 2 | hough (0 - 2) | 50206 | 18 - 13 |
+| may 12 | white sox | 4 - 2 | hibbard (2 - 1) | 50108 | 19 - 13 |
+| may 13 | royals | 4 - 2 | davis (2 - 4) | 44275 | 20 - 13 |
+| may 14 | royals | 4 - 1 | gubicza (0 - 1) | 43357 | 21 - 13 |
+| may 15 | royals | 6 - 4 | boucher (0 - 3) | 50113 | 21 - 14 |
+| may 17 | white sox | 5 - 3 | timlin (3 - 1) | 30095 | 21 - 15 |
+| may 18 | white sox | 9 - 2 | hibbard (2 - 2) | 34861 | 22 - 15 |
+| may 19 | white sox | 5 - 4 | timlin (3 - 2) | 41015 | 22 - 16 |
+| may 20 | athletics | 1 - 0 | welch (4 - 3) | 24631 | 23 - 16 |
+| may 21 | athletics | 11 - 7 | dressendorfer (3 - 3) | 22738 | 24 - 16 |
+| may 22 | athletics | 2 - 1 | stieb (4 - 3) | 34028 | 24 - 17 |
+| may 24 | angels | 3 - 2 | finley (7 - 2) | 26408 | 25 - 17 |
+| may 25 | angels | 5 - 0 | stottlemyre (5 - 1) | 36732 | 25 - 18 |
+| may 26 | angels | 6 - 2 | wells (5 - 4) | 45307 | 25 - 19 |
+| may 28 | athletics | 8 - 4 | acker (1 - 2) | 50299 | 25 - 20 |
+| may 29 | athletics | 8 - 3 | slusarski (1 - 2) | 50262 | 26 - 20 |
+| may 30 | athletics | 8 - 6 | ward (0 - 2) | 50271 | 26 - 21 |
+| may 31 | angels | 5 - 1 | langston (6 - 2) | 50252 | 27 - 21 |
+===================Question===================
+the toronto blue jays lost one consecutive games between the 25th and the 28th may 1991
+in the table:
+the toronto blue jays lost 3 consecutive games between the 25th and the 28th may 1991.
+===================Text===================
+~~~python~~~
+# Filter rows for dates between May 25 and May 28 inclusive
+# Assuming the 'date' column contains strings like 'may 25', 'may 26', etc.
+# We'll extract the day part and compare numerically
+df_filtered = df.copy()
+# Extract month and day from the date string
+df_filtered['day'] = df_filtered['date'].str.extract(r'(\d+)$').astype(int)
+df_filtered['month'] = df_filtered['date'].str.extract(r'^([a-z]+)', expand=False)
+# Keep only rows in May
+df_may = df_filtered[df_filtered['month'] == 'may']
+# Further filter for days between 25 and 28 inclusive
+df_period = df_may[(df_may['day'] >= 25) & (df_may['day'] <= 28)]
+# Determine if the Blue Jays lost: loss column indicates the losing pitcher (non-empty means a loss)
+# In the table, a loss is recorded when the 'loss' column is not empty (i.e., not NaN)
+# We'll check for consecutive losses in the sorted order by day
+df_period_sorted = df_period.sort_values('day')
+# Create a boolean series indicating loss (True if loss column is not null)
+loss_series = df_period_sorted['loss'].notna()
+# Check for exactly one consecutive loss (i.e., exactly one True in the series)
+# But the statement says "lost one consecutive games" which likely means exactly one loss in that period.
+# However, the statement in the question says "lost one consecutive games" which might be a typo and actually means "lost one game" consecutively? 
+# But the provided statement says "lost 3 consecutive games". We need to check the original statement polarity.
+# The question is: "the toronto blue jays lost one consecutive games between the 25th and the 28th may 1991"
+# The statement to verify is: "the toronto blue jays lost 3 consecutive games between the 25th and the 28th may 1991."
+# So we need to check if they lost 3 consecutive games in that period.
+# We'll compute the maximum number of consecutive losses in the period.
+consecutive_losses = 0
+max_consecutive = 0
+for loss in loss_series:
+    if loss:
+        consecutive_losses += 1
+        if consecutive_losses > max_consecutive:
+            max_consecutive = consecutive_losses
+    else:
+        consecutive_losses = 0
+
+# The statement says they lost 3 consecutive games. Check if max_consecutive is exactly 3.
+answer = (max_consecutive == 3)
+~~~
+---
+~~~python~~~
+# Filter rows for dates between May 25 and May 28 inclusive
+# Assuming the 'date' column contains strings like 'may 25', 'may 26', etc.
+# We'll extract the day part and compare numerically
+df_filtered = df.copy()
+# Extract day from the date string directly
+df_filtered['day'] = df_filtered['date'].str.extract(r'(\d+)$').astype(int)
+# Keep only rows in May (all rows are in May, but we filter to be safe)
+df_filtered = df_filtered[df_filtered['date'].str.startswith('may')]
+# Further filter for days between 25 and 28 inclusive
+df_period = df_filtered[(df_filtered['day'] >= 25) & (df_filtered['day'] <= 28)]
+# Determine if the Blue Jays lost: loss column indicates the losing pitcher (non-empty means a loss)
+# In the table, a loss is recorded when the 'loss' column is not empty (i.e., not NaN)
+# We'll check for consecutive losses in the sorted order by day
+df_period_sorted = df_period.sort_values('day')
+# Create a boolean series indicating loss (True if loss column is not null)
+loss_series = df_period_sorted['loss'].notna()
+# Check for exactly three consecutive losses in that period.
+consecutive_losses = 0
+max_consecutive = 0
+for loss in loss_series:
+    if loss:
+        consecutive_losses += 1
+        if consecutive_losses > max_consecutive:
+            max_consecutive = consecutive_losses
+    else:
+        consecutive_losses = 0
+
+# The statement says they lost 3 consecutive games. Check if max_consecutive is exactly 3.
+answer = (max_consecutive == 3)
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "UNKNOWN_COLUMN", "expected": null, "actual": "day", "evidence": ["unknown_column:day"], "confidence": 0.99, "repair_hint": "Use an existing table column."}], "confidence": 0.99}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "UNKNOWN_COLUMN", "expected": null, "actual": "day", "evidence": ["unknown_column:day"], "confidence": 0.99, "repair_hint": "Use an existing table column."}], "confidence": 0.99}, "repair_hint": "Use an existing table column.", "confidence": 0.99, "mode": "hybrid"}
+===================Repair Hint===================
+Use an existing table column.
+===================Repair Trace===================
+[{"repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "UNKNOWN_COLUMN", "expected": null, "actual": "day", "evidence": ["unknown_column:day", "unknown_column:month"], "confidence": 0.99, "repair_hint": "Use an existing table column."}, {"level": "PARAMETER", "error_type": "UNKNOWN_COLUMN", "expected": null, "actual": "month", "evidence": ["unknown_column:day", "unknown_column:month"], "confidence": 0.99, "repair_hint": "Use an existing table column."}], "confidence": 0.99}, "repair_hint": "Use an existing table column. Use an existing table column.", "confidence": 0.99, "mode": "hybrid"}, "repaired_code": "# Filter rows for dates between May 25 and May 28 inclusive\n# Assuming the 'date' column contains strings like 'may 25', 'may 26', etc.\n# We'll extract the day part and compare numerically\ndf_filtered = df.copy()\n# Extract day from the date string directly\ndf_filtered['day'] = df_filtered['date'].str.extract(r'(\\d+)$').astype(int)\n# Keep only rows in May (all rows are in May, but we filter to be safe)\ndf_filtered = df_filtered[df_filtered['date'].str.startswith('may')]\n# Further filter for days between 25 and 28 inclusive\ndf_period = df_filtered[(df_filtered['day'] >= 25) & (df_filtered['day'] <= 28)]\n# Determine if the Blue Jays lost: loss column indicates the losing pitcher (non-empty means a loss)\n# In the table, a loss is recorded when the 'loss' column is not empty (i.e., not NaN)\n# We'll check for consecutive losses in the sorted order by day\ndf_period_sorted = df_period.sort_values('day')\n# Create a boolean series indicating loss (True if loss column is not null)\nloss_series = df_period_sorted['loss'].notna()\n# Check for exactly three consecutive losses in that period.\nconsecutive_losses = 0\nmax_consecutive = 0\nfor loss in loss_series:\n    if loss:\n        consecutive_losses += 1\n        if consecutive_losses > max_consecutive:\n            max_consecutive = consecutive_losses\n    else:\n        consecutive_losses = 0\n\n# The statement says they lost 3 consecutive games. Check if max_consecutive is exactly 3.\nanswer = (max_consecutive == 3)", "execution": {"success": true, "error": null, "result": true, "observed_output_type": "boolean", "observed_value": true, "evidence": {"final_object_type": "boolean", "final_value": true, "dataframes": [{"name": "df", "shape": [27, 6], "columns": ["date", "opponent", "score", "loss", "attendance", "record"]}, {"name": "df_filtered", "shape": [27, 7], "columns": ["date", "opponent", "score", "loss", "attendance", "record", "day"]}, {"name": "df_period", "shape": [3, 7], "columns": ["date", "opponent", "score", "loss", "attendance", "record", "day"]}, {"name": "df_period_sorted", "shape": [3, 7], "columns": ["date", "opponent", "score", "loss", "attendance", "record", "day"]}], "stdout": "", "latency_seconds": 0.0027092068921774626}, "memory": {}}}]
+===================Final Answer===================
+True

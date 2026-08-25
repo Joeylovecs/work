@@ -1,0 +1,59 @@
+===================Title===================
+Taekwondo at the 2010 South American Games
+===================Table===================
+| Rank | Nation | Gold | Silver | Bronze | Total |
+| 1 | Brazil | 7 | 5 | 3 | 15 |
+| 2 | Venezuela | 3 | 2 | 8 | 13 |
+| 3 | Colombia | 2 | 3 | 4 | 9 |
+| 4 | Chile | 2 | 0 | 2 | 4 |
+| 5 | Argentina | 1 | 2 | 5 | 8 |
+| 6 | Peru | 1 | 1 | 2 | 4 |
+| 7 | Ecuador | 0 | 2 | 2 | 4 |
+| 8 | Guyana | 0 | 1 | 0 | 1 |
+| 9 | Aruba | 0 | 0 | 1 | 1 |
+| 9 | Netherlands Antilles | 0 | 0 | 1 | 1 |
+| 9 | Panama | 0 | 0 | 1 | 1 |
+| 9 | Uruguay | 0 | 0 | 1 | 1 |
+| Total | Total | 16 | 16 | 30 | 62 |
+===================Question===================
+what was the total difference in medals between the country who won the most and the country who the least?
+===================Text===================
+~~~python~~~
+# Find the country with the most total medals (excluding the 'Total' row)
+df_countries = df[df['Nation'] != 'Total']
+most_medals = df_countries['Total'].max()
+# Find the country with the least total medals among those with at least one medal
+least_medals = df_countries['Total'].min()
+# Calculate the difference
+answer = most_medals - least_medals
+~~~
+---
+~~~python
+# Find the country with the most total medals (excluding the 'Total' row)
+df_countries = df[df['Nation'] != 'Total']
+most_medals = df_countries['Total'].max()
+# Find the country with the least total medals among those with at least one medal
+least_medals = df_countries['Total'].min()
+# Calculate the difference
+answer = int(most_medals - least_medals)
+~~~
+===================Answer===================
+['14']
+===================Execution Result===================
+14
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "entity", "actual": "number", "evidence": ["filter:Nation != 'Total'", "column_access:Nation", "aggregation:max", "column_access:Total", "aggregation:min", "column_access:Total"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "WRONG_AGGREGATION", "expected": "sum", "actual": "min", "evidence": ["filter:Nation != 'Total'", "column_access:Nation", "aggregation:max", "column_access:Total", "aggregation:min", "column_access:Total"], "confidence": 0.98, "repair_hint": "Use sum rather than min."}], "confidence": 0.98}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "entity", "actual": "number", "evidence": ["filter:Nation != 'Total'", "column_access:Nation", "aggregation:max", "column_access:Total", "aggregation:min", "column_access:Total"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "WRONG_AGGREGATION", "expected": "sum", "actual": "min", "evidence": ["filter:Nation != 'Total'", "column_access:Nation", "aggregation:max", "column_access:Total", "aggregation:min", "column_access:Total"], "confidence": 0.98, "repair_hint": "Use sum rather than min."}], "confidence": 0.98}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object. Use sum rather than min.", "confidence": 0.98, "mode": "hybrid"}
+===================Repair Hint===================
+Return the requested answer type, not an intermediate numeric or table object. Use sum rather than min.
+===================Repair Trace===================
+[{"repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "entity", "actual": "number", "evidence": ["filter:Nation != 'Total'", "column_access:Nation", "aggregation:max", "column_access:Total", "aggregation:min", "column_access:Total"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "WRONG_AGGREGATION", "expected": "sum", "actual": "min", "evidence": ["filter:Nation != 'Total'", "column_access:Nation", "aggregation:max", "column_access:Total", "aggregation:min", "column_access:Total"], "confidence": 0.98, "repair_hint": "Use sum rather than min."}], "confidence": 0.98}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object. Use sum rather than min.", "confidence": 0.98, "mode": "hybrid"}, "repaired_code": "# Find the country with the most total medals (excluding the 'Total' row)\ndf_countries = df[df['Nation'] != 'Total']\nmost_medals = df_countries['Total'].max()\n# Find the country with the least total medals among those with at least one medal\nleast_medals = df_countries['Total'].min()\n# Calculate the difference\nanswer = int(most_medals - least_medals)", "execution": {"success": true, "error": null, "result": 14, "observed_output_type": "number", "observed_value": 14, "evidence": {"final_object_type": "number", "final_value": 14, "dataframes": [{"name": "df", "shape": [13, 6], "columns": ["Rank", "Nation", "Gold", "Silver", "Bronze", "Total"]}, {"name": "df_countries", "shape": [12, 6], "columns": ["Rank", "Nation", "Gold", "Silver", "Bronze", "Total"]}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.001048472011461854}, "memory": {}}, "accepted": false}]
+===================Final Answer===================
+14

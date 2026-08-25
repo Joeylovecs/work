@@ -1,0 +1,143 @@
+===================Title===================
+Love (2011 film)
+===================Table===================
+| Date | Festival | Location | Awards | Link |
+| Feb 2–5, Feb 11 | Santa Barbara International Film Festival | Santa Barbara, California  USA | Top 11 "Best of the Fest" Selection | sbiff.org |
+| May 21–22, Jun 11 | Seattle International Film Festival | Seattle, Washington  USA |  | siff.net |
+| Jul 18, Jul 25 | Fantasia Festival | Montreal, Quebec  Canada | Special Mention\n"for the resourcefulness and unwavering determination by a director to realize his unique vision" | FanTasia |
+| Sep 16 | Athens International Film Festival | Athens, Attica\n Greece | Best Director | aiff.gr |
+| Sep 19 | Lund International Fantastic Film Festival | Lund, Skåne\n Sweden |  | fff.se |
+| Sep 28 | Fantastic Fest | Austin, Texas\n USA |  | FantasticFest.com |
+| Oct 9 | London Int. Festival of Science Fiction Film | London, England\n UK | Closing Night Film | Sci-Fi London |
+| Oct 9, Oct 11 | Sitges Film Festival | Sitges, Catalonia\n Spain |  | Sitges Festival |
+| Oct 1, Oct 15 | Gwacheon International SF Festival | Gwacheon, Gyeonggi-do\n South Korea |  | gisf.org |
+| Oct 17, Oct 20 | Icon TLV | Tel Aviv, Central\n Israel |  | icon.org.il |
+| Oct 23 | Toronto After Dark | Toronto, Ontario\n Canada | Best Special Effects\nBest Musical Score | torontoafterdark.com |
+| Nov 11 | Les Utopiales | Nantes, Pays de la Loire\n France |  | utopiales.org |
+| Nov 12, Nov 18 | Indonesia Fantastic Film Festival | Jakarta, Bandung\n Indonesia |  | inaff.com |
+| Nov 16–18 | AFF | Wrocław, Lower Silesia\n Poland |  | AFF Poland |
+===================Question===================
+what festival was the film show at before the fantasia festival?
+===================Text===================
+~~~python
+# First, extract the date for Fantasia Festival to use as a reference
+fantasia_date = df.loc[df['Festival'] == 'Fantasia Festival', 'Date'].iloc[0]
+
+# Convert date strings to a comparable format. Since dates are in a range format like "Jul 18, Jul 25",
+# we can take the earliest date in the range for comparison.
+# We'll parse the first part of the date string (before any comma or dash) to get a month and day.
+def parse_first_date(date_str):
+    # Split by common separators: comma, dash, or space
+    # Take the first token that looks like a month abbreviation followed by a day
+    parts = date_str.replace(',', ' ').replace('–', ' ').split()
+    # Find the first part that is a month abbreviation (three letters)
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    for i, part in enumerate(parts):
+        if part in months:
+            # The next part should be the day (might have a comma or other punctuation)
+            day = parts[i+1].strip(',')
+            # Return a tuple (month, day) for easy comparison
+            return (months.index(part), int(day))
+    # If no valid month found, return a large value for sorting purposes
+    return (12, 31)
+
+# Parse the Fantasia Festival date
+fantasia_parsed = parse_first_date(fantasia_date)
+
+# Now, filter festivals that occurred before Fantasia Festival
+# We'll compare based on the parsed date
+before_festivals = []
+for idx, row in df.iterrows():
+    festival_date = row['Date']
+    festival_parsed = parse_first_date(festival_date)
+    if festival_parsed < fantasia_parsed:
+        before_festivals.append(row['Festival'])
+
+# The question asks for the festival before Fantasia Festival, implying the immediate predecessor.
+# Since the table is likely sorted by date, we can take the last festival before Fantasia.
+# But to be safe, we'll find the festival with the latest date that is still before Fantasia.
+# We'll create a temporary DataFrame for comparison
+temp_df = df.copy()
+temp_df['parsed_date'] = temp_df['Date'].apply(parse_first_date)
+# Filter rows before Fantasia
+before_df = temp_df[temp_df['parsed_date'] < fantasia_parsed]
+# Sort by parsed_date to get the closest one before Fantasia
+before_df = before_df.sort_values('parsed_date', ascending=False)
+# The festival immediately before Fantasia is the first row in this sorted DataFrame
+answer = before_df.iloc[0]['Festival'] if not before_df.empty else None
+~~~
+---
+~~~python~~~
+# First, extract the date for Fantasia Festival to use as a reference
+fantasia_date = df.loc[df['Festival'] == 'Fantasia Festival', 'Date'].iloc[0]
+
+# Convert date strings to a comparable format. Since dates are in a range format like "Jul 18, Jul 25",
+# we can take the earliest date in the range for comparison.
+# We'll parse the first part of the date string (before any comma or dash) to get a month and day.
+def parse_first_date(date_str):
+    # Split by common separators: comma, dash, or space
+    # Take the first token that looks like a month abbreviation followed by a day
+    parts = date_str.replace(',', ' ').replace('–', ' ').split()
+    # Find the first part that is a month abbreviation (three letters)
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    for i, part in enumerate(parts):
+        if part in months:
+            # The next part should be the day (might have a comma or other punctuation)
+            day = parts[i+1].strip(',')
+            # Return a tuple (month, day) for easy comparison
+            return (months.index(part), int(day))
+    # If no valid month found, return a large value for sorting purposes
+    return (12, 31)
+
+# Parse the Fantasia Festival date
+fantasia_parsed = parse_first_date(fantasia_date)
+
+# Now, filter festivals that occurred before Fantasia Festival
+# We'll compare based on the parsed date
+before_festivals = []
+for idx, row in df.iterrows():
+    festival_date = row['Date']
+    festival_parsed = parse_first_date(festival_date)
+    if festival_parsed < fantasia_parsed:
+        before_festivals.append(row['Festival'])
+
+# The question asks for the festival before Fantasia Festival, implying the immediate predecessor.
+# Since the table is likely sorted by date, we can take the last festival before Fantasia.
+# But to be safe, we'll find the festival with the latest date that is still before Fantasia.
+# We'll create a temporary DataFrame for comparison without adding a new column
+temp_df = df.copy()
+# Apply parsing to each row's Date and compare directly
+# Filter rows before Fantasia by comparing parsed dates
+before_indices = []
+for idx, row in temp_df.iterrows():
+    festival_parsed = parse_first_date(row['Date'])
+    if festival_parsed < fantasia_parsed:
+        before_indices.append(idx)
+
+# Get the subset of rows before Fantasia
+before_df = temp_df.loc[before_indices]
+# Sort by parsed date by applying the function during sorting
+before_df = before_df.iloc[sorted(range(len(before_df)), key=lambda i: parse_first_date(before_df.iloc[i]['Date']), reverse=True)]
+# The festival immediately before Fantasia is the first row in this sorted DataFrame
+answer = before_df.iloc[0]['Festival'] if not before_df.empty else None
+~~~
+===================Answer===================
+['Seattle International Film Festival']
+===================Execution Result===================
+"Seattle International Film Festival"
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "UNKNOWN_COLUMN", "expected": null, "actual": "parsed_date", "evidence": ["unknown_column:parsed_date", "cell_found:Festival=Fantasia Festival"], "confidence": 0.99, "repair_hint": "Use an existing table column."}], "confidence": 0.99}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "UNKNOWN_COLUMN", "expected": null, "actual": "parsed_date", "evidence": ["unknown_column:parsed_date", "cell_found:Festival=Fantasia Festival"], "confidence": 0.99, "repair_hint": "Use an existing table column."}], "confidence": 0.99}, "repair_hint": "Use an existing table column.", "confidence": 0.99, "mode": "hybrid"}
+===================Repair Hint===================
+Use an existing table column.
+===================Repair Trace===================
+[{"repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "UNKNOWN_COLUMN", "expected": null, "actual": "parsed_date", "evidence": ["unknown_column:parsed_date", "cell_found:Festival=Fantasia Festival"], "confidence": 0.99, "repair_hint": "Use an existing table column."}], "confidence": 0.99}, "repair_hint": "Use an existing table column.", "confidence": 0.99, "mode": "hybrid"}, "repaired_code": "# First, extract the date for Fantasia Festival to use as a reference\nfantasia_date = df.loc[df['Festival'] == 'Fantasia Festival', 'Date'].iloc[0]\n\n# Convert date strings to a comparable format. Since dates are in a range format like \"Jul 18, Jul 25\",\n# we can take the earliest date in the range for comparison.\n# We'll parse the first part of the date string (before any comma or dash) to get a month and day.\ndef parse_first_date(date_str):\n    # Split by common separators: comma, dash, or space\n    # Take the first token that looks like a month abbreviation followed by a day\n    parts = date_str.replace(',', ' ').replace('–', ' ').split()\n    # Find the first part that is a month abbreviation (three letters)\n    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']\n    for i, part in enumerate(parts):\n        if part in months:\n            # The next part should be the day (might have a comma or other punctuation)\n            day = parts[i+1].strip(',')\n            # Return a tuple (month, day) for easy comparison\n            return (months.index(part), int(day))\n    # If no valid month found, return a large value for sorting purposes\n    return (12, 31)\n\n# Parse the Fantasia Festival date\nfantasia_parsed = parse_first_date(fantasia_date)\n\n# Now, filter festivals that occurred before Fantasia Festival\n# We'll compare based on the parsed date\nbefore_festivals = []\nfor idx, row in df.iterrows():\n    festival_date = row['Date']\n    festival_parsed = parse_first_date(festival_date)\n    if festival_parsed < fantasia_parsed:\n        before_festivals.append(row['Festival'])\n\n# The question asks for the festival before Fantasia Festival, implying the immediate predecessor.\n# Since the table is likely sorted by date, we can take the last festival before Fantasia.\n# But to be safe, we'll find the festival with the latest date that is still before Fantasia.\n# We'll create a temporary DataFrame for comparison without adding a new column\ntemp_df = df.copy()\n# Apply parsing to each row's Date and compare directly\n# Filter rows before Fantasia by comparing parsed dates\nbefore_indices = []\nfor idx, row in temp_df.iterrows():\n    festival_parsed = parse_first_date(row['Date'])\n    if festival_parsed < fantasia_parsed:\n        before_indices.append(idx)\n\n# Get the subset of rows before Fantasia\nbefore_df = temp_df.loc[before_indices]\n# Sort by parsed date by applying the function during sorting\nbefore_df = before_df.iloc[sorted(range(len(before_df)), key=lambda i: parse_first_date(before_df.iloc[i]['Date']), reverse=True)]\n# The festival immediately before Fantasia is the first row in this sorted DataFrame\nanswer = before_df.iloc[0]['Festival'] if not before_df.empty else None", "execution": {"success": false, "error": "NameError: name 'parse_first_date' is not defined", "result": null, "observed_output_type": "unknown", "observed_value": null, "evidence": {"stdout": "", "traceback": "Traceback (most recent call last):\n  File \"/root/shared-nvme/wangjie/second_paper/semantic_audit/runtime_trace.py\", line 59, in execute_code\n    if body: exec(compile(ast.Module(body=body,type_ignores=[]),\"<generated>\",\"exec\"),glb,loc)\n  File \"<generated>\", line 50, in <module>\n  File \"<generated>\", line 50, in <lambda>\nNameError: name 'parse_first_date' is not defined\n", "semantic_warnings": ["execution_exception"], "latency_seconds": 0.0067156539298594}, "memory": {}}, "accepted": false}]
+===================Final Answer===================
+Seattle International Film Festival

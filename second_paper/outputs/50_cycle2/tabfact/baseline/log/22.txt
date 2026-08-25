@@ -1,0 +1,107 @@
+===================Title===================
+1971 south african grand prix
+===================Table===================
+| driver | constructor | laps | time / retired | grid |
+| mario andretti | ferrari | 79 | 1:47:35.5 | 4 |
+| jackie stewart | tyrrell - ford | 79 | + 20.9 | 1 |
+| clay regazzoni | ferrari | 79 | + 31.4 | 3 |
+| reine wisell | lotus - ford | 79 | + 1:09.4 | 14 |
+| chris amon | matra | 78 | + 1 lap | 2 |
+| denny hulme | mclaren - ford | 78 | + 1 lap | 7 |
+| brian redman | surtees - ford | 78 | + 1 lap | 17 |
+| jacky ickx | ferrari | 78 | + 1 lap | 8 |
+| graham hill | brabham - ford | 77 | + 2 laps | 19 |
+| ronnie peterson | march - ford | 77 | + 2 laps | 13 |
+| henri pescarolo | march - ford | 77 | + 2 laps | 18 |
+| rolf stommelen | surtees - ford | 77 | + 2 laps | 15 |
+| andrea de adamich | march - alfa romeo | 75 | + 4 laps | 22 |
+| emerson fittipaldi | lotus - ford | 58 | engine | 5 |
+| john surtees | surtees - ford | 56 | gearbox | 6 |
+| françois cevert | tyrrell - ford | 45 | accident | 9 |
+| howden ganley | brm | 42 | physical | 24 |
+| pedro rodríguez | brm | 33 | overheating | 10 |
+| dave charlton | brabham - ford | 31 | engine | 16 |
+| jo siffert | brm | 31 | overheating | 12 |
+| john love | march - ford | 30 | differential | 21 |
+| jackie pretorius | brabham - ford | 22 | engine | 20 |
+| peter gethin | mclaren - ford | 7 | fuel leak | 11 |
+| jo bonnier | mclaren - ford | 5 | suspension | 23 |
+| alex soler - roig | march - ford | 5 | engine | 25 |
+===================Question===================
+there are more fords then any other with alfa romeo and matra tying for the least
+in the table:
+17 fords.
+1 alfa romeo.
+1 matra.
+===================Text===================
+~~~python~~~
+# Count occurrences of each constructor
+constructor_counts = df['constructor'].value_counts()
+
+# Extract counts for 'ford', 'alfa romeo', and 'matra'
+# Note: The constructor column contains strings like 'tyrrell - ford', 'lotus - ford', etc.
+# We need to count entries that contain the substring 'ford', 'alfa romeo', or 'matra'
+ford_count = df['constructor'].str.contains('ford', case=False, na=False).sum()
+alfa_romeo_count = df['constructor'].str.contains('alfa romeo', case=False, na=False).sum()
+matra_count = df['constructor'].str.contains('matra', case=False, na=False).sum()
+
+# Check the conditions:
+# 1. There are more fords than any other (i.e., ford_count > max of other counts)
+# 2. alfa romeo and matra tie for the least (i.e., alfa_romeo_count == matra_count and both are the minimum among all constructor counts)
+
+# Get all unique constructor substrings? Actually, we need to compare ford_count to the maximum count among all other constructors.
+# But the statement says "more fords then any other", meaning ford_count should be strictly greater than the count of any other specific constructor.
+# However, the table groups constructors with engine suppliers (e.g., 'tyrrell - ford', 'lotus - ford'), so we need to consider each full constructor string as a distinct entity.
+# But the question is about "fords", "alfa romeo", and "matra" as engine suppliers, not the full constructor names.
+# So we should compare counts based on engine suppliers.
+
+# Let's extract engine supplier from constructor column: split by ' - ' and take the second part if exists, else the whole string?
+# Actually, looking at the table: all entries have a dash except 'ferrari' and 'matra' (and maybe others). 
+# For 'ferrari', it's both constructor and engine? In this context, 'ford', 'alfa romeo', 'matra' are engine suppliers.
+# We'll parse the engine supplier: if ' - ' in constructor, take part after dash, else take the constructor itself.
+def get_engine(constructor):
+    if ' - ' in constructor:
+        return constructor.split(' - ')[1].strip().lower()
+    else:
+        return constructor.strip().lower()
+
+df['engine'] = df['constructor'].apply(get_engine)
+engine_counts = df['engine'].value_counts()
+
+# Now get counts for 'ford', 'alfa romeo', 'matra'
+ford_count = engine_counts.get('ford', 0)
+alfa_romeo_count = engine_counts.get('alfa romeo', 0)
+matra_count = engine_counts.get('matra', 0)
+
+# Check condition 1: ford_count > max of all other engine counts (excluding ford)
+other_engine_counts = engine_counts.drop('ford', errors='ignore')
+max_other = other_engine_counts.max() if not other_engine_counts.empty else 0
+condition1 = ford_count > max_other
+
+# Check condition 2: alfa romeo and matra tie for the least
+min_count = engine_counts.min()
+condition2 = (alfa_romeo_count == matra_count) and (alfa_romeo_count == min_count) and (matra_count == min_count)
+
+# The statement is true if both conditions hold
+answer = condition1 and condition2
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

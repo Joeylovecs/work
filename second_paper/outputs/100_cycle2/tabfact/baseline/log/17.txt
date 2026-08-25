@@ -1,0 +1,81 @@
+===================Title===================
+utah jazz all - time roster
+===================Table===================
+| player | nationality | position | years for jazz | school / club team |
+| adrian dantley | united states | guard - forward | 1979 - 86 | notre dame |
+| brad davis | united states | guard | 1979 - 80 | maryland |
+| darryl dawkins | united states | center | 1987 - 88 | maynard evans hs |
+| paul dawkins | united states | guard | 1979 - 80 | northern illinois |
+| greg deane | united states | guard | 1979 - 80 | utah |
+| james donaldson | united states | center | 1993 , 1994 - 95 | washington state |
+| john drew | united states | guard - forward | 1982 - 85 | gardner - webb |
+| john duren | united states | guard | 1980 - 82 | georgetown |
+===================Question===================
+james donaldson had two stints on the jazz 's roster , totaling five years in total
+in the table:
+james donaldson had 1 stints on the jazz 's roster.
+james donaldson had 1993 years in total.
+===================Text===================
+~~~python~~~
+# Extract the row for James Donaldson
+donaldson_row = df[df['player'] == 'james donaldson']
+
+# Check if James Donaldson exists in the dataframe
+if donaldson_row.empty:
+    answer = False
+else:
+    # Get the 'years for jazz' value
+    years_str = donaldson_row['years for jazz'].iloc[0]
+    
+    # Count the number of stints: split by commas and count distinct year ranges
+    # First, split by commas to separate different stints
+    parts = [part.strip() for part in years_str.split(',')]
+    
+    # Count distinct stints (each part is a year or year range)
+    num_stints = len(parts)
+    
+    # Calculate total years: parse each part to count years
+    total_years = 0
+    for part in parts:
+        if '-' in part:
+            # Year range like "1994 - 95"
+            # Handle the case where the second year might be abbreviated
+            start_end = part.split('-')
+            start_year = start_end[0].strip()
+            end_year = start_end[1].strip()
+            # Convert to full years: if end_year is two digits, assume it's in the same century as start_year
+            start_year_int = int(start_year)
+            if len(end_year) == 2:
+                # Use the century from start_year
+                century = start_year_int // 100 * 100
+                end_year_int = century + int(end_year)
+            else:
+                end_year_int = int(end_year)
+            total_years += (end_year_int - start_year_int + 1)
+        else:
+            # Single year like "1993"
+            total_years += 1
+    
+    # Check the claim: two stints and totaling five years
+    answer = (num_stints == 2) and (total_years == 5)
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

@@ -1,0 +1,134 @@
+===================Title===================
+Škoda Auto
+===================Table===================
+| Model | 1991 | 1995 | 1996 | 1997 | 1998 | 1999 | 2000 | 2001 | 2002 | 2003 | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 | 2010 | 2011 | 2012 | 2013 |
+| Škoda Felicia | 172,000 | 210,000 |  | 288,458 | 261,127 | 241,256 | 148,028 | 44,963 | − | − | − | − | − | − | − | − | − | − | − | − |
+| Škoda Octavia | − | − |  | 47,876 | 102,373 | 143,251 | 158,503 | 164,134 | 164,017 | 165,635 | 181,683 | 233,322 | 270,274 | 309,951 | 344,857 | 317,335 | 349,746 | 387,200 | 409,360 | 359,600 |
+| Škoda Fabia | − | − | − | − | − | 823 | 128,872 | 250,978 | 264,641 | 260,988 | 247,600 | 236,698 | 243,982 | 232,890 | 246,561 | 264,173 | 229,045 | 266,800 | 255,025 | 202,000 |
+| Škoda Superb | − | − | − | − | − | − | − | 177 | 16,867 | 23,135 | 22,392 | 22,091 | 20,989 | 20,530 | 25,645 | 44,548 | 98,873 | 116,700 | 106,847 | 94,400 |
+| Škoda Roomster | − | − | − | − | − | − | − | − | − | − | − | − | 14,422 | 66,661 | 57,467 | 47,152 | 32,332 | 36,000 | 39,249 | 33,300 |
+| Škoda Yeti | − | − | − | − | − | − | − | − | − | − | − | − | − | − | − | 11,018 | 52,604 | 70,300 | 90,952 | 82,400 |
+| Škoda Rapid | − | − | − | − | − | − | − | − | − | − | − | − | − | − | − | − | − | 1,700 | 9,292 | 103,800 |
+| Škoda Citigo | − | − | − | − | − | − | − | − | − | − | − | − | − | − | − | − | − | 509 | 36,687 | 45,200 |
+| Total | 172,000 | 210,000 | 261,000 | 336,334 | 363,500 | 385,330 | 435,403 | 460,252 | 445,525 | 449,758 | 451,675 | 492,111 | 549,667 | 630,032 | 674,530 | 684,226 | 762,600 | 879,200 | 949,412 | 920,800 |
+===================Question===================
+what year had least number for skoda felicia?
+===================Text===================
+Looking at the Škoda Felicia row:  
+
+1991 → 172,000  
+1995 → 210,000  
+1996 → (blank, but likely not zero since production continued)  
+1997 → 288,458  
+1998 → 261,127  
+1999 → 241,256  
+2000 → 148,028  
+2001 → 44,963  
+2002 onward → − (no production)  
+
+The smallest number in the row is 44,963 in 2001.  
+
+Final Answer: 2001
+---
+Looking at the Škoda Felicia row:  
+
+1991 → 172,000  
+1995 → 210,000  
+1996 → (blank, but likely not zero since production continued)  
+1997 → 288,458  
+1998 → 261,127  
+1999 → 241,256  
+2000 → 148,028  
+2001 → 44,963  
+2002 onward → − (no production)  
+
+The smallest number in the row is 44,963 in 2001.  
+
+Final Answer: 2001
+---
+Looking at the Škoda Felicia row:  
+
+1991 → 172,000  
+1995 → 210,000  
+1996 → (blank, but likely not zero since production continued)  
+1997 → 288,458  
+1998 → 261,127  
+1999 → 241,256  
+2000 → 148,028  
+2001 → 44,963  
+2002 onward → − (no production)  
+
+The smallest number in the row is 44,963 in 2001.  
+
+Final Answer: 2001
+---
+~~~python~~~
+# Filter the row for Škoda Felicia
+felicia_row = df[df['Model'] == 'Škoda Felicia']
+
+# Extract the year columns (excluding 'Model' and 'Total' if present)
+# We'll consider only the columns that represent years (numeric-like column names)
+year_columns = [col for col in df.columns if col != 'Model' and col != 'Total']
+
+# Get the values for Škoda Felicia across years, convert to numeric (coerce errors to NaN)
+felicia_values = felicia_row[year_columns].apply(pd.to_numeric, errors='coerce').iloc[0]
+
+# Find the year with the minimum non‑NaN value
+min_year = felicia_values.idxmin()
+
+# The question asks for the year, so we return the exact column name (which is the year as a string)
+answer = min_year
+~~~
+---
+Looking at the error, the issue occurs when trying to access `.iloc[0]` on an empty DataFrame. This happens when the filter `df[df['Model'] == 'Škoda Felicia']` returns no rows, likely due to a mismatch in the exact string value. The table shows "Škoda Felicia" with the proper diacritics, but there might be whitespace or encoding differences.
+
+The fix is to handle the case where no matching row is found and to use a more robust filtering approach. We'll also ensure we handle the numeric conversion properly.
+
+```python
+# Filter the row for Škoda Felicia - handle potential whitespace or exact match issues
+felicia_row = df[df['Model'].str.strip() == 'Škoda Felicia']
+
+# If no match found, try case-insensitive or contains search as fallback
+if felicia_row.empty:
+    # Try case-insensitive exact match
+    felicia_row = df[df['Model'].str.strip().str.lower() == 'škoda felicia']
+if felicia_row.empty:
+    # Try contains search as last resort
+    felicia_row = df[df['Model'].str.contains('Felicia', case=False, na=False)]
+
+# If still no match, return appropriate value
+if felicia_row.empty:
+    answer = None
+else:
+    # Extract the year columns (excluding 'Model' and 'Total' if present)
+    year_columns = [col for col in df.columns if col != 'Model' and col != 'Total']
+    
+    # Get the values for Škoda Felicia across years, convert to numeric (coerce errors to NaN)
+    felicia_values = felicia_row[year_columns].apply(pd.to_numeric, errors='coerce').iloc[0]
+    
+    # Find the year with the minimum non‑NaN value
+    min_year = felicia_values.idxmin()
+    
+    # The question asks for the year, so we return the exact column name
+    answer = min_year
+```
+===================Answer===================
+['2001']
+===================Execution Result===================
+"2001"
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"kind": "execution", "repair_count": 1, "execution_error": "IndexError: single positional indexer is out-of-bounds", "repaired_code": "# Filter the row for Škoda Felicia - handle potential whitespace or exact match issues\nfelicia_row = df[df['Model'].str.strip() == 'Škoda Felicia']\n\n# If no match found, try case-insensitive or contains search as fallback\nif felicia_row.empty:\n    # Try case-insensitive exact match\n    felicia_row = df[df['Model'].str.strip().str.lower() == 'škoda felicia']\nif felicia_row.empty:\n    # Try contains search as last resort\n    felicia_row = df[df['Model'].str.contains('Felicia', case=False, na=False)]\n\n# If still no match, return appropriate value\nif felicia_row.empty:\n    answer = None\nelse:\n    # Extract the year columns (excluding 'Model' and 'Total' if present)\n    year_columns = [col for col in df.columns if col != 'Model' and col != 'Total']\n    \n    # Get the values for Škoda Felicia across years, convert to numeric (coerce errors to NaN)\n    felicia_values = felicia_row[year_columns].apply(pd.to_numeric, errors='coerce').iloc[0]\n    \n    # Find the year with the minimum non‑NaN value\n    min_year = felicia_values.idxmin()\n    \n    # The question asks for the year, so we return the exact column name\n    answer = min_year", "execution": {"success": true, "error": null, "result": "2001", "observed_output_type": "string", "observed_value": "2001", "evidence": {"final_object_type": "string", "final_value": "2001", "dataframes": [{"name": "df", "shape": [9, 21], "columns": ["Model", "1991", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013"]}, {"name": "felicia_row", "shape": [1, 21], "columns": ["Model", "1991", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013"]}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.0042805299162864685}, "memory": {}}}]
+===================Final Answer===================
+2001

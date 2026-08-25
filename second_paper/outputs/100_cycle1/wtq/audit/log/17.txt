@@ -1,0 +1,123 @@
+===================Title===================
+Cheltenham Town F.C.
+===================Table===================
+| Year | Kit Manufacturer | Shirt Sponsor | Back of Shirt Sponsor | Short Sponsor |
+| 1977–1978 |  | National Express |  |  |
+| 1982–1985 | Umbro |  |  |  |
+| 1985–1986 | Umbro | Whitbread |  |  |
+| 1986–1988 | Henson | Duraflex |  |  |
+| 1988–1989 |  | Gulf Oil |  |  |
+| 1991–1993 | Technik | Gulf Oil |  |  |
+| 1993–1994 | Club Sport | Gulf Oil |  |  |
+| 1994–1995 | Klūb Sport | Empress |  |  |
+| 1995–1996 | Matchwinner | Empress |  |  |
+| 1996–1997 | UK | Endsleigh Insurance |  |  |
+| 1997–1999 | Errea | Endsleigh Insurance |  |  |
+| 1999–2004 | Errea | Towergate Insurance |  |  |
+| 2004–2008 | Errea | Bence Building Merchants |  |  |
+| 2008– | Errea | Mira Showers |  |  |
+| 2009–2011 | Errea | Mira Showers | PSU Technology Group |  |
+| 2011–2013 | Errea | Mira Showers | Barr Stadia | Gloucestershire Echo |
+| 2013– | Errea | Mira Showers | Gloucestershire College | Gloucestershire Echo |
+===================Question===================
+total years errea manufactured?
+===================Text===================
+~~~python~~~
+# Filter rows where Kit Manufacturer is exactly 'Errea'
+errea_rows = df[df['Kit Manufacturer'] == 'Errea']
+
+# Extract the Year column for these rows
+years = errea_rows['Year']
+
+# Function to parse a year range string and compute the number of years covered
+def years_covered(year_str):
+    # Handle cases like '2008–' (ongoing) by assuming it goes to the latest year in the data? 
+    # But the question asks for total years Errea manufactured, so we need to count each season.
+    # Since the data lists seasons, we can count each season as one year.
+    # However, some entries span multiple years (e.g., 1997–1999 covers 3 seasons: 1997-98, 1998-99, 1999-2000?).
+    # Actually, in football kits, '1997–1999' typically means two seasons: 1997-98 and 1998-99.
+    # But the safest is to count each distinct season listed.
+    # Since each row is a distinct season or block of seasons, we need to parse the range.
+    if pd.isna(year_str):
+        return 0
+    # Split by '–' (en dash) or '-' (hyphen)
+    parts = year_str.replace('–', '-').split('-')
+    if len(parts) == 2:
+        start = parts[0].strip()
+        end = parts[1].strip()
+        if start.isdigit() and end.isdigit():
+            return int(end) - int(start) + 1
+        elif start.isdigit() and end == '':
+            # Ongoing, assume one season? But we don't know end year.
+            # Since the table goes up to 2013–, and Errea is still manufacturer, we need to know current year.
+            # However, the question likely expects the total number of seasons from the table.
+            # We'll assume each row represents one season, so count 1 for ongoing.
+            return 1
+    # If it's a single year like '1977–1978'? Actually that's a range of two seasons.
+    # But in the table, '1977–1978' is one season (1977-78). So it's one year.
+    # So we should treat each row as one season.
+    # Therefore, we can simply count the number of rows.
+    # However, some rows like '1999–2004' cover multiple seasons.
+    # Let's check the data: '1999–2004' likely means seasons 1999-2000, 2000-2001, 2001-2002, 2002-2003, 2003-2004 -> 5 seasons.
+    # So we need to parse properly.
+    # But the table might list each season separately? Actually, it lists blocks.
+    # For example, '1997–1999' is one row, but it covers two seasons: 1997-98 and 1998-99.
+    # So we need to compute the number of seasons from the range.
+    # Let's implement a more robust parsing.
+    # We'll assume the format is like '1997–1999' meaning start and end years.
+    # The number of seasons is (end - start + 1) if both are years.
+    # For '2008–' we don't know end, so we'll assume it's one season for simplicity, but that might be wrong.
+    # Alternatively, we can count the number of distinct seasons by expanding each range.
+    # But since we don't have the full list of seasons, we'll parse as above.
+    # Let's redo the parsing more carefully.
+
+# Actually, looking at the table, each row represents a kit used for a period.
+# The question: "total years errea manufactured?" likely means total number of seasons (years) for which Errea was the kit manufacturer.
+# We need to sum the duration of each Errea period.
+# Let's parse each year string to get the number of seasons.
+
+def seasons_in_range(year_str):
+    if pd.isna(year_str):
+        return 0
+    # Replace en dash with hyphen
+    year_str = year_str.replace('–', '-')
+    if '-' not in year_str:
+        # Single year? Not in the data, but handle
+        return 1
+    parts = year_str.split('-')
+    start = parts[0].strip()
+    end = parts[1].strip()
+    if not start.isdigit():
+        return 0
+    if end.isdigit():
+        return int(end) - int(start) + 1
+    else:
+        # Ongoing or empty end, assume one season for that row
+        return 1
+
+# Apply to each year in the filtered rows
+total_seasons = years.apply(seasons_in_range).sum()
+
+# Assign the answer
+answer = total_seasons
+~~~
+===================Answer===================
+['16']
+===================Execution Result===================
+22
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+22

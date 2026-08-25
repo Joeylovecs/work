@@ -1,0 +1,66 @@
+===================Title===================
+utah jazz all - time roster
+===================Table===================
+| player | nationality | position | years for jazz | school / club team |
+| adrian dantley | united states | guard - forward | 1979 - 86 | notre dame |
+| brad davis | united states | guard | 1979 - 80 | maryland |
+| darryl dawkins | united states | center | 1987 - 88 | maynard evans hs |
+| paul dawkins | united states | guard | 1979 - 80 | northern illinois |
+| greg deane | united states | guard | 1979 - 80 | utah |
+| james donaldson | united states | center | 1993 , 1994 - 95 | washington state |
+| john drew | united states | guard - forward | 1982 - 85 | gardner - webb |
+| john duren | united states | guard | 1980 - 82 | georgetown |
+===================Question===================
+adrian dantley was on the team the entire time that brad davis was
+===================Text===================
+~~~python~~~
+# Check the years for Adrian Dantley and Brad Davis
+dantley_years = df[df['player'] == 'adrian dantley']['years for jazz'].iloc[0]
+davis_years = df[df['player'] == 'brad davis']['years for jazz'].iloc[0]
+
+# Parse the year ranges
+def parse_years(years_str):
+    # Handle possible multiple ranges (e.g., "1993 , 1994 - 95")
+    parts = years_str.split(',')
+    years = []
+    for part in parts:
+        part = part.strip()
+        if '-' in part:
+            start, end = part.split('-')
+            start = start.strip()
+            end = end.strip()
+            # Convert to full years (assuming 1900s for two-digit years)
+            start_year = int(start) if len(start) == 4 else int('19' + start)
+            end_year = int(end) if len(end) == 4 else int('19' + end)
+            years.extend(range(start_year, end_year + 1))
+        else:
+            year = int(part) if len(part) == 4 else int('19' + part)
+            years.append(year)
+    return set(years)
+
+dantley_set = parse_years(dantley_years)
+davis_set = parse_years(davis_years)
+
+# Check if all years Brad Davis was on the team are within Adrian Dantley's years
+answer = davis_set.issubset(dantley_set)
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

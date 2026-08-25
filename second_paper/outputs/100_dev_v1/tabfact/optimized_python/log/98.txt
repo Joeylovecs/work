@@ -1,0 +1,170 @@
+===================Title===================
+1971 african cup of champions clubs
+===================Table===================
+| team 1 | agg | team 2 | 1st leg | 2nd leg |
+| al - merrikh | 2 - 2 (5 - 4 pen) | tele sc asmara | 2 - 1 | 0 - 1 |
+| abaluhya united | 1 - 3 | great olympics | 0 - 0 | 1 - 3 |
+| asc diaraf | 3 - 4 | stade malien | 3 - 0 | 0 - 4 |
+| maseru united | 3 - 5 | mmm tamatave | 1 - 2 | 2 - 3 |
+| as porto novo | 0 - 3 | victoria club mokanda | 0 - 1 | 0 - 2 |
+| canon yaoundé | 9 - 4 | as solidarité | 7 - 3 | 2 - 1 |
+| espérance | 1 - 0 | al - ahly (benghazi) | 0 - 0 | 1 - 0 |
+| secteur 6 | 1 - 2 | enugu rangers | 1 - 1 | 0 - 1 |
+| young africans | 2 - 0 | lavori publici | 2 - 0 | 0 - 0 |
+===================Question===================
+canon yaoundé scored five more points than their opponent
+===================Text===================
+```json
+{
+    "answer_type": "boolean",
+    "cardinality": "single",
+    "task_type": "verify",
+    "target_columns": ["agg"],
+    "filters": [
+        {
+            "column": "team 1",
+            "op": "=",
+            "value": "canon yaoundé"
+        }
+    ],
+    "operations": ["extract", "compare"],
+    "aggregation": null,
+    "ranking": null,
+    "arithmetic": ["subtraction"],
+    "boolean_polarity": "positive"
+}
+```
+---
+~~~python~~~
+# First, we need to find the row(s) where 'team 1' or 'team 2' is 'canon yaoundé'
+# The claim is about points scored, but the table shows aggregate scores (agg) and individual leg scores.
+# In football, points are not directly given; typically, a win gives 3 points, draw 1, loss 0.
+# However, the claim might be about goals scored. Let's check the context: "scored five more points" likely means goals.
+# But the table shows aggregate scores like "9 - 4" for canon yaoundé vs as solidarité.
+# Let's interpret "points" as goals in this context.
+
+# Extract the row for canon yaoundé
+# It could be in team 1 or team 2 column.
+mask = (df['team 1'] == 'canon yaoundé') | (df['team 2'] == 'canon yaoundé')
+relevant_row = df[mask]
+
+# If no row found, answer is False
+if relevant_row.empty:
+    answer = False
+else:
+    # There should be exactly one row
+    row = relevant_row.iloc[0]
+    
+    # Determine which team is canon yaoundé and which is the opponent
+    if row['team 1'] == 'canon yaoundé':
+        canon_team = 'team 1'
+        opponent_team = 'team 2'
+    else:
+        canon_team = 'team 2'
+        opponent_team = 'team 1'
+    
+    # The aggregate score is in the 'agg' column, e.g., "9 - 4"
+    agg_score = row['agg']
+    # Split by ' - ' and take the first part as goals for team 1, second for team 2
+    # But note: the agg score is always presented as team1_score - team2_score relative to the table order.
+    # So if canon yaoundé is team 1, then the first number is canon's goals, second is opponent's.
+    # If canon yaoundé is team 2, then the first number is opponent's goals, second is canon's.
+    parts = agg_score.split(' - ')
+    # There might be extra info like "(5 - 4 pen)", so we take only the first two numbers before any space or parenthesis.
+    # Actually, the format is like "9 - 4" or "2 - 2 (5 - 4 pen)". We need to extract the numbers before the parenthesis.
+    # Let's split by ' - ' and then take the first part of each.
+    # For "9 - 4", parts[0] is '9', parts[1] is '4'.
+    # For "2 - 2 (5 - 4 pen)", parts[0] is '2', parts[1] is '2 (5'.
+    # We need to extract only the numeric part before any space or parenthesis.
+    import re
+    team1_goals = int(re.split(r'[\s(]', parts[0])[0])
+    team2_goals = int(re.split(r'[\s(]', parts[1])[0])
+    
+    if canon_team == 'team 1':
+        canon_goals = team1_goals
+        opponent_goals = team2_goals
+    else:
+        canon_goals = team2_goals
+        opponent_goals = team1_goals
+    
+    # Check if canon yaoundé scored five more goals than opponent
+    answer = (canon_goals - opponent_goals) == 5
+~~~
+---
+~~~python~~~
+# First, we need to find the row(s) where 'team 1' or 'team 2' is 'canon yaoundé'
+# The claim is about points scored, but the table shows aggregate scores (agg) and individual leg scores.
+# In football, points are not directly given; typically, a win gives 3 points, draw 1, loss 0.
+# However, the claim might be about goals scored. Let's check the context: "scored five more points" likely means goals.
+# But the table shows aggregate scores like "9 - 4" for canon yaoundé vs as solidarité.
+# Let's interpret "points" as goals in this context.
+
+# Extract the row for canon yaoundé
+# It could be in team 1 or team 2 column.
+mask = (df['team 1'] == 'canon yaoundé') | (df['team 2'] == 'canon yaoundé')
+relevant_row = df[mask]
+
+# If no row found, answer is False
+if relevant_row.empty:
+    answer = False
+else:
+    # There should be exactly one row
+    row = relevant_row.iloc[0]
+    
+    # Determine which team is canon yaoundé and which is the opponent
+    if row['team 1'] == 'canon yaoundé':
+        canon_team = 'team 1'
+        opponent_team = 'team 2'
+    else:
+        canon_team = 'team 2'
+        opponent_team = 'team 1'
+    
+    # The aggregate score is in the 'agg' column, e.g., "9 - 4"
+    agg_score = row['agg']
+    # Split by ' - ' and take the first part as goals for team 1, second for team 2
+    # But note: the agg score is always presented as team1_score - team2_score relative to the table order.
+    # So if canon yaoundé is team 1, then the first number is canon's goals, second is opponent's.
+    # If canon yaoundé is team 2, then the first number is opponent's goals, second is canon's.
+    parts = agg_score.split(' - ')
+    # There might be extra info like "(5 - 4 pen)", so we take only the first two numbers before any space or parenthesis.
+    # Actually, the format is like "9 - 4" or "2 - 2 (5 - 4 pen)". We need to extract the numbers before the parenthesis.
+    # Let's split by ' - ' and then take the first part of each.
+    # For "9 - 4", parts[0] is '9', parts[1] is '4'.
+    # For "2 - 2 (5 - 4 pen)", parts[0] is '2', parts[1] is '2 (5'.
+    # We need to extract only the numeric part before any space or parenthesis.
+    import re
+    team1_goals = int(re.split(r'[\s(]', parts[0])[0])
+    team2_goals = int(re.split(r'[\s(]', parts[1])[0])
+    
+    if canon_team == 'team 1':
+        canon_goals = team1_goals
+        opponent_goals = team2_goals
+    else:
+        canon_goals = team2_goals
+        opponent_goals = team1_goals
+    
+    # Extract the difference in goals
+    goal_difference = canon_goals - opponent_goals
+    # Check if canon yaoundé scored five more goals than opponent
+    answer = goal_difference == 5
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "extract", "actual": ["filter", "compare", "arithmetic"], "evidence": ["filter:team 1 = 'canon yaoundé'", "column_access:team 1", "filter:team 2 = 'canon yaoundé'", "column_access:team 2", "dynamic_column_access", "filter:team 1 = 'canon yaoundé'", "column_access:team 1", "column_access:agg", "scalar_compare:canon_team == 'team 1'", "scalar_compare:canon_goals - opponent_goals == 5"], "confidence": 0.93, "repair_hint": "Add the missing extract operation before returning the answer."}, {"level": "OPERATOR", "error_type": "ARITHMETIC_ERROR", "expected": ["subtraction"], "actual": "difference", "evidence": ["filter:team 1 = 'canon yaoundé'", "column_access:team 1", "filter:team 2 = 'canon yaoundé'", "column_access:team 2", "dynamic_column_access", "filter:team 1 = 'canon yaoundé'", "column_access:team 1", "column_access:agg", "scalar_compare:canon_team == 'team 1'", "scalar_compare:canon_goals - opponent_goals == 5"], "confidence": 0.94, "repair_hint": "Use the requested arithmetic operation and sign."}], "confidence": 0.93}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "extract", "actual": ["filter", "compare", "arithmetic"], "evidence": ["filter:team 1 = 'canon yaoundé'", "column_access:team 1", "filter:team 2 = 'canon yaoundé'", "column_access:team 2", "dynamic_column_access", "filter:team 1 = 'canon yaoundé'", "column_access:team 1", "column_access:agg", "scalar_compare:canon_team == 'team 1'", "scalar_compare:canon_goals - opponent_goals == 5"], "confidence": 0.93, "repair_hint": "Add the missing extract operation before returning the answer."}, {"level": "OPERATOR", "error_type": "ARITHMETIC_ERROR", "expected": ["subtraction"], "actual": "difference", "evidence": ["filter:team 1 = 'canon yaoundé'", "column_access:team 1", "filter:team 2 = 'canon yaoundé'", "column_access:team 2", "dynamic_column_access", "filter:team 1 = 'canon yaoundé'", "column_access:team 1", "column_access:agg", "scalar_compare:canon_team == 'team 1'", "scalar_compare:canon_goals - opponent_goals == 5"], "confidence": 0.94, "repair_hint": "Use the requested arithmetic operation and sign."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Add the missing extract operation before returning the answer. Use the requested arithmetic operation and sign.", "confidence": 0.93, "mode": "hybrid"}
+===================Repair Hint===================
+Add the missing extract operation before returning the answer. Use the requested arithmetic operation and sign.
+===================Repair Trace===================
+[{"kind": "semantic", "repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "extract", "actual": ["filter", "compare", "arithmetic"], "evidence": ["filter:team 1 = 'canon yaoundé'", "column_access:team 1", "filter:team 2 = 'canon yaoundé'", "column_access:team 2", "dynamic_column_access", "filter:team 1 = 'canon yaoundé'", "column_access:team 1", "column_access:agg", "scalar_compare:canon_team == 'team 1'", "scalar_compare:canon_goals - opponent_goals == 5"], "confidence": 0.93, "repair_hint": "Add the missing extract operation before returning the answer."}, {"level": "OPERATOR", "error_type": "ARITHMETIC_ERROR", "expected": ["subtraction"], "actual": "difference", "evidence": ["filter:team 1 = 'canon yaoundé'", "column_access:team 1", "filter:team 2 = 'canon yaoundé'", "column_access:team 2", "dynamic_column_access", "filter:team 1 = 'canon yaoundé'", "column_access:team 1", "column_access:agg", "scalar_compare:canon_team == 'team 1'", "scalar_compare:canon_goals - opponent_goals == 5"], "confidence": 0.94, "repair_hint": "Use the requested arithmetic operation and sign."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Add the missing extract operation before returning the answer. Use the requested arithmetic operation and sign.", "confidence": 0.93, "mode": "hybrid"}, "repaired_code": "# First, we need to find the row(s) where 'team 1' or 'team 2' is 'canon yaoundé'\n# The claim is about points scored, but the table shows aggregate scores (agg) and individual leg scores.\n# In football, points are not directly given; typically, a win gives 3 points, draw 1, loss 0.\n# However, the claim might be about goals scored. Let's check the context: \"scored five more points\" likely means goals.\n# But the table shows aggregate scores like \"9 - 4\" for canon yaoundé vs as solidarité.\n# Let's interpret \"points\" as goals in this context.\n\n# Extract the row for canon yaoundé\n# It could be in team 1 or team 2 column.\nmask = (df['team 1'] == 'canon yaoundé') | (df['team 2'] == 'canon yaoundé')\nrelevant_row = df[mask]\n\n# If no row found, answer is False\nif relevant_row.empty:\n    answer = False\nelse:\n    # There should be exactly one row\n    row = relevant_row.iloc[0]\n    \n    # Determine which team is canon yaoundé and which is the opponent\n    if row['team 1'] == 'canon yaoundé':\n        canon_team = 'team 1'\n        opponent_team = 'team 2'\n    else:\n        canon_team = 'team 2'\n        opponent_team = 'team 1'\n    \n    # The aggregate score is in the 'agg' column, e.g., \"9 - 4\"\n    agg_score = row['agg']\n    # Split by ' - ' and take the first part as goals for team 1, second for team 2\n    # But note: the agg score is always presented as team1_score - team2_score relative to the table order.\n    # So if canon yaoundé is team 1, then the first number is canon's goals, second is opponent's.\n    # If canon yaoundé is team 2, then the first number is opponent's goals, second is canon's.\n    parts = agg_score.split(' - ')\n    # There might be extra info like \"(5 - 4 pen)\", so we take only the first two numbers before any space or parenthesis.\n    # Actually, the format is like \"9 - 4\" or \"2 - 2 (5 - 4 pen)\". We need to extract the numbers before the parenthesis.\n    # Let's split by ' - ' and then take the first part of each.\n    # For \"9 - 4\", parts[0] is '9', parts[1] is '4'.\n    # For \"2 - 2 (5 - 4 pen)\", parts[0] is '2', parts[1] is '2 (5'.\n    # We need to extract only the numeric part before any space or parenthesis.\n    import re\n    team1_goals = int(re.split(r'[\\s(]', parts[0])[0])\n    team2_goals = int(re.split(r'[\\s(]', parts[1])[0])\n    \n    if canon_team == 'team 1':\n        canon_goals = team1_goals\n        opponent_goals = team2_goals\n    else:\n        canon_goals = team2_goals\n        opponent_goals = team1_goals\n    \n    # Extract the difference in goals\n    goal_difference = canon_goals - opponent_goals\n    # Check if canon yaoundé scored five more goals than opponent\n    answer = goal_difference == 5", "execution": {"success": true, "error": null, "result": false, "observed_output_type": "boolean", "observed_value": false, "evidence": {"final_object_type": "boolean", "final_value": false, "dataframes": [{"name": "df", "shape": [9, 5], "columns": ["team 1", "agg", "team 2", "1st leg", "2nd leg"]}, {"name": "relevant_row", "shape": [0, 5], "columns": ["team 1", "agg", "team 2", "1st leg", "2nd leg"]}], "operation_trace": [{"operation": "input_table", "name": "df", "rows": 9, "columns": ["team 1", "agg", "team 2", "1st leg", "2nd leg"]}, {"operation": "series_state", "name": "mask", "length": 9, "column": null}, {"operation": "filter", "name": "relevant_row", "rows_before": 9, "rows_after": 0, "columns": ["team 1", "agg", "team 2", "1st leg", "2nd leg"]}, {"operation": "return", "output_type": "boolean", "value": false}], "semantic_warnings": ["empty_intermediate_dataframe"], "stdout": "", "latency_seconds": 0.001216122880578041}, "memory": {}}, "candidate_audit": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "extract", "actual": ["filter", "compare", "arithmetic"], "evidence": ["filter:team 1 = 'canon yaoundé'", "column_access:team 1", "filter:team 2 = 'canon yaoundé'", "column_access:team 2", "dynamic_column_access", "filter:team 1 = 'canon yaoundé'", "column_access:team 1", "column_access:agg", "scalar_compare:canon_team == 'team 1'", "scalar_compare:goal_difference == 5"], "confidence": 0.93, "repair_hint": "Add the missing extract operation before returning the answer."}, {"level": "OPERATOR", "error_type": "ARITHMETIC_ERROR", "expected": ["subtraction"], "actual": "difference", "evidence": ["filter:team 1 = 'canon yaoundé'", "column_access:team 1", "filter:team 2 = 'canon yaoundé'", "column_access:team 2", "dynamic_column_access", "filter:team 1 = 'canon yaoundé'", "column_access:team 1", "column_access:agg", "scalar_compare:canon_team == 'team 1'", "scalar_compare:goal_difference == 5"], "confidence": 0.94, "repair_hint": "Use the requested arithmetic operation and sign."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Add the missing extract operation before returning the answer. Use the requested arithmetic operation and sign.", "confidence": 0.93, "mode": "hybrid"}, "candidate_error_count": 2, "previous_error_count": 2, "answer_changed": false, "safe_change": false, "accepted": false, "rejection_reason": "no_verified_improvement"}]
+===================Final Answer===================
+False

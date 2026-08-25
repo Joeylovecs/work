@@ -1,0 +1,78 @@
+===================Title===================
+utah jazz all - time roster
+===================Table===================
+| player | nationality | position | years for jazz | school / club team |
+| adrian dantley | united states | guard - forward | 1979 - 86 | notre dame |
+| brad davis | united states | guard | 1979 - 80 | maryland |
+| darryl dawkins | united states | center | 1987 - 88 | maynard evans hs |
+| paul dawkins | united states | guard | 1979 - 80 | northern illinois |
+| greg deane | united states | guard | 1979 - 80 | utah |
+| james donaldson | united states | center | 1993 , 1994 - 95 | washington state |
+| john drew | united states | guard - forward | 1982 - 85 | gardner - webb |
+| john duren | united states | guard | 1980 - 82 | georgetown |
+===================Question===================
+james donaldson had two stints on the jazz 's roster , totaling five years in total
+in the table:
+james donaldson had 1 stints on the jazz 's roster.
+james donaldson had 1993 years in total.
+===================Text===================
+~~~python~~~
+# Extract the row for james donaldson
+donaldson_row = df[df['player'] == 'james donaldson']
+
+# Check if the row exists
+if donaldson_row.empty:
+    answer = False
+else:
+    # Get the 'years for jazz' value
+    years_str = donaldson_row['years for jazz'].iloc[0]
+    
+    # Count the number of stints: split by commas and count distinct year ranges
+    # The value is "1993 , 1994 - 95", which indicates two stints: one in 1993 and one from 1994-95
+    parts = [part.strip() for part in years_str.split(',')]
+    num_stints = len(parts)
+    
+    # Calculate total years: parse each part
+    total_years = 0
+    for part in parts:
+        if '-' in part:
+            # Range like "1994 - 95"
+            start_end = part.split('-')
+            start = start_end[0].strip()
+            end = start_end[1].strip()
+            # Convert end year to full year (assuming same century as start)
+            if len(end) == 2:
+                start_century = start[:2]
+                end = start_century + end
+            start_year = int(start)
+            end_year = int(end)
+            total_years += (end_year - start_year + 1)
+        else:
+            # Single year like "1993"
+            total_years += 1
+    
+    # Check the claim: two stints and totaling five years
+    claim_stints = 2
+    claim_total_years = 5
+    answer = (num_stints == claim_stints) and (total_years == claim_total_years)
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

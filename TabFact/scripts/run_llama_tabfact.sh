@@ -1,0 +1,62 @@
+#!/bin/bash
+# ============================================================
+# Llama-3.1-8B 跑 TabFact 测试集 (tabfact.json)
+# ============================================================
+# 用途: 在测试集上评估Llama模型
+# 输出: output/llama_tabfact/result.jsonl
+
+# ======== 模型路径配置 ========
+# Llama-3.1-8B-Instruct 模型路径
+MODEL_PATH="/data/amax/home/E23101002/wangjie/Llama-3.1-8B-Instruct"
+
+# ======== 参数配置 ========
+RESUME=${1:-0}           # 起始索引，可通过命令行参数传入
+STOP_AT=${2:-1e6}        # 结束索引，可通过命令行参数传入
+
+# ======== Provider 配置 ========
+# 可选: huggingface 或 vllm
+PROVIDER=${PROVIDER:-huggingface}
+
+# ======== GPU配置 ========
+export CUDA_VISIBLE_DEVICES=0,1
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+# ======== 切换到项目根目录 ========
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+cd "$ROOT_DIR" || exit 1
+
+# ======== 系统提示设置 ========
+SYSTEM_PROMPT="You are a helpful assistant. Follow the requested step-by-step format and end with Final Answer only."
+
+echo "========================================="
+echo "Llama-3.1-8B 跑 TabFact 测试集"
+echo "========================================="
+echo "模型路径: $MODEL_PATH"
+echo "Provider: $PROVIDER"
+echo "数据集: tabfact (TabFact测试集)"
+echo "处理范围: $RESUME 到 $STOP_AT"
+echo "输出目录: output/llama_tabfact"
+echo "========================================="
+
+python run_cot.py \
+    --model "$MODEL_PATH" \
+    --long_model "$MODEL_PATH" \
+    --provider "$PROVIDER" \
+    --system "$SYSTEM_PROMPT" \
+    --dataset tabfact \
+    --sub_sample False \
+    --perturbation none \
+    --norm True \
+    --disable_resort True \
+    --norm_cache True \
+    --resume $RESUME \
+    --stop_at $STOP_AT \
+    --self_consistency 1 \
+    --temperature 0.8 \
+    --use_strict_format True \
+    --enable_thinking=False \
+    --log_dir output/llama_tabfact \
+    --cache_dir cache/llama
+
+echo "完成! 结果保存在 output/llama_tabfact/result.jsonl"

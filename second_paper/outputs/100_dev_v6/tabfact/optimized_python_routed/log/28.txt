@@ -1,0 +1,71 @@
+===================Title===================
+lukáš melich
+===================Table===================
+| year | competition | venue | position | notes |
+| 1998 | world junior championships | annecy , france | 10th | 61.51 m |
+| 1999 | european junior championships | riga , latvia | 5th | 64.20 m |
+| 2001 | european u23 championships | amsterdam , netherlands | 11th | 66.41 m |
+| 2003 | universiade | daegu , south korea | 4th | 71.26 m |
+| 2005 | world championships | helsinki , finland | 14th | 74.53 m |
+| 2006 | european championships | gothenburg , sweden | 15th | 73.77 m |
+| 2008 | olympic games | beijing , pr china | 29th | 70.56 m |
+| 2009 | world championships | berlin , germany | 14th | 74.47 m |
+| 2012 | olympic games | london , great britain | 6th | 77.17 m |
+| 2013 | world championships | moscow , russia | 3rd | 79.36 m |
+===================Question===================
+lukáš melich completed in the olympic games two times
+in the table:
+lukáš melich completed in the olympic games 2 times.
+===================Text===================
+```json
+{
+    "answer_type": "boolean",
+    "cardinality": "single",
+    "task_type": "verification",
+    "target_columns": ["competition"],
+    "filters": [{"column": "competition", "op": "=", "value": "olympic games"}],
+    "operations": ["count"],
+    "aggregation": "count",
+    "ranking": null,
+    "arithmetic": null,
+    "boolean_polarity": "positive"
+}
+```
+---
+~~~python~~~
+# Filter rows where competition contains "olympic games"
+olympic_rows = df[df['competition'].str.contains('olympic games', case=False, na=False)]
+# Count the number of unique years for Olympic Games entries
+olympic_count = olympic_rows['year'].nunique()
+# Check if the count equals 2
+answer = (olympic_count == 2)
+~~~
+---
+~~~python~~~
+# Filter rows where competition contains "olympic games"
+olympic_rows = df[df['competition'].str.contains('olympic games', case=False, na=False)]
+# Count the number of rows for Olympic Games entries
+olympic_count = olympic_rows.shape[0]
+# Check if the count equals 2
+answer = (olympic_count == 2)
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"kind": "semantic", "repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "count", "actual": ["filter", "aggregate", "compare"], "evidence": ["filter:competition contains 'olympic games'", "column_access:competition", "aggregation:count_distinct", "column_access:year", "scalar_compare:olympic_count == 2"], "confidence": 0.93, "repair_hint": "Add the missing count operation before returning the answer."}, {"level": "OPERATOR", "error_type": "WRONG_AGGREGATION", "expected": "count", "actual": "count_distinct", "evidence": ["filter:competition contains 'olympic games'", "column_access:competition", "aggregation:count_distinct", "column_access:year", "scalar_compare:olympic_count == 2"], "confidence": 0.98, "repair_hint": "Use count rather than count_distinct."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Add the missing count operation before returning the answer. Use count rather than count_distinct.", "confidence": 0.93, "mode": "hybrid"}, "repaired_code": "# Filter rows where competition contains \"olympic games\"\nolympic_rows = df[df['competition'].str.contains('olympic games', case=False, na=False)]\n# Count the number of rows for Olympic Games entries\nolympic_count = olympic_rows.shape[0]\n# Check if the count equals 2\nanswer = (olympic_count == 2)", "execution": {"success": true, "error": null, "result": true, "observed_output_type": "boolean", "observed_value": true, "evidence": {"final_object_type": "boolean", "final_value": true, "dataframes": [{"name": "df", "shape": [10, 5], "columns": ["year", "competition", "venue", "position", "notes"]}, {"name": "olympic_rows", "shape": [2, 5], "columns": ["year", "competition", "venue", "position", "notes"]}], "operation_trace": [{"operation": "input_table", "name": "df", "rows": 10, "columns": ["year", "competition", "venue", "position", "notes"]}, {"operation": "filter", "name": "olympic_rows", "rows_before": 10, "rows_after": 2, "columns": ["year", "competition", "venue", "position", "notes"]}, {"operation": "return", "output_type": "boolean", "value": true}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.0004700375720858574}, "memory": {}}, "candidate_audit": {"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}, "candidate_error_count": 0, "previous_error_count": 2, "answer_changed": false, "safe_change": true, "accepted": true}]
+===================Final Answer===================
+True

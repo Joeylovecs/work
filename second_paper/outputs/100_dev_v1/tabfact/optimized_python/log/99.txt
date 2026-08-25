@@ -1,0 +1,76 @@
+===================Title===================
+1971 african cup of champions clubs
+===================Table===================
+| team 1 | agg | team 2 | 1st leg | 2nd leg |
+| al - merrikh | 2 - 2 (5 - 4 pen) | tele sc asmara | 2 - 1 | 0 - 1 |
+| abaluhya united | 1 - 3 | great olympics | 0 - 0 | 1 - 3 |
+| asc diaraf | 3 - 4 | stade malien | 3 - 0 | 0 - 4 |
+| maseru united | 3 - 5 | mmm tamatave | 1 - 2 | 2 - 3 |
+| as porto novo | 0 - 3 | victoria club mokanda | 0 - 1 | 0 - 2 |
+| canon yaoundé | 9 - 4 | as solidarité | 7 - 3 | 2 - 1 |
+| espérance | 1 - 0 | al - ahly (benghazi) | 0 - 0 | 1 - 0 |
+| secteur 6 | 1 - 2 | enugu rangers | 1 - 1 | 0 - 1 |
+| young africans | 2 - 0 | lavori publici | 2 - 0 | 0 - 0 |
+===================Question===================
+asc diaraf won against stade malien in the 1971 african cup of champions clubs
+===================Text===================
+~~~python~~~
+# Check the row where team 1 is "asc diaraf" and team 2 is "stade malien"
+match_row = df[(df['team 1'] == 'asc diaraf') & (df['team 2'] == 'stade malien')]
+
+if match_row.empty:
+    answer = False
+else:
+    # Extract the aggregate score
+    agg_score = match_row['agg'].iloc[0]
+    # Parse the aggregate score to determine the winner
+    # The format is "goals_team1 - goals_team2" possibly with extra info in parentheses
+    # Split by space to get the score part before any parentheses
+    score_part = agg_score.split()[0]
+    team1_goals, team2_goals = map(int, score_part.split('-'))
+    # Determine if asc diaraf (team 1) won (more goals)
+    answer = team1_goals > team2_goals
+~~~
+---
+~~~python~~~
+# Check the row where team 1 is "asc diaraf" and team 2 is "stade malien"
+match_row = df[(df['team 1'] == 'asc diaraf') & (df['team 2'] == 'stade malien')]
+
+if match_row.empty:
+    answer = False
+else:
+    # Extract the aggregate score
+    agg_score = match_row['agg'].iloc[0]
+    # Parse the aggregate score to determine the winner
+    # The format is "goals_team1 - goals_team2" possibly with extra info in parentheses
+    # Split by space to get the score part before any parentheses
+    score_part = agg_score.split()[0]
+    # Ensure we have exactly two parts separated by '-'
+    if '-' in score_part:
+        team1_goals, team2_goals = map(int, score_part.split('-'))
+        # Determine if asc diaraf (team 1) won (more goals)
+        answer = team1_goals > team2_goals
+    else:
+        # If no '-' found, assume no valid score and asc diaraf did not win
+        answer = False
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"kind": "execution", "repair_count": 1, "execution_error": "ValueError: not enough values to unpack (expected 2, got 1)", "repaired_code": "# Check the row where team 1 is \"asc diaraf\" and team 2 is \"stade malien\"\nmatch_row = df[(df['team 1'] == 'asc diaraf') & (df['team 2'] == 'stade malien')]\n\nif match_row.empty:\n    answer = False\nelse:\n    # Extract the aggregate score\n    agg_score = match_row['agg'].iloc[0]\n    # Parse the aggregate score to determine the winner\n    # The format is \"goals_team1 - goals_team2\" possibly with extra info in parentheses\n    # Split by space to get the score part before any parentheses\n    score_part = agg_score.split()[0]\n    # Ensure we have exactly two parts separated by '-'\n    if '-' in score_part:\n        team1_goals, team2_goals = map(int, score_part.split('-'))\n        # Determine if asc diaraf (team 1) won (more goals)\n        answer = team1_goals > team2_goals\n    else:\n        # If no '-' found, assume no valid score and asc diaraf did not win\n        answer = False", "execution": {"success": true, "error": null, "result": false, "observed_output_type": "boolean", "observed_value": false, "evidence": {"final_object_type": "boolean", "final_value": false, "dataframes": [{"name": "df", "shape": [9, 5], "columns": ["team 1", "agg", "team 2", "1st leg", "2nd leg"]}, {"name": "match_row", "shape": [1, 5], "columns": ["team 1", "agg", "team 2", "1st leg", "2nd leg"]}], "operation_trace": [{"operation": "input_table", "name": "df", "rows": 9, "columns": ["team 1", "agg", "team 2", "1st leg", "2nd leg"]}, {"operation": "filter", "name": "match_row", "rows_before": 9, "rows_after": 1, "columns": ["team 1", "agg", "team 2", "1st leg", "2nd leg"]}, {"operation": "return", "output_type": "boolean", "value": false}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.001139993779361248}, "memory": {}}, "accepted": true}]
+===================Final Answer===================
+False

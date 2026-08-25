@@ -1,0 +1,74 @@
+===================Title===================
+list of ngc objects (5001 - 6000)
+===================Table===================
+| ngc number | object type | constellation | right ascension ( j2000 ) | declination ( j2000 ) | apparent magnitude |
+| 5408 | irregular galaxy | centaurus | 14h03 m21.0s |  degree22′44″ | 14.0 |
+| 5457 | spiral galaxy | ursa major | 14h03 m12.5s |  degree20′53″ | 8.7 |
+| 5466 | globular cluster | boötes | 14h05 m27.4s |  degree32′04″ | 10.5 |
+| 5474 | spiral galaxy | ursa major | 14h05 m01.5s |  degree39′45″ | 11.9 |
+| 5477 | irregular galaxy | ursa major | 14h05 m33.1s |  degree27′40″ | 14.5 |
+===================Question===================
+irregular galaxy is the object type having 2.1 more apparent magnitude than globular galaxy
+===================Text===================
+~~~python~~~
+# First, we need to check if there is any "irregular galaxy" and "globular galaxy" in the 'object type' column.
+# However, note that the table schema shows "globular cluster", not "globular galaxy". 
+# The question says "globular galaxy", but in the table, the type is "globular cluster". 
+# We must use the exact column values from df. So we look for "globular cluster" as the closest match.
+# But the statement says "globular galaxy", which might be a mistake. Since we must use exact column names and cell values, 
+# we should check if "globular galaxy" exists in df['object type']. If not, then the statement cannot be true.
+
+# Let's check unique object types in df
+unique_types = df['object type'].unique()
+# If "globular galaxy" is not present, then there is no such object type, so the statement is false.
+# However, the statement might be referring to "globular cluster" as "globular galaxy". 
+# But the instruction says: "Use exact column names and cell values from df." 
+# So we should not assume synonyms. We'll check for "globular galaxy" exactly.
+
+# Check if "globular galaxy" exists in the dataframe
+if 'globular galaxy' in df['object type'].values:
+    # If it exists, then we proceed to compare with "irregular galaxy"
+    # Get the apparent magnitude values for each type
+    irregular_magnitudes = df[df['object type'] == 'irregular galaxy']['apparent magnitude']
+    globular_galaxy_magnitudes = df[df['object type'] == 'globular galaxy']['apparent magnitude']
+    
+    # The statement says: "irregular galaxy is the object type having 2.1 more apparent magnitude than globular galaxy"
+    # This is an existential claim: there exists at least one irregular galaxy and at least one globular galaxy 
+    # such that the irregular galaxy's magnitude is exactly 2.1 more than the globular galaxy's magnitude.
+    # We need to check if there is any pair (irregular, globular) where irregular_mag = globular_mag + 2.1
+    
+    # We'll create a cross product of magnitudes and check the condition
+    condition_met = False
+    for irr_mag in irregular_magnitudes:
+        for glob_mag in globular_galaxy_magnitudes:
+            if irr_mag == glob_mag + 2.1:
+                condition_met = True
+                break
+        if condition_met:
+            break
+    
+    answer = condition_met
+else:
+    # "globular galaxy" does not exist in the table, so the statement cannot be true.
+    answer = False
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

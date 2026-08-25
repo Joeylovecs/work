@@ -1,0 +1,72 @@
+===================Title===================
+Cheltenham Town F.C.
+===================Table===================
+| Year | Kit Manufacturer | Shirt Sponsor | Back of Shirt Sponsor | Short Sponsor |
+| 1977–1978 |  | National Express |  |  |
+| 1982–1985 | Umbro |  |  |  |
+| 1985–1986 | Umbro | Whitbread |  |  |
+| 1986–1988 | Henson | Duraflex |  |  |
+| 1988–1989 |  | Gulf Oil |  |  |
+| 1991–1993 | Technik | Gulf Oil |  |  |
+| 1993–1994 | Club Sport | Gulf Oil |  |  |
+| 1994–1995 | Klūb Sport | Empress |  |  |
+| 1995–1996 | Matchwinner | Empress |  |  |
+| 1996–1997 | UK | Endsleigh Insurance |  |  |
+| 1997–1999 | Errea | Endsleigh Insurance |  |  |
+| 1999–2004 | Errea | Towergate Insurance |  |  |
+| 2004–2008 | Errea | Bence Building Merchants |  |  |
+| 2008– | Errea | Mira Showers |  |  |
+| 2009–2011 | Errea | Mira Showers | PSU Technology Group |  |
+| 2011–2013 | Errea | Mira Showers | Barr Stadia | Gloucestershire Echo |
+| 2013– | Errea | Mira Showers | Gloucestershire College | Gloucestershire Echo |
+===================Question===================
+which kit manufacturer came next after umbro?
+===================Text===================
+~~~python~~~
+# Find the rows where Kit Manufacturer is 'Umbro'
+umbro_rows = df[df['Kit Manufacturer'] == 'Umbro']
+
+# Get the years for these rows, assuming Year is a string column
+# We need to find the earliest year after the Umbro years.
+# First, get all unique years from the table as strings, but we need to sort them.
+# Since the years are in format like "1977–1978", we can extract the start year for sorting.
+df['Start Year'] = df['Year'].str.split('–').str[0].astype(int)
+
+# Sort the dataframe by Start Year
+df_sorted = df.sort_values('Start Year')
+
+# Find the index positions of Umbro rows in the sorted dataframe
+umbro_indices = df_sorted[df_sorted['Kit Manufacturer'] == 'Umbro'].index
+
+# The last Umbro row index
+last_umbro_idx = umbro_indices[-1]
+
+# The next row after the last Umbro row
+next_row_idx = df_sorted.index[df_sorted.index.get_loc(last_umbro_idx) + 1]
+
+# Get the Kit Manufacturer of that next row
+next_kit_manufacturer = df_sorted.loc[next_row_idx, 'Kit Manufacturer']
+
+# Assign the answer
+answer = next_kit_manufacturer
+~~~
+===================Answer===================
+['Henson']
+===================Execution Result===================
+"Henson"
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+Henson

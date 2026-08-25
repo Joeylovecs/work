@@ -1,0 +1,123 @@
+===================Title===================
+1991 toronto blue jays season
+===================Table===================
+| date | opponent | score | loss | attendance | record |
+| may 1 | rangers | 3 - 0 | key (4 - 1) | 33439 | 12 - 10 |
+| may 2 | royals | 3 - 1 | appier (1 - 4) | 22896 | 13 - 10 |
+| may 3 | royals | 5 - 1 | davis (2 - 2) | 20809 | 14 - 10 |
+| may 4 | royals | 6 - 5 | boucher (0 - 2) | 22628 | 14 - 11 |
+| may 5 | royals | 3 - 0 | gordon (1 - 2) | 22588 | 15 - 11 |
+| may 7 | rangers | 3 - 2 | key (4 - 2) | 44622 | 15 - 12 |
+| may 8 | rangers | 4 - 2 | ryan (3 - 3) | 43211 | 16 - 12 |
+| may 9 | white sox | 2 - 0 | pãrez (1 - 2) | 47236 | 17 - 12 |
+| may 10 | white sox | 5 - 3 (12) | fraser (0 - 1) | 50198 | 17 - 13 |
+| may 11 | white sox | 5 - 2 | hough (0 - 2) | 50206 | 18 - 13 |
+| may 12 | white sox | 4 - 2 | hibbard (2 - 1) | 50108 | 19 - 13 |
+| may 13 | royals | 4 - 2 | davis (2 - 4) | 44275 | 20 - 13 |
+| may 14 | royals | 4 - 1 | gubicza (0 - 1) | 43357 | 21 - 13 |
+| may 15 | royals | 6 - 4 | boucher (0 - 3) | 50113 | 21 - 14 |
+| may 17 | white sox | 5 - 3 | timlin (3 - 1) | 30095 | 21 - 15 |
+| may 18 | white sox | 9 - 2 | hibbard (2 - 2) | 34861 | 22 - 15 |
+| may 19 | white sox | 5 - 4 | timlin (3 - 2) | 41015 | 22 - 16 |
+| may 20 | athletics | 1 - 0 | welch (4 - 3) | 24631 | 23 - 16 |
+| may 21 | athletics | 11 - 7 | dressendorfer (3 - 3) | 22738 | 24 - 16 |
+| may 22 | athletics | 2 - 1 | stieb (4 - 3) | 34028 | 24 - 17 |
+| may 24 | angels | 3 - 2 | finley (7 - 2) | 26408 | 25 - 17 |
+| may 25 | angels | 5 - 0 | stottlemyre (5 - 1) | 36732 | 25 - 18 |
+| may 26 | angels | 6 - 2 | wells (5 - 4) | 45307 | 25 - 19 |
+| may 28 | athletics | 8 - 4 | acker (1 - 2) | 50299 | 25 - 20 |
+| may 29 | athletics | 8 - 3 | slusarski (1 - 2) | 50262 | 26 - 20 |
+| may 30 | athletics | 8 - 6 | ward (0 - 2) | 50271 | 26 - 21 |
+| may 31 | angels | 5 - 1 | langston (6 - 2) | 50252 | 27 - 21 |
+===================Question===================
+the toronto blue jays lost three consecutive games between the 25th and the 28th may 1991
+in the table:
+the toronto blue jays lost 3 consecutive games between the 25th and the 28th may 1991.
+===================Text===================
+~~~python~~~
+# Filter rows for dates between May 25 and May 28 inclusive
+# The date column appears to be in format like "may 25", "may 28"
+# We'll convert to datetime for proper comparison, but note year is 1991
+df['date_dt'] = pd.to_datetime(df['date'] + ' 1991', format='%b %d %Y')
+start_date = pd.to_datetime('may 25 1991', format='%b %d %Y')
+end_date = pd.to_datetime('may 28 1991', format='%b %d %Y')
+mask = (df['date_dt'] >= start_date) & (df['date_dt'] <= end_date)
+period_df = df.loc[mask].copy()
+
+# Determine if the Blue Jays lost each game
+# The 'loss' column shows the losing pitcher; if Blue Jays lost, the pitcher name is in parentheses.
+# But the table shows the Blue Jays' record after each game.
+# We can infer loss by checking if the record's losses increased compared to previous row.
+# However, simpler: The 'loss' column format: "pitcher (W-L)" where pitcher is from the losing team.
+# If the Blue Jays lost, the pitcher is a Blue Jays pitcher.
+# From the table, Blue Jays pitchers include: key, appier, davis, boucher, gordon, pãrez, fraser, hough, hibbard, gubicza, timlin, welch, dressendorfer, stieb, finley, stottlemyre, wells, acker, slusarski, ward, langston.
+# We'll check if the 'loss' column contains a Blue Jays pitcher name.
+# But we need to be careful: the 'loss' column may have opponent pitcher if Blue Jays won.
+# Actually, the 'loss' column always shows the losing pitcher, so if Blue Jays lost, the pitcher is a Blue Jays pitcher.
+# So we can check if the pitcher is one of the known Blue Jays pitchers.
+# Let's extract the pitcher name (part before '(').
+period_df['loss_pitcher'] = period_df['loss'].str.split('(').str[0].str.strip()
+
+# Known Blue Jays pitchers from the table (list from observed values)
+blue_jays_pitchers = {'key', 'appier', 'davis', 'boucher', 'gordon', 'pãrez', 'fraser', 'hough', 'hibbard', 'gubicza', 'timlin', 'welch', 'dressendorfer', 'stieb', 'finley', 'stottlemyre', 'wells', 'acker', 'slusarski', 'ward', 'langston'}
+
+# Determine if Blue Jays lost
+period_df['blue_jays_lost'] = period_df['loss_pitcher'].isin(blue_jays_pitchers)
+
+# Check for three consecutive losses
+# We need to see if there is a sequence of at least three consecutive True in 'blue_jays_lost'
+# Since we are only looking at the period May 25-28, we need to see if there are three games in that period and all are losses.
+# Let's list the games in order:
+# From the table, May 25: angels, 5 - 0, loss: stottlemyre (5 - 1) -> Blue Jays lost (stottlemyre is Blue Jays)
+# May 26: angels, 6 - 2, loss: wells (5 - 4) -> Blue Jays lost
+# May 28: athletics, 8 - 4, loss: acker (1 - 2) -> Blue Jays lost
+# May 27? There is no May 27 in the table, so only three games in the period.
+# So we have exactly three games and all are losses.
+# Let's verify programmatically:
+games_in_period = period_df.shape[0]
+if games_in_period == 3:
+    # Check if all three are losses
+    answer = period_df['blue_jays_lost'].all()
+else:
+    # If not exactly three games, we need to check if there is a subsequence of three consecutive losses
+    # But the claim says "between the 25th and the 28th may 1991", inclusive, and there are three games.
+    # So we can just check if all three are losses.
+    # However, to be general, we'll check for three consecutive losses in the period.
+    # Since the period is short, we can check if there exists a run of three consecutive True.
+    # But the period may have more than three games? In this table, it's exactly three.
+    # Let's compute the maximum consecutive losses in the period.
+    # We'll use a loop over the sorted period_df by date.
+    period_df_sorted = period_df.sort_values('date_dt')
+    max_consecutive = 0
+    current = 0
+    for lost in period_df_sorted['blue_jays_lost']:
+        if lost:
+            current += 1
+            max_consecutive = max(max_consecutive, current)
+        else:
+            current = 0
+    answer = max_consecutive >= 3
+
+# Clean up temporary columns
+df.drop(columns=['date_dt'], inplace=True, errors='ignore')
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

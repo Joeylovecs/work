@@ -1,0 +1,104 @@
+===================Title===================
+nbc sunday night football results (2006 - present)
+===================Table===================
+| date | visiting team | final score | host team | stadium |
+| september 7 | miami dolphins | 17 - 28 | pittsburgh steelers | heinz field |
+| september 10 | indianapolis colts | 26 - 21 | new york giants | giants stadium |
+| september 17 | washington redskins | 10 - 27 | dallas cowboys | texas stadium |
+| september 24 | denver broncos | 17 - 7 | new england patriots | gillette stadium |
+| october 1 | seattle seahawks | 6 - 37 | chicago bears | soldier field |
+| october 8 | pittsburgh steelers | 13 - 23 | san diego chargers | qualcomm stadium |
+| october 15 | oakland raiders | 3 - 13 | denver broncos | invesco field at mile high |
+| october 29 | dallas cowboys | 35 - 14 | carolina panthers | bank of america stadium |
+| november 5 | indianapolis colts | 27 - 20 | new england patriots | gillette stadium |
+| november 12 | chicago bears | 38 - 20 | new york giants | giants stadium |
+| november 19 | san diego chargers | 35 - 27 | denver broncos | invesco field at mile high |
+| november 26 | philadelphia eagles | 21 - 45 | indianapolis colts | rca dome |
+| december 3 | seattle seahawks | 23 - 20 | denver broncos | invesco field at mile high |
+| december 10 | new orleans saints | 42 - 17 | dallas cowboys | texas stadium |
+| december 17 | kansas city chiefs | 9 - 20 | san diego chargers | qualcomm stadium |
+| december 25 | philadelphia eagles | 23 - 7 | dallas cowboys | texas stadium |
+| december 31 | green bay packers | 26 - 7 | chicago bears | soldier field |
+| january 6 | kansas city chiefs | 8 - 23 | indianapolis colts | rca dome |
+| january 6 | dallas cowboys | 20 - 21 | seattle seahawks | qwest field |
+===================Question===================
+the dallas cowboys and the seattle seahawks played at the qwest field on december 31 , and the cowboys led in a final score of 20 - 9
+===================Text===================
+~~~python~~~
+# Extract the relevant row(s) for the claim
+# The claim specifies date "december 31", teams "dallas cowboys" and "seattle seahawks", stadium "qwest field", and final score "20 - 9" with cowboys leading.
+# First, filter rows where date is "december 31"
+dec31_rows = df[df['date'].str.lower() == 'december 31']
+
+# Further filter rows where both teams are involved (either as visiting or host) and stadium is "qwest field"
+# Since the claim says "played at the qwest field", we check if stadium matches.
+# Also check if the two teams are present in the row.
+relevant_rows = dec31_rows[
+    (dec31_rows['stadium'].str.lower() == 'qwest field') &
+    (
+        ((dec31_rows['visiting team'].str.lower() == 'dallas cowboys') & (dec31_rows['host team'].str.lower() == 'seattle seahawks')) |
+        ((dec31_rows['visiting team'].str.lower() == 'seattle seahawks') & (dec31_rows['host team'].str.lower() == 'dallas cowboys'))
+    )
+]
+
+# If no such row exists, the claim is false.
+if relevant_rows.empty:
+    answer = False
+else:
+    # There should be at most one row. Check the final score.
+    # The claim says "cowboys led in a final score of 20 - 9".
+    # This implies the final score is 20-9 with the Cowboys having 20.
+    # We need to determine which team is which in the row and compare.
+    row = relevant_rows.iloc[0]
+    visiting_team = row['visiting team'].lower()
+    host_team = row['host team'].lower()
+    final_score = row['final score']
+    
+    # Parse the final score string (format like "20 - 9")
+    # Split by ' - ' and convert to integers
+    try:
+        visiting_score_str, host_score_str = final_score.split(' - ')
+        visiting_score = int(visiting_score_str.strip())
+        host_score = int(host_score_str.strip())
+    except:
+        # If parsing fails, assume claim is false
+        answer = False
+    else:
+        # Determine if Cowboys are visiting or host
+        if visiting_team == 'dallas cowboys':
+            cowboys_score = visiting_score
+            opponent_score = host_score
+        elif host_team == 'dallas cowboys':
+            cowboys_score = host_score
+            opponent_score = visiting_score
+        else:
+            # This shouldn't happen given our filter, but just in case
+            answer = False
+        # Check if the score matches 20-9 and Cowboys are leading
+        if cowboys_score == 20 and opponent_score == 9 and cowboys_score > opponent_score:
+            answer = True
+        else:
+            answer = False
+
+answer
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

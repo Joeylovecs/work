@@ -1,0 +1,82 @@
+===================Title===================
+ai miyazato
+===================Table===================
+| no | date | tournament | winning score | to par | margin of victory | runner (s) - up |
+| 1 | 28 sep 2003 | miyagi tv cup dunlop ladies open (as an amateur ) | 70 + 70 + 71 = 211 | - 5 | 1 stroke | mari katayama hiroko yamaguchi |
+| 2 | 7 mar 2004 | daikin orchid ladies | 70 + 66 + 70 = 206 | - 10 | 3 strokes | kaori higo |
+| 3 | 13 jun 2004 | suntory ladies open | 69 + 70 + 70 + 68 = 277 | - 11 | 6 strokes | hiroko yamaguchi toshimi kimura |
+| 4 | 20 jun 2004 | apita circle k sunkus ladies | 69 + 69 + 72 = 210 | - 6 | 1 stroke | yuri fudoh |
+| 5 | 24 oct 2004 | masters gc ladies | 69 + 68 + 68 = 205 | - 11 | 1 stroke | miho koga |
+| 6 | 21 nov 2004 | daio paper elleair ladies open | 66 + 67 + 69 = 202 | - 14 | 3 strokes | chieko amanuma rui kitada |
+| 7 | 15 may 2005 | vernal ladies | 69 + 64 + 70 = 203 | - 13 | 8 strokes | akiko fukushima |
+| 8 | 22 may 2005 | chukyo tv bridgestone ladies open | 65 + 74 + 70 = 209 | - 7 | playoff | nikki campbell |
+| 9 | 21 aug 2005 | new catapillar mitsubishi ladies | 66 + 75 + 68 = 209 | - 10 | 3 strokes | mi - jeong jeon hiromi mogi |
+| 10 | 2 oct 2005 | japan women 's open golf championship | 69 + 69 + 72 + 73 = 283 | - 5 | 5 strokes | akiko fukushima |
+| 12 | 20 nov 2005 | daio paper elleair ladies open | 69 + 70 + 65 = 204 | - 12 | 5 strokes | shiho oyama woo - soon ko kasumi fujii |
+| 13 | 10 sep 2006 | jlpga championship konica minolta cup | 70 + 68 + 74 + 70 = 282 | - 6 | 3 strokes | hyun - ju shin |
+| 14 | 24 sep 2006 | miyagi tv cup dunlop ladies open | 70 + 73 + 71 = 214 | - 2 | 3 strokes | shiho oyama |
+===================Question===================
+the winner of the miyagi tv cup dunlop ladies open had a 3 - stroke margin of victory
+===================Text===================
+~~~python~~~
+# Check the statement: "the winner of the miyagi tv cup dunlop ladies open had a 3 - stroke margin of victory"
+# Filter rows where tournament column contains "miyagi tv cup dunlop ladies open"
+filtered = df[df['tournament'].str.contains('miyagi tv cup dunlop ladies open', case=False, na=False)]
+
+# Extract the 'margin of victory' values for these rows
+margins = filtered['margin of victory'].astype(str).str.strip()
+
+# Check if any of these margins exactly match "3 strokes" (as per the claim)
+# The claim says "3 - stroke", but the table uses "3 strokes" (without hyphen). 
+# We'll compare the numeric part and the unit.
+# We'll parse the margin string to see if it represents 3 strokes.
+# Since the table uses "1 stroke", "3 strokes", etc., we can check if the string contains '3' and 'stroke' (ignoring hyphen and plural).
+# However, to be precise, we'll check if the margin string equals "3 strokes" (as in the table) or "3 stroke" (as in claim without plural).
+# But the claim says "3 - stroke" (with hyphen and singular). We'll treat it as meaning 3 strokes.
+# We'll check if the margin string, after removing hyphens and extra spaces, equals "3 strokes" or "3 stroke".
+def normalize_margin(m):
+    # Remove hyphens, extra spaces, convert to lower case
+    m = str(m).replace('-', '').strip().lower()
+    return m
+
+# Normalize margins
+normalized_margins = margins.apply(normalize_margin)
+
+# Check if any normalized margin is exactly "3 strokes" or "3 stroke"
+# The table has two entries for this tournament: one with "1 stroke" and one with "3 strokes"
+# We need to see if any of the rows have a margin of victory that corresponds to 3 strokes.
+# The claim is about "the winner" (singular), but there are two winners in different years.
+# The claim does not specify a year, so we need to check if any winner of this tournament had a 3-stroke margin.
+# If at least one winner had a 3-stroke margin, the statement is true.
+# However, the claim might be interpreted as "the winner" referring to a specific instance, but without year, we check existence.
+# We'll check if any row has margin containing '3' and 'stroke'.
+has_3_stroke = any('3' in m and 'stroke' in m for m in normalized_margins)
+
+# Alternatively, we can check exact matches from the table.
+# From the table, the margins for this tournament are "1 stroke" and "3 strokes".
+# So we can check if "3 strokes" appears in the original margin values.
+has_3_strokes_exact = any(m.strip() == '3 strokes' for m in margins)
+
+# Since the claim says "3 - stroke", which is essentially 3 strokes, we'll use the exact match from table.
+answer = has_3_strokes_exact
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

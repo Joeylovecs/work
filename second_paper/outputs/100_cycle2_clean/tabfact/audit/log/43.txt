@@ -1,0 +1,89 @@
+===================Title===================
+west berkshire brewery
+===================Table===================
+| year | beer name | prize | category | competition |
+| 1995 | good old boy | overall winner | beer of the festival | camra white horse branch beer festival |
+| 1997 | dr hexter 's healer | runner up | beer of the festival | camra northamptonshire branch beer festival |
+| 2002 | good old boy | gold medal | best bitter | siba south east region beer competition |
+| 2002 | good old boy | second reserve champion | overall | siba south east region beer competition |
+| 2002 | maggs magnificent mild | gold medal | mild and porter | siba south east region beer competition |
+| 2002 | mr chubb 's lunchtime bitter | silver medal | standard bitter | siba south east region beer competition |
+| 2002 | dr hexter 's healer | silver medal | strong ale | siba south east region beer competition |
+| 2003 | maggs magnificent mild | gold medal | mild and porter | siba national beer competition |
+| 2003 | full circle | silver medal | best bitter | camra great british beer festival |
+| 2004 | maggs magnificent mild | overall winner | beer of the festival | bracknell blues and real ale festival |
+| 2005 | maggs magnificent mild | gold medal | mild | camra reading branch beer festival |
+| 2005 | maggs magnificent mild | third place | overall | camra reading branch beer festival |
+| 2005 | maggs magnificent mild | gold medal | mild | siba south east region beer competition |
+| 2005 | maggs magnificent mild | bronze medal | overall | siba south east region beer competition |
+| 2005 | good old boy | silver medal | best bitter | siba south east region beer competition |
+| 2005 | dr hexter 's wedding ale | third place | best bitter | norwich beer festival |
+| 2006 | maggs magnificent mild | silver medal | mild | siba national beer competition |
+| 2006 | maggs magnificent mild | silver medal | mild | camra reading branch beer festival |
+| 2006 | old father thames | bronze medal | light bitters | siba south east region beer competition |
+| 2007 | skiff | gold medal | standard bitter | camra reading branch beer festival |
+| 2007 | full circle | bronze medal | premium biter | camra reading branch beer festival |
+| 2007 | mash tun | bronze medal | best bitter | camra reading branch beer festival |
+| 2008 | dr hexter 's healer | gold medal | best local beer | camra reading branch beer festival |
+| 2008 | mr chubb 's lunchtime bitter | gold medal | in category | camra reading branch beer festival |
+| 2008 | maggs magnificent mild | silver medal | in category | camra reading branch beer festival |
+| 2009 | dr hexter 's healer | gold medal | best local beer | camra reading branch beer festival |
+| 2009 | dr hexter 's healer | gold medal | in category | camra london and south east regional competition |
+| 2009 | good old boy | gold medal | in category | camra london and south east regional competition |
+===================Question===================
+west berkshire brewery 's maggs magnificent mild was its most decorated beer between 1995 and 2009
+===================Text===================
+~~~python~~~
+# Check if maggs magnificent mild is the most decorated beer between 1995 and 2009
+# First, filter the dataframe to the relevant years
+df_filtered = df[(df['year'] >= 1995) & (df['year'] <= 2009)]
+
+# Count the number of prizes (rows) for each beer in this period
+prize_counts = df_filtered['beer name'].value_counts()
+
+# Get the beer with the maximum count
+max_count = prize_counts.max()
+most_decorated_beers = prize_counts[prize_counts == max_count].index.tolist()
+
+# Check if "maggs magnificent mild" is among the most decorated beers (and is the only one if tie is allowed)
+# The statement says "its most decorated beer", which could imply a single top beer. If there is a tie, the statement might be false.
+# We'll check if "maggs magnificent mild" has the highest count and is the only one with that count.
+answer = ('maggs magnificent mild' in most_decorated_beers) and (len(most_decorated_beers) == 1)
+~~~
+---
+~~~python~~~
+# Check if maggs magnificent mild is the most decorated beer between 1995 and 2009
+# First, filter the dataframe to the relevant years
+df_filtered = df[(df['year'] >= 1995) & (df['year'] <= 2009)]
+
+# Count the number of prizes (rows) for each beer in this period
+prize_counts = df_filtered['beer name'].value_counts()
+
+# Get the beer with the maximum count using argmax to identify the top-ranked beer
+most_decorated_beer = prize_counts.idxmax()
+max_count = prize_counts.max()
+
+# Check if "maggs magnificent mild" is the most decorated beer (unique top)
+# The statement says "its most decorated beer", which implies a single top beer.
+answer = (most_decorated_beer == 'maggs magnificent mild') and (prize_counts == max_count).sum() == 1
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_RANKING", "expected": {"direction": "desc", "column": "beer name"}, "actual": null, "evidence": ["filter:year >= 1995", "column_access:year", "filter:year <= 2009", "column_access:year", "aggregation:count", "column_access:beer name", "aggregation:max", "scalar_compare:prize_counts == max_count", "scalar_compare:'maggs magnificent mild' in most_decorated_beers", "scalar_compare:len(most_decorated_beers) == 1", "aggregation:count"], "confidence": 0.96, "repair_hint": "Use the requested ranking or argmax/argmin operation."}], "confidence": 0.96}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Use the requested ranking or argmax/argmin operation.", "confidence": 0.96, "mode": "hybrid"}, "repaired_code": "# Check if maggs magnificent mild is the most decorated beer between 1995 and 2009\n# First, filter the dataframe to the relevant years\ndf_filtered = df[(df['year'] >= 1995) & (df['year'] <= 2009)]\n\n# Count the number of prizes (rows) for each beer in this period\nprize_counts = df_filtered['beer name'].value_counts()\n\n# Get the beer with the maximum count using argmax to identify the top-ranked beer\nmost_decorated_beer = prize_counts.idxmax()\nmax_count = prize_counts.max()\n\n# Check if \"maggs magnificent mild\" is the most decorated beer (unique top)\n# The statement says \"its most decorated beer\", which implies a single top beer.\nanswer = (most_decorated_beer == 'maggs magnificent mild') and (prize_counts == max_count).sum() == 1", "execution": {"success": true, "error": null, "result": "True", "observed_output_type": "boolean", "observed_value": true, "evidence": {"final_object_type": "boolean", "final_value": true, "dataframes": [{"name": "df", "shape": [28, 5], "columns": ["year", "beer name", "prize", "category", "competition"]}, {"name": "df_filtered", "shape": [28, 5], "columns": ["year", "beer name", "prize", "category", "competition"]}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.0020555949304252863}, "memory": {}}, "accepted": true}]
+===================Final Answer===================
+True

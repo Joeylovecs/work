@@ -1,0 +1,93 @@
+===================Title===================
+1971 african cup of champions clubs
+===================Table===================
+| team 1 | agg | team 2 | 1st leg | 2nd leg |
+| al - merrikh | 2 - 2 (5 - 4 pen) | tele sc asmara | 2 - 1 | 0 - 1 |
+| abaluhya united | 1 - 3 | great olympics | 0 - 0 | 1 - 3 |
+| asc diaraf | 3 - 4 | stade malien | 3 - 0 | 0 - 4 |
+| maseru united | 3 - 5 | mmm tamatave | 1 - 2 | 2 - 3 |
+| as porto novo | 0 - 3 | victoria club mokanda | 0 - 1 | 0 - 2 |
+| canon yaoundé | 9 - 4 | as solidarité | 7 - 3 | 2 - 1 |
+| espérance | 1 - 0 | al - ahly (benghazi) | 0 - 0 | 1 - 0 |
+| secteur 6 | 1 - 2 | enugu rangers | 1 - 1 | 0 - 1 |
+| young africans | 2 - 0 | lavori publici | 2 - 0 | 0 - 0 |
+===================Question===================
+the young africans scored two points in the 1971 african cup of champions clubs
+===================Text===================
+~~~python~~~
+# Check if there is a row where 'team 1' is 'young africans' and the 'agg' column indicates they scored two points.
+# The 'agg' column contains strings like "2 - 0". We need to extract the first number (goals for team 1) and see if it equals 2.
+# Also consider the case where 'team 2' is 'young africans', then we need to look at the second number in 'agg'.
+
+# First, find rows where 'young africans' appears in either team column.
+mask_team1 = df['team 1'] == 'young africans'
+mask_team2 = df['team 2'] == 'young africans'
+
+# Combine masks to get rows involving young africans
+mask = mask_team1 | mask_team2
+
+if mask.any():
+    # Get the relevant row(s)
+    relevant_rows = df[mask]
+    # For each row, determine if young africans scored exactly 2 points (goals) in the aggregate.
+    # We'll check each row individually; there should be only one match.
+    for idx, row in relevant_rows.iterrows():
+        if mask_team1[idx]:
+            # young africans is team 1, so first number in agg is their goals
+            goals_str = row['agg'].split('-')[0].strip()
+            try:
+                goals = int(goals_str)
+                if goals == 2:
+                    answer = True
+                    break
+            except ValueError:
+                # In case the string format is unexpected, we can try to handle it.
+                # But from the table, the format is like "2 - 0" or "2 - 2 (5 - 4 pen)".
+                # We can split by space and take the first token.
+                goals_str = row['agg'].split()[0]
+                try:
+                    goals = int(goals_str)
+                    if goals == 2:
+                        answer = True
+                        break
+                except ValueError:
+                    continue
+        else:
+            # young africans is team 2, so second number in agg is their goals
+            # The agg string might have extra info like "(5 - 4 pen)". We split by '-' and take the second part.
+            parts = row['agg'].split('-')
+            if len(parts) >= 2:
+                goals_str = parts[1].strip().split()[0]  # take the first token after the dash
+                try:
+                    goals = int(goals_str)
+                    if goals == 2:
+                        answer = True
+                        break
+                except ValueError:
+                    continue
+    else:
+        # If no row matched the condition, set answer to False
+        answer = False
+else:
+    answer = False
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

@@ -1,0 +1,49 @@
+===================Title===================
+Yankton, South Dakota
+===================Table===================
+| Frequency | Call sign | Name | Format | Owner | Target city/market | City of license |
+| 89.7 FM | KUSD | South Dakota Public Broadcasting | NPR | SD Board of Directors for Educational Telecommunications | Yankton/Vermillion | Vermillion |
+| 93.1 FM | KKYA | KK93 | Country | Riverfront Broadcasting LLC | Yankton/Vermillion | Yankton |
+| 94.3 FM | KDAM | The Dam | Mainstream Rock | Riverfront Broadcasting LLC | Yankton/Vermillion | Hartington |
+| 104.1 FM | WNAX-FM | The Wolf 104.1 | Country | Saga Communications | Yankton/Vermillion | Yankton |
+| 106.3 FM | KVHT | Classic Hits 106.3 | Classic Hits | Cullhane Communications, Inc. | Yankton/Vermillion | Vermillion |
+===================Question===================
+if you want to listen to classic rock where do you have to tune into?
+===================Text===================
+~~~python~~~
+# Filter rows where the Format column contains "Classic Rock" or "Mainstream Rock" (since "Mainstream Rock" is the closest match for classic rock in the table)
+rock_stations = df[df['Format'].str.contains('Rock', case=False, na=False)]
+# If there are multiple rock stations, we need to identify the one that is specifically classic rock or the closest match.
+# The table shows "Mainstream Rock" for KDAM, which is likely the intended classic rock station.
+# Let's filter for that specific format.
+classic_rock_station = df[df['Format'].str.contains('Mainstream Rock', case=False, na=False)]
+# Extract the frequency and call sign for the answer
+if not classic_rock_station.empty:
+    answer = classic_rock_station.iloc[0]['Frequency']
+else:
+    # Fallback: if no mainstream rock, use any rock station
+    if not rock_stations.empty:
+        answer = rock_stations.iloc[0]['Frequency']
+    else:
+        answer = None
+~~~
+===================Answer===================
+['106.3 FM']
+===================Execution Result===================
+"94.3 FM"
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+94.3 FM

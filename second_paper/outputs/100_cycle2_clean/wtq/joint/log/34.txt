@@ -1,0 +1,233 @@
+===================Title===================
+Love (2011 film)
+===================Table===================
+| Date | Festival | Location | Awards | Link |
+| Feb 2–5, Feb 11 | Santa Barbara International Film Festival | Santa Barbara, California  USA | Top 11 "Best of the Fest" Selection | sbiff.org |
+| May 21–22, Jun 11 | Seattle International Film Festival | Seattle, Washington  USA |  | siff.net |
+| Jul 18, Jul 25 | Fantasia Festival | Montreal, Quebec  Canada | Special Mention\n"for the resourcefulness and unwavering determination by a director to realize his unique vision" | FanTasia |
+| Sep 16 | Athens International Film Festival | Athens, Attica\n Greece | Best Director | aiff.gr |
+| Sep 19 | Lund International Fantastic Film Festival | Lund, Skåne\n Sweden |  | fff.se |
+| Sep 28 | Fantastic Fest | Austin, Texas\n USA |  | FantasticFest.com |
+| Oct 9 | London Int. Festival of Science Fiction Film | London, England\n UK | Closing Night Film | Sci-Fi London |
+| Oct 9, Oct 11 | Sitges Film Festival | Sitges, Catalonia\n Spain |  | Sitges Festival |
+| Oct 1, Oct 15 | Gwacheon International SF Festival | Gwacheon, Gyeonggi-do\n South Korea |  | gisf.org |
+| Oct 17, Oct 20 | Icon TLV | Tel Aviv, Central\n Israel |  | icon.org.il |
+| Oct 23 | Toronto After Dark | Toronto, Ontario\n Canada | Best Special Effects\nBest Musical Score | torontoafterdark.com |
+| Nov 11 | Les Utopiales | Nantes, Pays de la Loire\n France |  | utopiales.org |
+| Nov 12, Nov 18 | Indonesia Fantastic Film Festival | Jakarta, Bandung\n Indonesia |  | inaff.com |
+| Nov 16–18 | AFF | Wrocław, Lower Silesia\n Poland |  | AFF Poland |
+===================Question===================
+what festival was the film show at before the fantasia festival?
+===================Text===================
+Let’s look at the table in date order.  
+
+The Fantasia Festival is listed with dates **Jul 18, Jul 25**.  
+Before that in the table:  
+
+- **Feb 2–5, Feb 11** — Santa Barbara International Film Festival  
+- **May 21–22, Jun 11** — Seattle International Film Festival  
+
+The one immediately before Fantasia Festival in the list is **Seattle International Film Festival**, but we should check if any festival occurs between Seattle and Fantasia.  
+Looking at the dates:  
+Seattle ends Jun 11.  
+Next is Fantasia on Jul 18.  
+No other festivals are listed between those dates in the table.  
+
+So the festival before Fantasia Festival is **Seattle International Film Festival**.  
+
+Final Answer: Seattle International Film Festival
+---
+Let’s look at the table in date order.  
+
+The Fantasia Festival is listed with dates **Jul 18, Jul 25**.  
+Before that in the table:  
+
+- **Feb 2–5, Feb 11** — Santa Barbara International Film Festival  
+- **May 21–22, Jun 11** — Seattle International Film Festival  
+
+The one immediately before Fantasia Festival in the list is **Seattle International Film Festival**, but we should check if any festival occurs between Seattle and Fantasia.  
+Looking at the dates:  
+Seattle ends Jun 11.  
+Next is Fantasia on Jul 18.  
+No other festivals are listed between those dates in the table.  
+
+So the festival before Fantasia Festival is **Seattle International Film Festival**.  
+
+Final Answer: Seattle International Film Festival
+---
+Let’s look at the table in date order.  
+
+The Fantasia Festival is listed with dates **Jul 18, Jul 25**.  
+Before that in the table:  
+
+- **Feb 2–5, Feb 11** — Santa Barbara International Film Festival  
+- **May 21–22, Jun 11** — Seattle International Film Festival  
+
+The one immediately before Fantasia Festival in the list is **Seattle International Film Festival**, but we should check if any festival occurs between Seattle and Fantasia.  
+Looking at the dates:  
+Seattle ends Jun 11.  
+Next is Fantasia on Jul 18.  
+No other festivals are listed between those dates in the table.  
+
+So the festival before Fantasia Festival is **Seattle International Film Festival**.  
+
+Final Answer: Seattle International Film Festival
+---
+~~~python~~~
+# Filter rows to find the Fantasia Festival date
+fantasia_row = df[df['Festival'] == 'Fantasia Festival']
+if not fantasia_row.empty:
+    fantasia_date = fantasia_row['Date'].iloc[0]
+    # Extract the earliest date from the Fantasia Festival entry (assuming the first date in the range)
+    # The date format is like "Jul 18, Jul 25", we take the first part before the comma
+    fantasia_first_date_str = fantasia_date.split(',')[0].strip()
+    # Convert to a comparable datetime object (assuming year 2011 as per film title)
+    import datetime
+    # Parse the month and day
+    fantasia_dt = datetime.datetime.strptime(fantasia_first_date_str + " 2011", "%b %d %Y")
+    
+    # Get all rows except Fantasia Festival
+    other_rows = df[df['Festival'] != 'Fantasia Festival'].copy()
+    
+    # Function to extract the earliest date from each Date entry
+    def get_earliest_date(date_str):
+        # Handle date ranges like "Feb 2–5, Feb 11" or single dates like "Sep 16"
+        # Split by comma to get multiple date groups
+        parts = date_str.split(',')
+        earliest = None
+        for part in parts:
+            part = part.strip()
+            # If there's a dash, take the start date
+            if '–' in part:
+                start = part.split('–')[0].strip()
+                # Parse the month and day (assuming month is before the dash)
+                month_day = start.split()
+                if len(month_day) == 2:
+                    month, day = month_day
+                    try:
+                        dt = datetime.datetime.strptime(f"{month} {day} 2011", "%b %d %Y")
+                    except ValueError:
+                        # Handle cases like "Feb 2–5" where start is "Feb 2"
+                        dt = datetime.datetime.strptime(f"{month} {day} 2011", "%b %d %Y")
+                else:
+                    # Fallback: take the whole part before dash
+                    start = part.split('–')[0]
+                    # Assume format like "Feb 2"
+                    month, day = start.split()
+                    dt = datetime.datetime.strptime(f"{month} {day} 2011", "%b %d %Y")
+            else:
+                # Single date
+                month, day = part.split()
+                dt = datetime.datetime.strptime(f"{month} {day} 2011", "%b %d %Y")
+            if earliest is None or dt < earliest:
+                earliest = dt
+        return earliest
+    
+    other_rows['earliest_date'] = other_rows['Date'].apply(get_earliest_date)
+    
+    # Filter rows where earliest_date is before Fantasia's earliest date
+    before_rows = other_rows[other_rows['earliest_date'] < fantasia_dt]
+    
+    # Sort by date descending to get the one immediately before
+    before_rows = before_rows.sort_values('earliest_date', ascending=False)
+    
+    if not before_rows.empty:
+        # Get the festival name of the most recent one before Fantasia
+        answer = before_rows['Festival'].iloc[0]
+    else:
+        answer = None
+else:
+    answer = None
+~~~
+---
+Looking at the error, the issue is that `datetime` is imported inside the `if` block, but it's being used in the `get_earliest_date` function which is defined outside that block. When the function tries to use `datetime.datetime.strptime`, it fails because `datetime` is not in the function's scope.
+
+Here's the corrected code with the import moved to the top:
+
+~~~python
+import datetime
+
+# Filter rows to find the Fantasia Festival date
+fantasia_row = df[df['Festival'] == 'Fantasia Festival']
+if not fantasia_row.empty:
+    fantasia_date = fantasia_row['Date'].iloc[0]
+    # Extract the earliest date from the Fantasia Festival entry (assuming the first date in the range)
+    # The date format is like "Jul 18, Jul 25", we take the first part before the comma
+    fantasia_first_date_str = fantasia_date.split(',')[0].strip()
+    # Convert to a comparable datetime object (assuming year 2011 as per film title)
+    # Parse the month and day
+    fantasia_dt = datetime.datetime.strptime(fantasia_first_date_str + " 2011", "%b %d %Y")
+    
+    # Get all rows except Fantasia Festival
+    other_rows = df[df['Festival'] != 'Fantasia Festival'].copy()
+    
+    # Function to extract the earliest date from each Date entry
+    def get_earliest_date(date_str):
+        # Handle date ranges like "Feb 2–5, Feb 11" or single dates like "Sep 16"
+        # Split by comma to get multiple date groups
+        parts = date_str.split(',')
+        earliest = None
+        for part in parts:
+            part = part.strip()
+            # If there's a dash, take the start date
+            if '–' in part:
+                start = part.split('–')[0].strip()
+                # Parse the month and day (assuming month is before the dash)
+                month_day = start.split()
+                if len(month_day) == 2:
+                    month, day = month_day
+                    try:
+                        dt = datetime.datetime.strptime(f"{month} {day} 2011", "%b %d %Y")
+                    except ValueError:
+                        # Handle cases like "Feb 2–5" where start is "Feb 2"
+                        dt = datetime.datetime.strptime(f"{month} {day} 2011", "%b %d %Y")
+                else:
+                    # Fallback: take the whole part before dash
+                    start = part.split('–')[0]
+                    # Assume format like "Feb 2"
+                    month, day = start.split()
+                    dt = datetime.datetime.strptime(f"{month} {day} 2011", "%b %d %Y")
+            else:
+                # Single date
+                month, day = part.split()
+                dt = datetime.datetime.strptime(f"{month} {day} 2011", "%b %d %Y")
+            if earliest is None or dt < earliest:
+                earliest = dt
+        return earliest
+    
+    other_rows['earliest_date'] = other_rows['Date'].apply(get_earliest_date)
+    
+    # Filter rows where earliest_date is before Fantasia's earliest date
+    before_rows = other_rows[other_rows['earliest_date'] < fantasia_dt]
+    
+    # Sort by date descending to get the one immediately before
+    before_rows = before_rows.sort_values('earliest_date', ascending=False)
+    
+    if not before_rows.empty:
+        # Get the festival name of the most recent one before Fantasia
+        answer = before_rows['Festival'].iloc[0]
+    else:
+        answer = None
+else:
+    answer = None
+~~~
+===================Answer===================
+['Seattle International Film Festival']
+===================Execution Result===================
+null
+===================Execution Error===================
+NameError: name 'datetime' is not defined
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"kind": "execution", "repair_count": 1, "execution_error": "NameError: name 'datetime' is not defined", "repaired_code": "import datetime\n\n# Filter rows to find the Fantasia Festival date\nfantasia_row = df[df['Festival'] == 'Fantasia Festival']\nif not fantasia_row.empty:\n    fantasia_date = fantasia_row['Date'].iloc[0]\n    # Extract the earliest date from the Fantasia Festival entry (assuming the first date in the range)\n    # The date format is like \"Jul 18, Jul 25\", we take the first part before the comma\n    fantasia_first_date_str = fantasia_date.split(',')[0].strip()\n    # Convert to a comparable datetime object (assuming year 2011 as per film title)\n    # Parse the month and day\n    fantasia_dt = datetime.datetime.strptime(fantasia_first_date_str + \" 2011\", \"%b %d %Y\")\n    \n    # Get all rows except Fantasia Festival\n    other_rows = df[df['Festival'] != 'Fantasia Festival'].copy()\n    \n    # Function to extract the earliest date from each Date entry\n    def get_earliest_date(date_str):\n        # Handle date ranges like \"Feb 2–5, Feb 11\" or single dates like \"Sep 16\"\n        # Split by comma to get multiple date groups\n        parts = date_str.split(',')\n        earliest = None\n        for part in parts:\n            part = part.strip()\n            # If there's a dash, take the start date\n            if '–' in part:\n                start = part.split('–')[0].strip()\n                # Parse the month and day (assuming month is before the dash)\n                month_day = start.split()\n                if len(month_day) == 2:\n                    month, day = month_day\n                    try:\n                        dt = datetime.datetime.strptime(f\"{month} {day} 2011\", \"%b %d %Y\")\n                    except ValueError:\n                        # Handle cases like \"Feb 2–5\" where start is \"Feb 2\"\n                        dt = datetime.datetime.strptime(f\"{month} {day} 2011\", \"%b %d %Y\")\n                else:\n                    # Fallback: take the whole part before dash\n                    start = part.split('–')[0]\n                    # Assume format like \"Feb 2\"\n                    month, day = start.split()\n                    dt = datetime.datetime.strptime(f\"{month} {day} 2011\", \"%b %d %Y\")\n            else:\n                # Single date\n                month, day = part.split()\n                dt = datetime.datetime.strptime(f\"{month} {day} 2011\", \"%b %d %Y\")\n            if earliest is None or dt < earliest:\n                earliest = dt\n        return earliest\n    \n    other_rows['earliest_date'] = other_rows['Date'].apply(get_earliest_date)\n    \n    # Filter rows where earliest_date is before Fantasia's earliest date\n    before_rows = other_rows[other_rows['earliest_date'] < fantasia_dt]\n    \n    # Sort by date descending to get the one immediately before\n    before_rows = before_rows.sort_values('earliest_date', ascending=False)\n    \n    if not before_rows.empty:\n        # Get the festival name of the most recent one before Fantasia\n        answer = before_rows['Festival'].iloc[0]\n    else:\n        answer = None\nelse:\n    answer = None", "execution": {"success": false, "error": "NameError: name 'datetime' is not defined", "result": null, "observed_output_type": "unknown", "observed_value": null, "evidence": {"stdout": "", "traceback": "Traceback (most recent call last):\n  File \"/root/shared-nvme/wangjie/second_paper/semantic_audit/runtime_trace.py\", line 59, in execute_code\n    if body: exec(compile(ast.Module(body=body,type_ignores=[]),\"<generated>\",\"exec\"),glb,loc)\n  File \"<generated>\", line 51, in <module>\n  File \"/root/.conda/envs/work/lib/python3.10/site-packages/pandas/core/series.py\", line 4935, in apply\n    ).apply()\nNameError: name 'datetime' is not defined\n", "semantic_warnings": ["execution_exception"], "latency_seconds": 0.0025363960303366184}, "memory": {}}}]
+===================Final Answer===================
+Seattle International Film Festival

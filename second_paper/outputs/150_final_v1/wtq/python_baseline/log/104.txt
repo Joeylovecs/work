@@ -1,0 +1,75 @@
+===================Title===================
+Cheltenham Town F.C.
+===================Table===================
+| Year | Kit Manufacturer | Shirt Sponsor | Back of Shirt Sponsor | Short Sponsor |
+| 1977–1978 |  | National Express |  |  |
+| 1982–1985 | Umbro |  |  |  |
+| 1985–1986 | Umbro | Whitbread |  |  |
+| 1986–1988 | Henson | Duraflex |  |  |
+| 1988–1989 |  | Gulf Oil |  |  |
+| 1991–1993 | Technik | Gulf Oil |  |  |
+| 1993–1994 | Club Sport | Gulf Oil |  |  |
+| 1994–1995 | Klūb Sport | Empress |  |  |
+| 1995–1996 | Matchwinner | Empress |  |  |
+| 1996–1997 | UK | Endsleigh Insurance |  |  |
+| 1997–1999 | Errea | Endsleigh Insurance |  |  |
+| 1999–2004 | Errea | Towergate Insurance |  |  |
+| 2004–2008 | Errea | Bence Building Merchants |  |  |
+| 2008– | Errea | Mira Showers |  |  |
+| 2009–2011 | Errea | Mira Showers | PSU Technology Group |  |
+| 2011–2013 | Errea | Mira Showers | Barr Stadia | Gloucestershire Echo |
+| 2013– | Errea | Mira Showers | Gloucestershire College | Gloucestershire Echo |
+===================Question===================
+last year to not have a back sponsor?
+===================Text===================
+```python
+# Find the last year without a back sponsor
+# First, ensure the 'Back of Shirt Sponsor' column is properly handled (empty strings or NaN)
+# We'll treat empty strings and NaN as missing back sponsors
+
+# Create a mask for rows where back sponsor is missing (NaN or empty string)
+mask = df['Back of Shirt Sponsor'].isna() | (df['Back of Shirt Sponsor'] == '')
+
+# Filter rows with missing back sponsors
+no_back_sponsor = df[mask]
+
+# Sort by year to find the most recent
+# Extract the start year from the 'Year' column for proper sorting
+def extract_start_year(year_str):
+    # Handle cases like "2008–" by taking the first part
+    if '–' in year_str:
+        return int(year_str.split('–')[0])
+    return int(year_str)
+
+no_back_sponsor = no_back_sponsor.copy()
+no_back_sponsor['start_year'] = no_back_sponsor['Year'].apply(extract_start_year)
+no_back_sponsor = no_back_sponsor.sort_values('start_year', ascending=False)
+
+# Get the most recent year without back sponsor
+if not no_back_sponsor.empty:
+    answer = no_back_sponsor.iloc[0]['Year']
+else:
+    answer = None
+
+answer
+```
+===================Answer===================
+['2008']
+===================Execution Result===================
+"2008–"
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+2008–

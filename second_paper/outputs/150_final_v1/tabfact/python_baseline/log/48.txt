@@ -1,0 +1,60 @@
+===================Title===================
+1972 vfl season
+===================Table===================
+| home team | home team score | away team | away team score | venue | crowd | date |
+| footscray | 14.7 (91) | st kilda | 9.11 (65) | western oval | 18655 | 15 july 1972 |
+| fitzroy | 16.14 (110) | north melbourne | 9.12 (66) | junction oval | 7007 | 15 july 1972 |
+| essendon | 13.12 (90) | richmond | 17.9 (111) | windy hill | 22251 | 15 july 1972 |
+| carlton | 20.8 (128) | south melbourne | 8.15 (63) | princes park | 14465 | 15 july 1972 |
+| hawthorn | 19.14 (128) | geelong | 15.8 (98) | glenferrie oval | 12425 | 15 july 1972 |
+| collingwood | 10.13 (73) | melbourne | 8.10 (58) | vfl park | 30883 | 15 july 1972 |
+===================Question===================
+more than half of the away teams had a score greater than 10
+in the table:
+6 away teams had a score greater than 10.
+===================Text===================
+```python
+import pandas as pd
+
+# Extract numeric score from away team score column
+def extract_score(score_str):
+    # Format is like "9.11 (65)" - we want the total points (65)
+    try:
+        # Extract the number in parentheses
+        total_points = int(score_str.split('(')[1].split(')')[0])
+        return total_points
+    except:
+        return 0
+
+# Apply the extraction
+df['away_score_numeric'] = df['away team score'].apply(extract_score)
+
+# Count away teams with score > 10
+away_teams_above_10 = (df['away_score_numeric'] > 10).sum()
+
+# Total number of away teams
+total_away_teams = len(df)
+
+# Check if more than half have score > 10
+answer = away_teams_above_10 > (total_away_teams / 2)
+```
+===================Answer===================
+0
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

@@ -1,0 +1,84 @@
+===================Title===================
+nbc sunday night football results (2006 - present)
+===================Table===================
+| date | visiting team | final score | host team | stadium |
+| september 7 | miami dolphins | 17 - 28 | pittsburgh steelers | heinz field |
+| september 10 | indianapolis colts | 26 - 21 | new york giants | giants stadium |
+| september 17 | washington redskins | 10 - 27 | dallas cowboys | texas stadium |
+| september 24 | denver broncos | 17 - 7 | new england patriots | gillette stadium |
+| october 1 | seattle seahawks | 6 - 37 | chicago bears | soldier field |
+| october 8 | pittsburgh steelers | 13 - 23 | san diego chargers | qualcomm stadium |
+| october 15 | oakland raiders | 3 - 13 | denver broncos | invesco field at mile high |
+| october 29 | dallas cowboys | 35 - 14 | carolina panthers | bank of america stadium |
+| november 5 | indianapolis colts | 27 - 20 | new england patriots | gillette stadium |
+| november 12 | chicago bears | 38 - 20 | new york giants | giants stadium |
+| november 19 | san diego chargers | 35 - 27 | denver broncos | invesco field at mile high |
+| november 26 | philadelphia eagles | 21 - 45 | indianapolis colts | rca dome |
+| december 3 | seattle seahawks | 23 - 20 | denver broncos | invesco field at mile high |
+| december 10 | new orleans saints | 42 - 17 | dallas cowboys | texas stadium |
+| december 17 | kansas city chiefs | 9 - 20 | san diego chargers | qualcomm stadium |
+| december 25 | philadelphia eagles | 23 - 7 | dallas cowboys | texas stadium |
+| december 31 | green bay packers | 26 - 7 | chicago bears | soldier field |
+| january 6 | kansas city chiefs | 8 - 23 | indianapolis colts | rca dome |
+| january 6 | dallas cowboys | 20 - 21 | seattle seahawks | qwest field |
+===================Question===================
+the dallas cowboys and the seattle seahawks played at the qwest field on december 31 , and the cowboys led in a final score of 20 - 9
+===================Text===================
+~~~python~~~
+# Extract the relevant row(s) for the claim
+# The claim mentions date "december 31", teams "dallas cowboys" and "seattle seahawks", stadium "qwest field"
+# Filter the dataframe accordingly
+filtered = df[(df['date'].str.lower() == 'december 31') & 
+              (df['visiting team'].str.lower().isin(['dallas cowboys', 'seattle seahawks'])) &
+              (df['host team'].str.lower().isin(['dallas cowboys', 'seattle seahawks'])) &
+              (df['stadium'].str.lower() == 'qwest field')]
+
+# Check if any row matches the date, teams, and stadium
+if filtered.empty:
+    answer = False
+else:
+    # Get the row
+    row = filtered.iloc[0]
+    # Extract final score
+    final_score = row['final score']
+    # The claim says "cowboys led in a final score of 20 - 9"
+    # This implies the Cowboys scored 20 and the Seahawks scored 9
+    # Determine which team is which in the row
+    visiting = row['visiting team'].lower()
+    host = row['host team'].lower()
+    # Split the score
+    scores = final_score.split(' - ')
+    visiting_score = int(scores[0])
+    host_score = int(scores[1])
+    
+    # Check if Cowboys are visiting or host and compare scores
+    if 'dallas cowboys' in visiting:
+        cowboys_score = visiting_score
+        seahawks_score = host_score
+    else:
+        cowboys_score = host_score
+        seahawks_score = visiting_score
+    
+    # Verify the claimed score
+    answer = (cowboys_score == 20) and (seahawks_score == 9)
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

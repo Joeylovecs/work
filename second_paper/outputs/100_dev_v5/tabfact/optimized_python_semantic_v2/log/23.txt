@@ -1,0 +1,84 @@
+===================Title===================
+ai miyazato
+===================Table===================
+| no | date | tournament | winning score | to par | margin of victory | runner (s) - up |
+| 1 | 28 sep 2003 | miyagi tv cup dunlop ladies open (as an amateur ) | 70 + 70 + 71 = 211 | - 5 | 1 stroke | mari katayama hiroko yamaguchi |
+| 2 | 7 mar 2004 | daikin orchid ladies | 70 + 66 + 70 = 206 | - 10 | 3 strokes | kaori higo |
+| 3 | 13 jun 2004 | suntory ladies open | 69 + 70 + 70 + 68 = 277 | - 11 | 6 strokes | hiroko yamaguchi toshimi kimura |
+| 4 | 20 jun 2004 | apita circle k sunkus ladies | 69 + 69 + 72 = 210 | - 6 | 1 stroke | yuri fudoh |
+| 5 | 24 oct 2004 | masters gc ladies | 69 + 68 + 68 = 205 | - 11 | 1 stroke | miho koga |
+| 6 | 21 nov 2004 | daio paper elleair ladies open | 66 + 67 + 69 = 202 | - 14 | 3 strokes | chieko amanuma rui kitada |
+| 7 | 15 may 2005 | vernal ladies | 69 + 64 + 70 = 203 | - 13 | 8 strokes | akiko fukushima |
+| 8 | 22 may 2005 | chukyo tv bridgestone ladies open | 65 + 74 + 70 = 209 | - 7 | playoff | nikki campbell |
+| 9 | 21 aug 2005 | new catapillar mitsubishi ladies | 66 + 75 + 68 = 209 | - 10 | 3 strokes | mi - jeong jeon hiromi mogi |
+| 10 | 2 oct 2005 | japan women 's open golf championship | 69 + 69 + 72 + 73 = 283 | - 5 | 5 strokes | akiko fukushima |
+| 12 | 20 nov 2005 | daio paper elleair ladies open | 69 + 70 + 65 = 204 | - 12 | 5 strokes | shiho oyama woo - soon ko kasumi fujii |
+| 13 | 10 sep 2006 | jlpga championship konica minolta cup | 70 + 68 + 74 + 70 = 282 | - 6 | 3 strokes | hyun - ju shin |
+| 14 | 24 sep 2006 | miyagi tv cup dunlop ladies open | 70 + 73 + 71 = 214 | - 2 | 3 strokes | shiho oyama |
+===================Question===================
+the winning score of the vernal ladies tournament was 203
+===================Text===================
+~~~python
+# Check if there is a row where tournament equals "vernal ladies" and winning score equals "203"
+# The table shows "vernal ladies" in row 7 with winning score "69 + 64 + 70 = 203"
+# We need to test the exact claim: winning score of the vernal ladies tournament was 203
+# The claim says "203", but the table shows "69 + 64 + 70 = 203". We need to check if the winning score column contains "203" as part of the string.
+# However, the claim likely refers to the numeric total 203, which is present in the winning score string.
+# We'll filter for rows where tournament contains "vernal ladies" (case-insensitive) and winning score contains "203".
+# Since the table uses exact strings, we'll do exact matching on tournament column as given in the table.
+# From the schema, the tournament value is "vernal ladies" (lowercase, no extra words).
+# Let's filter df for tournament == "vernal ladies" and check if the winning score string ends with "203" or contains "203".
+# Actually, the winning score column for that row is "69 + 64 + 70 = 203". So we can check if "203" is in the winning score string.
+# We'll do a direct comparison: does the winning score for that row equal "203"? No, it's a longer string.
+# But the claim says "the winning score ... was 203". In sports tables, "winning score" often refers to the total numeric score.
+# The table column "winning score" contains the full expression, but the numeric total is the last part after "=".
+# We need to extract the numeric total from the winning score string and compare to 203.
+# Let's extract the part after "=", strip spaces, and convert to integer.
+# However, we must be careful: only do this for the row corresponding to "vernal ladies".
+# Steps:
+# 1. Filter df where tournament == "vernal ladies"
+# 2. Get the winning score string for that row
+# 3. Extract the numeric total after "="
+# 4. Compare to 203
+
+# First, ensure we use exact column names as in df
+# From the schema, column names are: 'no', 'date', 'tournament', 'winning score', 'to par', 'margin of victory', 'runner (s) - up'
+
+# Filter for vernal ladies
+vernal_row = df[df['tournament'].str.lower() == 'vernal ladies']
+
+if vernal_row.empty:
+    answer = False
+else:
+    # Get the winning score string
+    winning_score_str = vernal_row.iloc[0]['winning score']
+    # Extract the total: split by '=' and take last part, strip spaces
+    total_str = winning_score_str.split('=')[-1].strip()
+    # Convert to integer
+    try:
+        total = int(total_str)
+        answer = (total == 203)
+    except:
+        # If conversion fails, check if "203" is in the string
+        answer = ('203' in winning_score_str)
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

@@ -1,0 +1,63 @@
+===================Title===================
+brian watts
+===================Table===================
+| tournament | wins | top - 5 | top - 25 | events | cuts made |
+| masters tournament | 0 | 0 | 0 | 2 | 1 |
+| us open | 0 | 0 | 1 | 2 | 1 |
+| the open championship | 0 | 1 | 2 | 7 | 4 |
+| pga championship | 0 | 0 | 0 | 6 | 4 |
+| totals | 0 | 1 | 3 | 17 | 10 |
+===================Question===================
+for brian watts , the open championship is the tournament with his second highest number of events
+===================Text===================
+~~~python
+# First, get the row for "the open championship"
+open_championship_row = df[df['tournament'] == 'the open championship']
+open_events = open_championship_row['events'].iloc[0]
+
+# Get all tournament rows (excluding "totals")
+tournament_df = df[df['tournament'] != 'totals']
+
+# Sort tournaments by events in descending order to find rankings
+sorted_tournaments = tournament_df.sort_values(by='events', ascending=False)
+
+# Determine the rank of "the open championship" in terms of events
+# Since we need second highest, we check if it's ranked second
+# Get the events values in descending order
+events_desc = sorted_tournaments['events'].values
+
+# Check if there is a tie for first place
+if len(events_desc) > 1:
+    # Find unique event counts in descending order
+    unique_events_desc = sorted_tournaments['events'].unique()
+    unique_events_desc.sort()
+    unique_events_desc = unique_events_desc[::-1]  # descending
+    
+    # Determine the rank of open_events among unique values
+    # Rank 1 is highest, rank 2 is second highest, etc.
+    rank = list(unique_events_desc).index(open_events) + 1
+    answer = (rank == 2)
+else:
+    # If only one tournament (excluding totals), it can't be second highest
+    answer = False
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

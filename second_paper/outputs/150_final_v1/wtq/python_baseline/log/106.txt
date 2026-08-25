@@ -1,0 +1,59 @@
+===================Title===================
+Cheltenham Town F.C.
+===================Table===================
+| Year | Kit Manufacturer | Shirt Sponsor | Back of Shirt Sponsor | Short Sponsor |
+| 1977–1978 |  | National Express |  |  |
+| 1982–1985 | Umbro |  |  |  |
+| 1985–1986 | Umbro | Whitbread |  |  |
+| 1986–1988 | Henson | Duraflex |  |  |
+| 1988–1989 |  | Gulf Oil |  |  |
+| 1991–1993 | Technik | Gulf Oil |  |  |
+| 1993–1994 | Club Sport | Gulf Oil |  |  |
+| 1994–1995 | Klūb Sport | Empress |  |  |
+| 1995–1996 | Matchwinner | Empress |  |  |
+| 1996–1997 | UK | Endsleigh Insurance |  |  |
+| 1997–1999 | Errea | Endsleigh Insurance |  |  |
+| 1999–2004 | Errea | Towergate Insurance |  |  |
+| 2004–2008 | Errea | Bence Building Merchants |  |  |
+| 2008– | Errea | Mira Showers |  |  |
+| 2009–2011 | Errea | Mira Showers | PSU Technology Group |  |
+| 2011–2013 | Errea | Mira Showers | Barr Stadia | Gloucestershire Echo |
+| 2013– | Errea | Mira Showers | Gloucestershire College | Gloucestershire Echo |
+===================Question===================
+what company has the longest tenure as kit manufacturer?
+===================Text===================
+```python
+# Find the kit manufacturer with the longest tenure
+# First, extract the start year from the Year column
+df['Start_Year'] = df['Year'].str.split('–').str[0].astype(int)
+
+# Group by kit manufacturer and calculate tenure as max year - min year + 1
+manufacturer_tenure = df.groupby('Kit Manufacturer')['Start_Year'].agg(['min', 'max'])
+manufacturer_tenure['tenure_years'] = manufacturer_tenure['max'] - manufacturer_tenure['min'] + 1
+
+# Find the manufacturer with the maximum tenure
+longest_tenure = manufacturer_tenure['tenure_years'].max()
+longest_manufacturer = manufacturer_tenure[manufacturer_tenure['tenure_years'] == longest_tenure].index[0]
+
+answer = longest_manufacturer
+```
+===================Answer===================
+['Errea']
+===================Execution Result===================
+"Errea"
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+Errea

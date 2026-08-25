@@ -1,0 +1,114 @@
+===================Title===================
+Kodachrome
+===================Table===================
+| Film | Film | Date |
+| Kodachrome film | 16 mm, daylight (ASA 10) & Type A (ASA 16) | 1935–1962 |
+| Kodachrome film | 8 mm, daylight (ASA 10) & Type A (ASA 16) | 1936–1962 |
+| Kodachrome film | 35 mm and 828, daylight & Type A | 1936–1962 |
+| Kodachrome Professional film (sheets) | daylight (ASA 8) and Type B (ASA 10) | 1938–1951 |
+| Kodachrome film | 35 mm and 828, Type F (ASA 12) | 1955–1962 |
+| Kodachrome Professional film | 35 mm, Type A (ASA 16) | 1956–1962 |
+| Kodak Color Print Material | Type D (slide duping film) | 1955–1957 |
+| Kodachrome II film | 16 mm, daylight (ASA 25) and Type A (ASA 40) | 1961–1974 |
+| Kodachrome II film | 8 mm, daylight (ASA 25) and Type A (ASA 40) | 1961–1974 |
+| Kodachrome II film | S-8, Type A (ASA 40) | 1965–1974 |
+| Kodachrome II film | 35 mm and 828, daylight (ASA 25/early) (ASA 64/late) | 1961–1974 |
+| Kodachrome II film | Professional, 35 mm, Type A (ASA 40) | 1962–1978 |
+| Kodachrome-X film | 35 mm (ASA 64) | 1962–1974 |
+| Kodachrome-X film | 126 format | 1963–1974 |
+| Kodachrome-X film | 110 format | 1972–1974 |
+| Kodachrome 25 film | 35 mm, daylight | 1974–2001 |
+| Kodachrome 25 film | Movie film, 16 mm, daylight | 1974–2002 |
+| Kodachrome 25 film | Movie film, 8 mm, daylight | 1974–1992 |
+| Kodachrome 25 film | Professional film, 35 mm, daylight | 1983–1999 |
+| Kodachrome 40 film | 35 mm, Type A | 1978–1997 |
+| Kodachrome 40 film | Movie film, 16 mm, Type A | 1974–2006 |
+| Kodachrome 40 film | Movie film, S-8, Type A | 1974–2005 |
+| Kodachrome 40 film | Sound Movie film, S-8, Type A | 1974–1998 |
+| Kodachrome 40 film | Movie film, 8 mm, Type A | 1974–1992 |
+| Kodachrome 64 | 35 mm, daylight | 1974–2009 |
+| Kodachrome 64 | 126 format, daylight | 1974–1993 |
+| Kodachrome 64 | 110 format, daylight | 1974–1987 |
+| Kodachrome 64 | Professional film, 35 mm, daylight | 1983–2009 |
+| Kodachrome 64 | Professional film, daylight, 120 format | 1986–1996 |
+| Kodachrome 200 | Professional film, 35 mm, daylight | 1986–2004 |
+| Kodachrome 200 | 35 mm, daylight | 1988–2007 |
+| Cine-Chrome 40A | Double Regular 8 mm, tungsten | 2003–2006 |
+===================Question===================
+when was the kodachrome professional 35mm film first released?
+===================Text===================
+~~~python~~~
+# Filter rows where 'Film' contains 'Kodachrome Professional' and '35 mm' (or '35mm')
+# The exact column values may have variations like 'Kodachrome Professional film (sheets)' or 'Kodachrome Professional film'
+# We need to match both the film type and the format.
+# The 'Film' column contains the film name, and the second column (unnamed) contains details like format and ASA.
+# We'll filter rows where 'Film' includes 'Kodachrome Professional' and the second column includes '35 mm' or '35mm'.
+# The second column is named 'Film' as well due to duplicate column names? Actually the schema shows two columns named 'Film'.
+# In pandas, duplicate column names are allowed but we can refer to them by position.
+# Let's inspect the column names first (but we cannot print in final answer, we'll assume the second column is named 'Film.1' or similar).
+# Since we cannot see the actual df structure, we'll use a robust approach: filter based on string matching across both columns.
+# We'll combine the two columns into a single string for matching.
+# First, ensure we handle duplicate column names: df.columns returns list, we can rename for clarity.
+# However, the instruction says not to recreate df, but we can assign a temporary variable with renamed columns.
+# Let's rename the columns to 'Film_name' and 'Details' for clarity.
+df_renamed = df.copy()
+df_renamed.columns = ['Film_name', 'Details', 'Date']
+
+# Now filter rows where Film_name contains 'Kodachrome Professional' and Details contains '35 mm' or '35mm'
+# Also note there might be 'Professional film' in Film_name and '35 mm' in Details.
+# We'll use case-insensitive matching and allow for variations.
+filtered = df_renamed[
+    df_renamed['Film_name'].str.contains('Kodachrome Professional', case=False, na=False) &
+    df_renamed['Details'].str.contains('35 mm|35mm', case=False, na=False)
+]
+
+# If no rows found, try a broader search: maybe 'Kodachrome Professional film' and '35 mm'
+if filtered.empty:
+    filtered = df_renamed[
+        df_renamed['Film_name'].str.contains('Kodachrome Professional film', case=False, na=False) &
+        df_renamed['Details'].str.contains('35 mm|35mm', case=False, na=False)
+    ]
+
+# Extract the 'Date' column values
+dates = filtered['Date'].tolist()
+
+# The question asks: "when was the kodachrome professional 35mm film first released?"
+# We need the earliest release year from the date ranges.
+# Date format is like '1938–1951', we need the start year.
+# Split by '–' and take the first part, convert to integer.
+start_years = []
+for date_str in dates:
+    # Handle possible different dash characters (en dash, em dash, hyphen)
+    # Replace common dash-like characters with '-'
+    date_str_clean = date_str.replace('–', '-').replace('—', '-')
+    start_year = int(date_str_clean.split('-')[0].strip())
+    start_years.append(start_year)
+
+# Find the minimum start year
+if start_years:
+    earliest_year = min(start_years)
+    answer = earliest_year
+else:
+    # If no rows found, return None or appropriate value
+    answer = None
+~~~
+===================Answer===================
+['1956']
+===================Execution Result===================
+1956
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+1956

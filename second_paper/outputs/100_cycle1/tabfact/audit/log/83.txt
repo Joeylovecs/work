@@ -1,0 +1,54 @@
+===================Title===================
+bhind (lok sabha constituency)
+===================Table===================
+| constituency number | name | reserved for ( sc / st / none) | district | number of electorates (2009) |
+| 9 | ater | none | bhind | 177334 |
+| 10 | bhind | none | bhind | 197183 |
+| 11 | lahar | none | bhind | 205839 |
+| 12 | mehgaon | none | bhind | 210649 |
+| 13 | gohad | sc | bhind | 166893 |
+| 20 | sewda | none | datia | 130161 |
+| 21 | bhander | sc | datia | 139600 |
+| 22 | datia | none | datia | 143593 |
+| total : | total : | total : | total : | 1371252 |
+===================Question===================
+datia 's constituency number is higher than gohad 's by 9
+===================Text===================
+~~~python
+~~~
+# First, extract the constituency numbers for 'datia' and 'gohad'
+datia_number = df.loc[df['name'] == 'datia', 'constituency number'].iloc[0]
+gohad_number = df.loc[df['name'] == 'gohad', 'constituency number'].iloc[0]
+
+# Check if datia's number is higher than gohad's by exactly 9
+answer = (datia_number - gohad_number) == 9
+~~~
+---
+~~~python~~~
+# Extract constituency numbers for 'datia' and 'gohad'
+datia_num = df.loc[df['name'] == 'datia', 'constituency number'].iloc[0]
+gohad_num = df.loc[df['name'] == 'gohad', 'constituency number'].iloc[0]
+
+# Check if datia's constituency number is higher than gohad's by 9
+answer = (datia_num - gohad_num) == 9
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "MISSING_FILTER_PARAMETER", "expected": {"column": "constituency number", "op": "=", "value": "higher than gohad"}, "actual": null, "evidence": ["column_access:constituency number", "filter:name = 'datia'", "column_access:name", "column_access:constituency number", "filter:name = 'gohad'", "column_access:name", "scalar_compare:datia_num - gohad_num == 9"], "confidence": 0.9, "repair_hint": "Ground the filter column and value in the question and table."}], "confidence": 0.9}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "MISSING_FILTER_PARAMETER", "expected": {"column": "constituency number", "op": "=", "value": "higher than gohad"}, "actual": null, "evidence": ["column_access:constituency number", "filter:name = 'datia'", "column_access:name", "column_access:constituency number", "filter:name = 'gohad'", "column_access:name", "scalar_compare:datia_num - gohad_num == 9"], "confidence": 0.9, "repair_hint": "Ground the filter column and value in the question and table."}], "confidence": 0.9}, "repair_hint": "Ground the filter column and value in the question and table.", "confidence": 0.9, "mode": "hybrid"}
+===================Repair Hint===================
+Ground the filter column and value in the question and table.
+===================Repair Trace===================
+[{"repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "boolean", "actual": "null", "evidence": [], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_FILTER", "expected": {"column": "constituency number", "op": "=", "value": "higher than gohad"}, "actual": [], "evidence": [], "confidence": 0.96, "repair_hint": "Add filter constituency number = higher than gohad before the aggregation."}, {"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "filter", "actual": [], "evidence": [], "confidence": 0.93, "repair_hint": "Add the missing filter operation before returning the answer."}, {"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "boolean_reduce", "actual": [], "evidence": [], "confidence": 0.93, "repair_hint": "Add the missing boolean_reduce operation before returning the answer."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "MISSING_FILTER_PARAMETER", "expected": {"column": "constituency number", "op": "=", "value": "higher than gohad"}, "actual": null, "evidence": [], "confidence": 0.9, "repair_hint": "Ground the filter column and value in the question and table."}], "confidence": 0.9}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object. Add filter constituency number = higher than gohad before the aggregation. Add the missing filter operation before returning the answer. Add the missing boolean_reduce operation before returning the answer. Ground the filter column and value in the question and table.", "confidence": 0.9, "mode": "hybrid"}, "repaired_code": "# Extract constituency numbers for 'datia' and 'gohad'\ndatia_num = df.loc[df['name'] == 'datia', 'constituency number'].iloc[0]\ngohad_num = df.loc[df['name'] == 'gohad', 'constituency number'].iloc[0]\n\n# Check if datia's constituency number is higher than gohad's by 9\nanswer = (datia_num - gohad_num) == 9", "execution": {"success": true, "error": null, "result": "True", "observed_output_type": "boolean", "observed_value": true, "evidence": {"final_object_type": "boolean", "final_value": true, "dataframes": [{"name": "df", "shape": [9, 5], "columns": ["constituency number", "name", "reserved for ( sc / st / none)", "district", "number of electorates (2009)"]}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.0007186299189925194}, "memory": {}}, "accepted": true}]
+===================Final Answer===================
+True

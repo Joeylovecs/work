@@ -1,0 +1,68 @@
+===================Title===================
+united states house of representatives elections , 1974
+===================Table===================
+| district | incumbent | party | first elected | result | candidates |
+| maryland 1 | robert bauman | republican | 1973 | re - elected | robert bauman (r) 53.0% thomas j hatem (d) 47.0% |
+| maryland 2 | clarence long | democratic | 1962 | re - elected | clarence long (d) 77.1% john m seney (r) 22.9% |
+| maryland 4 | marjorie holt | republican | 1972 | re - elected | marjorie holt (r) 58.1% fred l wineland (d) 41.9% |
+| maryland 6 | goodloe byron | democratic | 1970 | re - elected | goodloe byron (d) 73.7% elton r wampler (r) 26.3% |
+| maryland 7 | parren mitchell | democratic | 1970 | re - elected | parren mitchell (d) unopposed |
+===================Question===================
+in the elections with goodloe byron as the incumbent politician , goodloe byron (d) won with 73.7% of the vote vs elton rwampler (r)
+===================Text===================
+~~~python~~~
+# Filter rows where the incumbent is "goodloe byron"
+byron_rows = df[df['incumbent'].str.lower() == 'goodloe byron']
+
+# Check if there is exactly one such row
+if byron_rows.shape[0] == 1:
+    # Extract the candidates string for that row
+    candidates_str = byron_rows['candidates'].iloc[0].lower()
+    
+    # Check if the candidates string contains the exact vote percentages and names as stated
+    # The claim states: "goodloe byron (d) won with 73.7% of the vote vs elton rwampler (r)"
+    # Note: The claim writes "elton rwampler" (no space after 'r'), but the table has "elton r wampler".
+    # We need to check if the candidates string matches the pattern with the correct percentages.
+    # We'll check for the presence of "goodloe byron (d)" and "73.7%" and "elton r wampler (r)" with "26.3%"
+    # However, the claim only mentions Byron's percentage and the opponent's name, not the opponent's percentage.
+    # The claim says "won with 73.7% of the vote vs elton rwampler (r)", which implies Byron got 73.7% and the opponent is elton rwampler (r).
+    # We'll verify both the name and the percentage for Byron.
+    
+    # Check if "goodloe byron (d) 73.7%" appears in the candidates string
+    byron_pattern = "goodloe byron (d) 73.7%"
+    # Check if "elton r wampler (r)" appears (note the space in the table)
+    opponent_pattern = "elton r wampler (r)"
+    
+    # Since the claim writes "elton rwampler" without space, we'll also check a version without space for robustness
+    opponent_pattern_no_space = "elton rwampler (r)"
+    
+    # Check conditions
+    condition1 = byron_pattern in candidates_str
+    condition2 = (opponent_pattern in candidates_str) or (opponent_pattern_no_space in candidates_str)
+    
+    # The claim is true if both conditions are met
+    answer = condition1 and condition2
+else:
+    # If there is not exactly one row, the claim is false
+    answer = False
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

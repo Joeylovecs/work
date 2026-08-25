@@ -1,0 +1,107 @@
+#!/bin/bash
+# 3-Round Iteration + Parallel Analysis + Multi-Priority Voting - WTQ Dataset
+# 【思考模式版本】- 基座模型开启思考模式
+# Uses fine-tuned Qwen3-8B as analyst to evaluate reasoning steps
+# Original Qwen3-8B as base model to generate reasoning steps (with thinking mode)
+# 3 rounds iteration with multi-priority voting for final answer
+
+# ======== Model Path Configuration ========
+# Base reasoning model (original Qwen3-8B)
+MODEL_PATH="/data/amax/home/E23101002/wangjie/Qwen3-8B"
+
+# Analyst model (fine-tuned Qwen3-8B)
+ANALYST_MODEL_PATH="/data/amax/home/E23101002/wangjie/Rethinking Tabular DeepSeek new/buzhou/training_data_zhengti/weitiao/qwen3_8b_merged_final"
+
+# ======== GPU Configuration ========
+# Use two 4090 GPUs for inference
+# Base model -> GPU 0 (HuggingFace)
+# Analyst model -> GPU 1 (VLLM)
+export CUDA_VISIBLE_DEVICES=0,1
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+# ======== Switch to project root directory ========
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+echo "Script directory: $SCRIPT_DIR"
+echo "Project root: $ROOT_DIR"
+cd "$ROOT_DIR" || exit  
+echo "Current working directory: $(pwd)"
+
+# ======== Thinking Mode Control ========
+# 【关键配置】控制基座模型的思考模式
+# 这个变量会传递给 run_cot_sikao.py 的 --enable_thinking 参数
+# 以及 --enable_thinking_analyst 参数（分析师模型的思考开关）
+ENABLE_THINKING=${ENABLE_THINKING:-true}
+ENABLE_THINKING_ANALYST=${ENABLE_THINKING_ANALYST:-true}
+export QWEN_ENABLE_THINKING="$ENABLE_THINKING"
+
+echo "========================================="
+echo "3-Round Iteration + Parallel Analysis + Multi-Priority Voting"
+echo "【思考模式版本】"
+echo "========================================="
+echo "Base Model: $MODEL_PATH"
+echo "Analyst Model: $ANALYST_MODEL_PATH"
+echo "Base Model Thinking Mode: $ENABLE_THINKING"
+echo "Analyst Model Thinking Mode: $ENABLE_THINKING_ANALYST"
+echo "========================================="
+echo ""
+echo "Workflow:"
+echo "  Round 1: Base generates Path 1,2,3 (3 independent windows)"
+echo "           -> Analyst analyzes in 3 parallel windows"
+echo "           -> All correct & same answer? -> YES: output, NO: continue"
+echo ""
+echo "  Round 2: Base generates Path 4,5,6 (with error analysis)"
+echo "           -> Analyst analyzes in 3 parallel windows"
+echo "           -> Has correct & unique? -> YES: output, NO: continue"
+echo ""
+echo "  Round 3: Base generates Path 7,8,9"
+echo "           -> Analyst analyzes in 3 parallel windows"
+echo "           -> Final Decision:"
+echo "              Priority1: Round3 correct path"
+echo "              Priority2: History correct vote"
+echo "              Priority3: All 9 answers vote"
+echo ""
+echo "========================================="
+
+# ======== System Prompt Setting ========
+# 思考模式使用简洁的提示，让模型自由思考
+if [ "$ENABLE_THINKING" = "true" ]; then
+    SYSTEM_PROMPT="You are a helpful assistant. Think step by step and show your reasoning process."
+else
+    SYSTEM_PROMPT="You are a precise table question answering assistant. 
+
+CRITICAL ANSWER FORMAT RULES:
+1. For 'how many' questions: Answer with a NUMBER only (e.g., '3', not 'Spain, Italy, France')
+2. For 'most/least/only/single' questions: Give ONE answer only, even if tied. Pick the one that appears FIRST in the table.
+3. For comparison questions (which is more/less): Choose ONE option, not both.
+4. For 'last/first' in a list: Identify by row position, NOT by label like 'Total'.
+5. For 'after X year': The year immediately FOLLOWING X, not the same year.
+
+VALIDATION:
+- Before giving Final Answer, verify it matches the question type.
+- If question asks 'how many', your answer MUST be a number.
+- If question asks 'which one', your answer MUST be exactly ONE item.
+
+Do NOT use <think> or any hidden/internal reasoning. Follow the requested step-by-step format and end with Final Answer only."
+fi
+
+# ======== Run 3-Round + Parallel Analysis Inference ========
+python fenxishi/run_cot_sikao.py \
+    --model="$MODEL_PATH" \
+    --long_model="$MODEL_PATH" \
+    --analyst_model_path="$ANALYST_MODEL_PATH" \
+    --provider="vllm" \
+    --system="$SYSTEM_PROMPT" \
+    --dataset="wtq" \
+    --sub_sample=False \
+    --perturbation="none" \
+    --norm=True \
+    --disable_resort=True \
+    --norm_cache=True \
+    --resume=0 \
+    --stop_at=100 \
+    --temperature=0.8 \
+    --enable_thinking="$ENABLE_THINKING" \
+    --enable_thinking_analyst="$ENABLE_THINKING_ANALYST" \
+    --log_dir="fenxishi/output/final_sikao_wtq" \
+    --cache_dir="cache/qwen3_8b"

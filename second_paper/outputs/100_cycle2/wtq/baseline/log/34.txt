@@ -1,0 +1,81 @@
+===================Title===================
+Love (2011 film)
+===================Table===================
+| Date | Festival | Location | Awards | Link |
+| Feb 2–5, Feb 11 | Santa Barbara International Film Festival | Santa Barbara, California  USA | Top 11 "Best of the Fest" Selection | sbiff.org |
+| May 21–22, Jun 11 | Seattle International Film Festival | Seattle, Washington  USA |  | siff.net |
+| Jul 18, Jul 25 | Fantasia Festival | Montreal, Quebec  Canada | Special Mention\n"for the resourcefulness and unwavering determination by a director to realize his unique vision" | FanTasia |
+| Sep 16 | Athens International Film Festival | Athens, Attica\n Greece | Best Director | aiff.gr |
+| Sep 19 | Lund International Fantastic Film Festival | Lund, Skåne\n Sweden |  | fff.se |
+| Sep 28 | Fantastic Fest | Austin, Texas\n USA |  | FantasticFest.com |
+| Oct 9 | London Int. Festival of Science Fiction Film | London, England\n UK | Closing Night Film | Sci-Fi London |
+| Oct 9, Oct 11 | Sitges Film Festival | Sitges, Catalonia\n Spain |  | Sitges Festival |
+| Oct 1, Oct 15 | Gwacheon International SF Festival | Gwacheon, Gyeonggi-do\n South Korea |  | gisf.org |
+| Oct 17, Oct 20 | Icon TLV | Tel Aviv, Central\n Israel |  | icon.org.il |
+| Oct 23 | Toronto After Dark | Toronto, Ontario\n Canada | Best Special Effects\nBest Musical Score | torontoafterdark.com |
+| Nov 11 | Les Utopiales | Nantes, Pays de la Loire\n France |  | utopiales.org |
+| Nov 12, Nov 18 | Indonesia Fantastic Film Festival | Jakarta, Bandung\n Indonesia |  | inaff.com |
+| Nov 16–18 | AFF | Wrocław, Lower Silesia\n Poland |  | AFF Poland |
+===================Question===================
+what festival was the film show at before the fantasia festival?
+===================Text===================
+~~~python
+~~~
+# First, extract the date for Fantasia Festival to use as a reference
+fantasia_date = df.loc[df['Festival'] == 'Fantasia Festival', 'Date'].iloc[0]
+
+# Convert date strings to a comparable format (assuming we can compare as strings for this table's date format)
+# We'll parse the start date (first part before any separator) to a datetime for comparison
+def get_start_date(date_str):
+    # Split by common separators and take the first part
+    first_part = date_str.split(',')[0].split('–')[0].strip()
+    # Parse to datetime, assuming month abbreviation and day format
+    # Since we don't have year, we'll assume 2011 (from the film title) for parsing
+    from datetime import datetime
+    try:
+        return datetime.strptime(f"{first_part} 2011", "%b %d %Y")
+    except ValueError:
+        # Handle cases like "Feb 2–5" where first_part is "Feb 2"
+        # Remove month abbreviation and keep day
+        day_part = first_part.split(' ')[-1]
+        month_part = first_part.split(' ')[0]
+        return datetime.strptime(f"{month_part} {day_part} 2011", "%b %d %Y")
+
+# Apply to all dates
+df['StartDate'] = df['Date'].apply(get_start_date)
+
+# Get the Fantasia Festival start date
+fantasia_start = df.loc[df['Festival'] == 'Fantasia Festival', 'StartDate'].iloc[0]
+
+# Filter festivals with start date before Fantasia's start date
+before_fantasia = df[df['StartDate'] < fantasia_start]
+
+# Sort by start date descending to get the one immediately before
+before_fantasia_sorted = before_fantasia.sort_values('StartDate', ascending=False)
+
+# Get the festival name of the one immediately before Fantasia
+if not before_fantasia_sorted.empty:
+    answer = before_fantasia_sorted.iloc[0]['Festival']
+else:
+    answer = None
+~~~
+===================Answer===================
+['Seattle International Film Festival']
+===================Execution Result===================
+null
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+None

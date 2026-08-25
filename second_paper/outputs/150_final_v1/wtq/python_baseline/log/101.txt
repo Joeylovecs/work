@@ -1,0 +1,72 @@
+===================Title===================
+Cheltenham Town F.C.
+===================Table===================
+| Year | Kit Manufacturer | Shirt Sponsor | Back of Shirt Sponsor | Short Sponsor |
+| 1977–1978 |  | National Express |  |  |
+| 1982–1985 | Umbro |  |  |  |
+| 1985–1986 | Umbro | Whitbread |  |  |
+| 1986–1988 | Henson | Duraflex |  |  |
+| 1988–1989 |  | Gulf Oil |  |  |
+| 1991–1993 | Technik | Gulf Oil |  |  |
+| 1993–1994 | Club Sport | Gulf Oil |  |  |
+| 1994–1995 | Klūb Sport | Empress |  |  |
+| 1995–1996 | Matchwinner | Empress |  |  |
+| 1996–1997 | UK | Endsleigh Insurance |  |  |
+| 1997–1999 | Errea | Endsleigh Insurance |  |  |
+| 1999–2004 | Errea | Towergate Insurance |  |  |
+| 2004–2008 | Errea | Bence Building Merchants |  |  |
+| 2008– | Errea | Mira Showers |  |  |
+| 2009–2011 | Errea | Mira Showers | PSU Technology Group |  |
+| 2011–2013 | Errea | Mira Showers | Barr Stadia | Gloucestershire Echo |
+| 2013– | Errea | Mira Showers | Gloucestershire College | Gloucestershire Echo |
+===================Question===================
+which kit manufacturer came next after umbro?
+===================Text===================
+```python
+# Find the years where Umbro was the kit manufacturer
+umbro_years = df[df['Kit Manufacturer'] == 'Umbro']['Year']
+
+# Get the maximum year (most recent) where Umbro was used
+latest_umbro_year = umbro_years.max()
+
+# Find all years after the latest Umbro year
+# First, convert Year strings to sortable format for comparison
+# Since years are in format like "1977–1978", we'll extract the start year
+df['Start_Year'] = df['Year'].str.split('–').str[0].astype(int)
+
+# Find the next entry after the latest Umbro year
+latest_umbro_start = int(latest_umbro_year.split('–')[0])
+next_entries = df[df['Start_Year'] > latest_umbro_start].sort_values('Start_Year')
+
+# Get the kit manufacturer of the next entry
+if not next_entries.empty:
+    next_manufacturer = next_entries.iloc[0]['Kit Manufacturer']
+    answer = next_manufacturer
+else:
+    answer = None
+
+# Clean up temporary column
+df.drop('Start_Year', axis=1, inplace=True)
+
+answer
+```
+===================Answer===================
+['Henson']
+===================Execution Result===================
+"Henson"
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+Henson

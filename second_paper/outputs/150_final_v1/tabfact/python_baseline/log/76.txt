@@ -1,0 +1,88 @@
+===================Title===================
+utah jazz all - time roster
+===================Table===================
+| player | nationality | position | years for jazz | school / club team |
+| adrian dantley | united states | guard - forward | 1979 - 86 | notre dame |
+| brad davis | united states | guard | 1979 - 80 | maryland |
+| darryl dawkins | united states | center | 1987 - 88 | maynard evans hs |
+| paul dawkins | united states | guard | 1979 - 80 | northern illinois |
+| greg deane | united states | guard | 1979 - 80 | utah |
+| james donaldson | united states | center | 1993 , 1994 - 95 | washington state |
+| john drew | united states | guard - forward | 1982 - 85 | gardner - webb |
+| john duren | united states | guard | 1980 - 82 | georgetown |
+===================Question===================
+the jazz had two players with the last name dawkins but their time on the team did not overlap
+in the table:
+the jazz had 2 players with the last name dawkins.
+the jazz had 2 players with the last name dawkins.
+===================Text===================
+```python
+import pandas as pd
+
+# Extract last names
+df['last_name'] = df['player'].str.split().str[-1]
+
+# Filter for Dawkins players
+dawkins_df = df[df['last_name'] == 'dawkins'].copy()
+
+# Parse years to extract start and end years
+def parse_years(years_str):
+    # Handle cases like "1993 , 1994 - 95"
+    years_str = str(years_str).replace(' ', '')
+    # Find all 4-digit years
+    import re
+    years = re.findall(r'\d{4}', years_str)
+    if years:
+        return [int(y) for y in years]
+    return []
+
+dawkins_df['years_list'] = dawkins_df['years for jazz'].apply(parse_years)
+
+# Check if their time overlapped
+if len(dawkins_df) == 2:
+    years1 = dawkins_df.iloc[0]['years_list']
+    years2 = dawkins_df.iloc[1]['years_list']
+    
+    # Create sets of years each player was on the team
+    set1 = set()
+    set2 = set()
+    
+    # For each year range, add all years in between
+    for i in range(0, len(years1), 2):
+        if i + 1 < len(years1):
+            start, end = years1[i], years1[i + 1]
+            set1.update(range(start, end + 1))
+    
+    for i in range(0, len(years2), 2):
+        if i + 1 < len(years2):
+            start, end = years2[i], years2[i + 1]
+            set2.update(range(start, end + 1))
+    
+    # Check for overlap
+    overlap = bool(set1.intersection(set2))
+    answer = not overlap  # True if they did NOT overlap
+else:
+    answer = False
+
+answer
+```
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

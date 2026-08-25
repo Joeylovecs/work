@@ -1,0 +1,60 @@
+===================Title===================
+1972 vfl season
+===================Table===================
+| home team | home team score | away team | away team score | venue | crowd | date |
+| footscray | 14.7 (91) | st kilda | 9.11 (65) | western oval | 18655 | 15 july 1972 |
+| fitzroy | 16.14 (110) | north melbourne | 9.12 (66) | junction oval | 7007 | 15 july 1972 |
+| essendon | 13.12 (90) | richmond | 17.9 (111) | windy hill | 22251 | 15 july 1972 |
+| carlton | 20.8 (128) | south melbourne | 8.15 (63) | princes park | 14465 | 15 july 1972 |
+| hawthorn | 19.14 (128) | geelong | 15.8 (98) | glenferrie oval | 12425 | 15 july 1972 |
+| collingwood | 10.13 (73) | melbourne | 8.10 (58) | vfl park | 30883 | 15 july 1972 |
+===================Question===================
+more than half of the away teams had a score greater than 10
+in the table:
+6 away teams had a score greater than 10.
+===================Text===================
+~~~python~~~
+# Count total number of away teams (unique away team entries per row)
+total_away_teams = df['away team'].nunique()
+
+# Extract numeric away team score from the 'away team score' column
+# The score format is like "9.11 (65)" – we need the number before the dot for comparison with 10
+# We'll split by space, take the first part, then split by '.' and take the first part again to get the first number.
+def extract_first_number(score_str):
+    # Split by space, take first part (e.g., "9.11")
+    first_part = score_str.split()[0]
+    # Split by '.' and take the first number
+    try:
+        first_num = int(first_part.split('.')[0])
+    except:
+        first_num = 0
+    return first_num
+
+df['away_score_first_num'] = df['away team score'].apply(extract_first_number)
+
+# Count unique away teams where away_score_first_num > 10
+away_teams_gt_10 = df[df['away_score_first_num'] > 10]['away team'].nunique()
+
+# Check if more than half of the away teams had a score greater than 10
+answer = away_teams_gt_10 > (total_away_teams / 2)
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

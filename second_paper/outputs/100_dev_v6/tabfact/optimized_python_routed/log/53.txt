@@ -1,0 +1,54 @@
+===================Title===================
+1972 vfl season
+===================Table===================
+| home team | home team score | away team | away team score | venue | crowd | date |
+| footscray | 14.7 (91) | st kilda | 9.11 (65) | western oval | 18655 | 15 july 1972 |
+| fitzroy | 16.14 (110) | north melbourne | 9.12 (66) | junction oval | 7007 | 15 july 1972 |
+| essendon | 13.12 (90) | richmond | 17.9 (111) | windy hill | 22251 | 15 july 1972 |
+| carlton | 20.8 (128) | south melbourne | 8.15 (63) | princes park | 14465 | 15 july 1972 |
+| hawthorn | 19.14 (128) | geelong | 15.8 (98) | glenferrie oval | 12425 | 15 july 1972 |
+| collingwood | 10.13 (73) | melbourne | 8.10 (58) | vfl park | 30883 | 15 july 1972 |
+===================Question===================
+1 / 3 of the away teams had a score greater than 10
+===================Text===================
+~~~python~~~
+# Extract away team scores from the "away team score" column
+# The scores are in format like "9.11 (65)". We need the numeric part inside parentheses.
+# We'll extract the numeric score (the total points) from the parentheses.
+df['away_score_numeric'] = df['away team score'].str.extract(r'\((\d+)\)').astype(int)
+
+# Count total number of away teams (each row is one game, so number of rows)
+total_away_teams = df.shape[0]
+
+# Count number of away teams with score > 10
+away_teams_gt_10 = (df['away_score_numeric'] > 10).sum()
+
+# Check if exactly 1/3 of away teams have score > 10
+# Since we are dealing with integer counts, we need to check if away_teams_gt_10 equals total_away_teams / 3
+# But total_away_teams might not be divisible by 3, so we check if the proportion equals 1/3.
+# However, the question says "1 / 3 of the away teams", which implies exactly one third.
+# We'll compute the fraction and compare to 1/3 with a tolerance for floating point.
+is_one_third = abs(away_teams_gt_10 / total_away_teams - 1/3) < 1e-9
+
+answer = bool(is_one_third)
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

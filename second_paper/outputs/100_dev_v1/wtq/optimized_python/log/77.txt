@@ -1,0 +1,80 @@
+===================Title===================
+Radhika Pandit
+===================Table===================
+| Year | Film | Role | Language | Notes |
+| 2008 | Moggina Manasu | Chanchala | Kannada | Filmfare Award for Best Actress - Kannada\nKarnataka State Film Award for Best Actress |
+| 2009 | Olave Jeevana Lekkachaara | Rukmini | Kannada | Innovative Film Award for Best Actress |
+| 2009 | Love Guru | Kushi | Kannada | Filmfare Award for Best Actress - Kannada |
+| 2010 | Krishnan Love Story | Geetha | Kannada | Filmfare Award for Best Actress - Kannada\nUdaya Award for Best Actress |
+| 2010 | Gaana Bajaana | Radhey | Kannada |  |
+| 2011 | Hudugaru | Gayithri | Kannada | Nominated, Filmfare Award for Best Actress – Kannada |
+| 2012 | Alemari | Neeli | Kannada |  |
+| 2012 | Breaking News | Shraddha | Kannada |  |
+| 2012 | Addhuri | Poorna | Kannada | Udaya Award for Best Actress\nNominated — SIIMA Award for Best Actress\nNominated — Filmfare Award for Best Actress – Kannada |
+| 2012 | 18th Cross | Punya | Kannada |  |
+| 2012 | Sagar | Kajal | Kannada |  |
+| 2012 | Drama | Nandini | Kannada |  |
+| 2013 | Kaddipudi | Uma | Kannada |  |
+| 2013 | Dilwala | Preethi | Kannada |  |
+| 2013 | Bahaddoor | Anjali | Kannada | Filming |
+| 2014 | Mr. & Mrs. Ramachari |  |  | Announced |
+| 2014 | Endendigu |  |  | Filming |
+===================Question===================
+how many films were nominated for an award.
+===================Text===================
+```json
+{
+    "answer_type": "scalar",
+    "cardinality": "single",
+    "task_type": "count",
+    "target_columns": ["Film"],
+    "filters": [
+        {
+            "column": "Notes",
+            "op": "in",
+            "value": "Nominated"
+        }
+    ],
+    "operations": ["filter", "count"],
+    "aggregation": "count",
+    "ranking": null,
+    "arithmetic": null,
+    "boolean_polarity": "positive"
+}
+```
+---
+~~~python~~~
+# Filter rows where the 'Notes' column contains the word 'Nominated'
+nominated_films = df[df['Notes'].str.contains('Nominated', na=False, case=False)]
+
+# Count the number of unique films (distinct film titles) in the filtered rows
+answer = nominated_films['Film'].nunique()
+~~~
+---
+~~~python~~~
+# Filter rows where the 'Notes' column contains the word 'Nominated'
+nominated_films = df[df['Notes'].str.contains('Nominated', na=False, case=False)]
+
+# Count the number of unique films (distinct film titles) in the filtered rows
+answer = int(nominated_films['Film'].nunique())
+~~~
+===================Answer===================
+['6']
+===================Execution Result===================
+2
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "scalar", "actual": "number", "evidence": ["filter:Notes contains 'Nominated'", "column_access:Notes", "aggregation:count", "column_access:Film", "select:Film"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "COMPARATOR_MISMATCH", "expected": "in", "actual": "contains", "evidence": ["question_filter={'column': 'Notes', 'op': 'in', 'value': 'Nominated'}", "code_filter={'column': 'Notes', 'op': 'contains', 'value': 'Nominated'}"], "confidence": 0.99, "repair_hint": "Use comparator in for Notes Nominated."}], "confidence": 0.99}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "scalar", "actual": "number", "evidence": ["filter:Notes contains 'Nominated'", "column_access:Notes", "aggregation:count", "column_access:Film", "select:Film"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "COMPARATOR_MISMATCH", "expected": "in", "actual": "contains", "evidence": ["question_filter={'column': 'Notes', 'op': 'in', 'value': 'Nominated'}", "code_filter={'column': 'Notes', 'op': 'contains', 'value': 'Nominated'}"], "confidence": 0.99, "repair_hint": "Use comparator in for Notes Nominated."}], "confidence": 0.99}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object. Use comparator in for Notes Nominated.", "confidence": 0.98, "mode": "hybrid"}
+===================Repair Hint===================
+Return the requested answer type, not an intermediate numeric or table object. Use comparator in for Notes Nominated.
+===================Repair Trace===================
+[{"kind": "semantic", "repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "scalar", "actual": "number", "evidence": ["filter:Notes contains 'Nominated'", "column_access:Notes", "aggregation:count", "column_access:Film", "select:Film"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "COMPARATOR_MISMATCH", "expected": "in", "actual": "contains", "evidence": ["question_filter={'column': 'Notes', 'op': 'in', 'value': 'Nominated'}", "code_filter={'column': 'Notes', 'op': 'contains', 'value': 'Nominated'}"], "confidence": 0.99, "repair_hint": "Use comparator in for Notes Nominated."}], "confidence": 0.99}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object. Use comparator in for Notes Nominated.", "confidence": 0.98, "mode": "hybrid"}, "repaired_code": "# Filter rows where the 'Notes' column contains the word 'Nominated'\nnominated_films = df[df['Notes'].str.contains('Nominated', na=False, case=False)]\n\n# Count the number of unique films (distinct film titles) in the filtered rows\nanswer = int(nominated_films['Film'].nunique())", "execution": {"success": true, "error": null, "result": 2, "observed_output_type": "number", "observed_value": 2, "evidence": {"final_object_type": "number", "final_value": 2, "dataframes": [{"name": "df", "shape": [17, 5], "columns": ["Year", "Film", "Role", "Language", "Notes"]}, {"name": "nominated_films", "shape": [2, 5], "columns": ["Year", "Film", "Role", "Language", "Notes"]}], "operation_trace": [{"operation": "input_table", "name": "df", "rows": 17, "columns": ["Year", "Film", "Role", "Language", "Notes"]}, {"operation": "filter", "name": "nominated_films", "rows_before": 17, "rows_after": 2, "columns": ["Year", "Film", "Role", "Language", "Notes"]}, {"operation": "return", "output_type": "number", "value": 2}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.001179044134914875}, "memory": {}}, "candidate_audit": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "scalar", "actual": "number", "evidence": ["filter:Notes contains 'Nominated'", "column_access:Notes", "aggregation:count", "column_access:Film", "select:Film"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "COMPARATOR_MISMATCH", "expected": "in", "actual": "contains", "evidence": ["question_filter={'column': 'Notes', 'op': 'in', 'value': 'Nominated'}", "code_filter={'column': 'Notes', 'op': 'contains', 'value': 'Nominated'}"], "confidence": 0.99, "repair_hint": "Use comparator in for Notes Nominated."}], "confidence": 0.99}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object. Use comparator in for Notes Nominated.", "confidence": 0.98, "mode": "hybrid"}, "candidate_error_count": 2, "previous_error_count": 2, "answer_changed": false, "safe_change": true, "accepted": false, "rejection_reason": "no_verified_improvement"}]
+===================Final Answer===================
+2

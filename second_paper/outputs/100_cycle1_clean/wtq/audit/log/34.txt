@@ -1,0 +1,125 @@
+===================Title===================
+Love (2011 film)
+===================Table===================
+| Date | Festival | Location | Awards | Link |
+| Feb 2–5, Feb 11 | Santa Barbara International Film Festival | Santa Barbara, California  USA | Top 11 "Best of the Fest" Selection | sbiff.org |
+| May 21–22, Jun 11 | Seattle International Film Festival | Seattle, Washington  USA |  | siff.net |
+| Jul 18, Jul 25 | Fantasia Festival | Montreal, Quebec  Canada | Special Mention\n"for the resourcefulness and unwavering determination by a director to realize his unique vision" | FanTasia |
+| Sep 16 | Athens International Film Festival | Athens, Attica\n Greece | Best Director | aiff.gr |
+| Sep 19 | Lund International Fantastic Film Festival | Lund, Skåne\n Sweden |  | fff.se |
+| Sep 28 | Fantastic Fest | Austin, Texas\n USA |  | FantasticFest.com |
+| Oct 9 | London Int. Festival of Science Fiction Film | London, England\n UK | Closing Night Film | Sci-Fi London |
+| Oct 9, Oct 11 | Sitges Film Festival | Sitges, Catalonia\n Spain |  | Sitges Festival |
+| Oct 1, Oct 15 | Gwacheon International SF Festival | Gwacheon, Gyeonggi-do\n South Korea |  | gisf.org |
+| Oct 17, Oct 20 | Icon TLV | Tel Aviv, Central\n Israel |  | icon.org.il |
+| Oct 23 | Toronto After Dark | Toronto, Ontario\n Canada | Best Special Effects\nBest Musical Score | torontoafterdark.com |
+| Nov 11 | Les Utopiales | Nantes, Pays de la Loire\n France |  | utopiales.org |
+| Nov 12, Nov 18 | Indonesia Fantastic Film Festival | Jakarta, Bandung\n Indonesia |  | inaff.com |
+| Nov 16–18 | AFF | Wrocław, Lower Silesia\n Poland |  | AFF Poland |
+===================Question===================
+what festival was the film show at before the fantasia festival?
+===================Text===================
+~~~python~~~
+# Filter rows to find the Fantasia Festival row and get its date
+fantasia_row = df[df['Festival'] == 'Fantasia Festival']
+if not fantasia_row.empty:
+    fantasia_date = fantasia_row['Date'].iloc[0]
+    # Extract the first date part (assuming format like "Jul 18, Jul 25")
+    # We'll convert to a comparable date object for ordering
+    # Since dates are in a custom format, we'll parse the first date in the string
+    import datetime
+    def parse_first_date(date_str):
+        # Split by comma or dash to get the first date part
+        # Example: "Jul 18, Jul 25" -> "Jul 18"
+        # Example: "Feb 2–5, Feb 11" -> "Feb 2"
+        # We'll take the part before the first comma or dash
+        first_part = date_str.split(',')[0].split('–')[0].strip()
+        # Parse the month and day
+        try:
+            return datetime.datetime.strptime(first_part + " 2011", "%b %d %Y")
+        except ValueError:
+            # If parsing fails, return a far future date for safety
+            return datetime.datetime.max
+
+    fantasia_first_date = parse_first_date(fantasia_date)
+    
+    # Parse dates for all rows
+    df['parsed_date'] = df['Date'].apply(parse_first_date)
+    
+    # Find rows with parsed_date strictly before fantasia_first_date
+    before_rows = df[df['parsed_date'] < fantasia_first_date]
+    
+    # Sort by parsed_date descending to get the one immediately before
+    before_rows_sorted = before_rows.sort_values('parsed_date', ascending=False)
+    
+    if not before_rows_sorted.empty:
+        # Get the festival name of the most recent before Fantasia
+        answer = before_rows_sorted.iloc[0]['Festival']
+    else:
+        answer = None
+else:
+    answer = None
+~~~
+---
+~~~python~~~
+import datetime
+
+# Filter rows to find the Fantasia Festival row and get its date
+fantasia_row = df[df['Festival'] == 'Fantasia Festival']
+if not fantasia_row.empty:
+    fantasia_date = fantasia_row['Date'].iloc[0]
+    # Extract the first date part (assuming format like "Jul 18, Jul 25")
+    # We'll convert to a comparable date object for ordering
+    # Since dates are in a custom format, we'll parse the first date in the string
+    def parse_first_date(date_str):
+        # Split by comma or dash to get the first date part
+        # Example: "Jul 18, Jul 25" -> "Jul 18"
+        # Example: "Feb 2–5, Feb 11" -> "Feb 2"
+        # We'll take the part before the first comma or dash
+        first_part = date_str.split(',')[0].split('–')[0].strip()
+        # Parse the month and day
+        try:
+            return datetime.datetime.strptime(first_part + " 2011", "%b %d %Y")
+        except ValueError:
+            # If parsing fails, return a far future date for safety
+            return datetime.datetime.max
+
+    fantasia_first_date = parse_first_date(fantasia_date)
+    
+    # Parse dates for all rows
+    df['parsed_date'] = df['Date'].apply(parse_first_date)
+    
+    # Find rows with parsed_date strictly before fantasia_first_date
+    before_rows = df[df['parsed_date'] < fantasia_first_date]
+    
+    # Sort by parsed_date descending to get the one immediately before
+    before_rows_sorted = before_rows.sort_values('parsed_date', ascending=False)
+    
+    if not before_rows_sorted.empty:
+        # Get the festival name of the most recent before Fantasia
+        answer = before_rows_sorted.iloc[0]['Festival']
+    else:
+        answer = None
+else:
+    answer = None
+~~~
+===================Answer===================
+['Seattle International Film Festival']
+===================Execution Result===================
+null
+===================Execution Error===================
+NameError: name 'datetime' is not defined
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"kind": "execution", "repair_count": 1, "execution_error": "NameError: name 'datetime' is not defined", "repaired_code": "import datetime\n\n# Filter rows to find the Fantasia Festival row and get its date\nfantasia_row = df[df['Festival'] == 'Fantasia Festival']\nif not fantasia_row.empty:\n    fantasia_date = fantasia_row['Date'].iloc[0]\n    # Extract the first date part (assuming format like \"Jul 18, Jul 25\")\n    # We'll convert to a comparable date object for ordering\n    # Since dates are in a custom format, we'll parse the first date in the string\n    def parse_first_date(date_str):\n        # Split by comma or dash to get the first date part\n        # Example: \"Jul 18, Jul 25\" -> \"Jul 18\"\n        # Example: \"Feb 2–5, Feb 11\" -> \"Feb 2\"\n        # We'll take the part before the first comma or dash\n        first_part = date_str.split(',')[0].split('–')[0].strip()\n        # Parse the month and day\n        try:\n            return datetime.datetime.strptime(first_part + \" 2011\", \"%b %d %Y\")\n        except ValueError:\n            # If parsing fails, return a far future date for safety\n            return datetime.datetime.max\n\n    fantasia_first_date = parse_first_date(fantasia_date)\n    \n    # Parse dates for all rows\n    df['parsed_date'] = df['Date'].apply(parse_first_date)\n    \n    # Find rows with parsed_date strictly before fantasia_first_date\n    before_rows = df[df['parsed_date'] < fantasia_first_date]\n    \n    # Sort by parsed_date descending to get the one immediately before\n    before_rows_sorted = before_rows.sort_values('parsed_date', ascending=False)\n    \n    if not before_rows_sorted.empty:\n        # Get the festival name of the most recent before Fantasia\n        answer = before_rows_sorted.iloc[0]['Festival']\n    else:\n        answer = None\nelse:\n    answer = None", "execution": {"success": false, "error": "NameError: name 'datetime' is not defined", "result": null, "observed_output_type": "unknown", "observed_value": null, "evidence": {"stdout": "", "traceback": "Traceback (most recent call last):\n  File \"/root/shared-nvme/wangjie/second_paper/semantic_audit/runtime_trace.py\", line 59, in execute_code\n    if body: exec(compile(ast.Module(body=body,type_ignores=[]),\"<generated>\",\"exec\"),glb,loc)\n  File \"<generated>\", line 23, in <module>\n  File \"<generated>\", line 18, in parse_first_date\nNameError: name 'datetime' is not defined\n", "semantic_warnings": ["execution_exception"], "latency_seconds": 0.0029052000027149916}, "memory": {}}}]
+===================Final Answer===================
+None

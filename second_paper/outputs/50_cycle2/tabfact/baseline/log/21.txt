@@ -1,0 +1,142 @@
+===================Title===================
+1971 african cup of champions clubs
+===================Table===================
+| team 1 | agg | team 2 | 1st leg | 2nd leg |
+| al - merrikh | 2 - 2 (5 - 4 pen) | tele sc asmara | 2 - 1 | 0 - 1 |
+| abaluhya united | 1 - 3 | great olympics | 0 - 0 | 1 - 3 |
+| asc diaraf | 3 - 4 | stade malien | 3 - 0 | 0 - 4 |
+| maseru united | 3 - 5 | mmm tamatave | 1 - 2 | 2 - 3 |
+| as porto novo | 0 - 3 | victoria club mokanda | 0 - 1 | 0 - 2 |
+| canon yaoundé | 9 - 4 | as solidarité | 7 - 3 | 2 - 1 |
+| espérance | 1 - 0 | al - ahly (benghazi) | 0 - 0 | 1 - 0 |
+| secteur 6 | 1 - 2 | enugu rangers | 1 - 1 | 0 - 1 |
+| young africans | 2 - 0 | lavori publici | 2 - 0 | 0 - 0 |
+===================Question===================
+the young africans scored zero points in the 1971 african cup of champions clubs
+in the table:
+the young africans scored 2 points in the 1971 african cup of champions clubs.
+===================Text===================
+~~~python~~~
+# Check if there is a row where 'team 1' is 'young africans' and the 'agg' column contains a score where the first number (points scored by team 1) is 0.
+# The 'agg' column format is "X - Y" (possibly with additional text like penalties). We need to extract the first number before the dash.
+# Also note that the team could appear in either 'team 1' or 'team 2' column. We need to check both.
+
+# First, define a function to extract the first number from the 'agg' string.
+def extract_first_score(agg_str):
+    # Split by space and take the first part (e.g., "2-2" from "2 - 2 (5 - 4 pen)")
+    # Actually the format in the table is "2 - 2 (5 - 4 pen)", so splitting by space gives ['2', '-', '2', '(5', '-', '4', 'pen)']
+    # We'll split by space and take the first element, then split by '-' if needed, but the first element is already the first number.
+    # However, the first element might be like "2" or "0". Let's split by space and take the first token.
+    if isinstance(agg_str, str):
+        # Remove any leading/trailing spaces
+        parts = agg_str.strip().split()
+        if parts:
+            # The first part should be the first number (e.g., "2")
+            first_part = parts[0]
+            # Sometimes it might be like "2-2"? In the given data it's separated by spaces: "2 - 2"
+            # But the first part is still the first number.
+            # Convert to integer if possible
+            try:
+                return int(first_part)
+            except ValueError:
+                # If conversion fails, try splitting by '-' within the first part
+                subparts = first_part.split('-')
+                if subparts:
+                    try:
+                        return int(subparts[0])
+                    except:
+                        return None
+    return None
+
+# Now, check for rows where 'young africans' is in 'team 1' and the extracted first score is 0.
+mask_team1 = df['team 1'] == 'young africans'
+if mask_team1.any():
+    agg_vals = df.loc[mask_team1, 'agg']
+    # Apply extraction
+    scores = agg_vals.apply(extract_first_score)
+    # Check if any score is 0
+    team1_zero = (scores == 0).any()
+else:
+    team1_zero = False
+
+# Check for rows where 'young africans' is in 'team 2' and the extracted second score (points scored by team 2) is 0.
+# When team is in 'team 2', the points they scored are the second number in the 'agg' string.
+def extract_second_score(agg_str):
+    if isinstance(agg_str, str):
+        parts = agg_str.strip().split()
+        if len(parts) >= 3:
+            # The third part should be the second number (e.g., "2" in "2 - 2")
+            second_part = parts[2]
+            try:
+                return int(second_part)
+            except ValueError:
+                # Try splitting by '-'
+                subparts = second_part.split('-')
+                if subparts:
+                    try:
+                        return int(subparts[0])
+                    except:
+                        return None
+    return None
+
+mask_team2 = df['team 2'] == 'young africans'
+if mask_team2.any():
+    agg_vals = df.loc[mask_team2, 'agg']
+    scores = agg_vals.apply(extract_second_score)
+    team2_zero = (scores == 0).any()
+else:
+    team2_zero = False
+
+# The statement says "the young africans scored zero points", meaning they scored 0 points in the aggregate.
+# According to the table, for the row with young africans, the 'agg' is "2 - 0", meaning they scored 2 points (as team 1) and the opponent scored 0.
+# Actually, looking at the table: "young africans | 2 - 0 | lavori publici"
+# So young africans scored 2 points, not 0.
+# Therefore, the statement is false.
+
+# However, we should compute based on the data.
+# The statement is true if young africans scored 0 points in any match (aggregate).
+# But the question says "scored zero points in the 1971 african cup of champions clubs", which likely refers to the aggregate score in their match.
+# In the given row, young africans (team 1) has first score 2, so they scored 2 points.
+# So they did not score 0 points.
+
+# Alternatively, if we interpret "points" as goals, then they scored 2 goals, not 0.
+
+# Therefore, the statement is false.
+
+# Let's compute programmatically:
+# We need to check if the points scored by young africans (whether as team1 or team2) is 0 in the aggregate.
+# We have already extracted scores for both cases.
+# If in any row they appear and their score is 0, then the statement would be true.
+# But in the data, they appear only once, as team1 with score 2.
+
+# Combine the conditions
+young_africans_scored_zero = team1_zero or team2_zero
+
+# The statement says "the young africans scored zero points", which is the opposite of what we found.
+# So the truth value of the statement is the negation of young_africans_scored_zero? Actually no.
+# The statement asserts that they scored zero points. So if they scored zero points, statement is true; else false.
+# We have computed whether they scored zero points in any match (aggregate). But the statement might be about the entire tournament? They only have one match.
+# So we can use young_africans_scored_zero directly.
+
+answer = young_africans_scored_zero
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

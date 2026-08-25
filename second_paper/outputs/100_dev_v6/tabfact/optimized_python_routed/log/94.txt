@@ -1,0 +1,63 @@
+===================Title===================
+1971 african cup of champions clubs
+===================Table===================
+| team 1 | agg | team 2 | 1st leg | 2nd leg |
+| al - merrikh | 2 - 2 (5 - 4 pen) | tele sc asmara | 2 - 1 | 0 - 1 |
+| abaluhya united | 1 - 3 | great olympics | 0 - 0 | 1 - 3 |
+| asc diaraf | 3 - 4 | stade malien | 3 - 0 | 0 - 4 |
+| maseru united | 3 - 5 | mmm tamatave | 1 - 2 | 2 - 3 |
+| as porto novo | 0 - 3 | victoria club mokanda | 0 - 1 | 0 - 2 |
+| canon yaoundé | 9 - 4 | as solidarité | 7 - 3 | 2 - 1 |
+| espérance | 1 - 0 | al - ahly (benghazi) | 0 - 0 | 1 - 0 |
+| secteur 6 | 1 - 2 | enugu rangers | 1 - 1 | 0 - 1 |
+| young africans | 2 - 0 | lavori publici | 2 - 0 | 0 - 0 |
+===================Question===================
+asc diaraf lost to stade malien in the 1971 african cup of champions clubs
+===================Text===================
+~~~python~~~
+# Check if there is a row where team 1 is "asc diaraf" and team 2 is "stade malien"
+# and the aggregate score indicates asc diaraf lost.
+# The agg column contains the aggregate score in the format "goals_asc_diaraf - goals_stade_malien"
+# We need to parse the numbers before and after the dash to determine the winner.
+
+# Filter the dataframe for the specific match
+match_row = df[(df['team 1'] == 'asc diaraf') & (df['team 2'] == 'stade malien')]
+
+if match_row.empty:
+    answer = False
+else:
+    # Extract the aggregate score string
+    agg_str = match_row['agg'].iloc[0]
+    # Split by space and take the first part (e.g., "3-4")
+    score_part = agg_str.split()[0]
+    # Split by dash to get the two numbers
+    try:
+        score_asc, score_stade = map(int, score_part.split('-'))
+    except:
+        # In case of unexpected format, fallback to checking the 1st and 2nd leg results
+        # But according to the table, the format is consistent.
+        answer = False
+    else:
+        # asc diaraf is team 1, so if their score is less than team 2's score, they lost.
+        answer = score_asc < score_stade
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

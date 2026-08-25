@@ -1,0 +1,87 @@
+===================Title===================
+List of tallest freestanding structures in the world
+===================Table===================
+| Name | Country | Town | Height\nmetres / ft | Structural type | Held record | Notes |
+| Great Pyramid of Giza | Egypt | Giza | 146 / 480 | Mausoleum | 2570 BC–1311 | Due to erosion today it stands at the height of 138.8 metres (455 ft). |
+| Lincoln Cathedral | England | Lincoln | 159.7 / 524 | Church | 1311–1549 | Spire collapsed in 1549; today, stands at a height of 83 metres (272 ft). |
+| St. Mary's Church | Germany | Stralsund | 151 / 500 | Church | 1549–1647 | Spire destroyed by lightning in 1647; today stands at a height of 104 metres (341 ft). |
+| Strasbourg Cathedral | Germany and/or France (today France) | Strasbourg | 142 / 470 | Church | 1647–1874 |  |
+| St Nikolai | Germany | Hamburg | 147.3 / 483 | Church | 1874–1876 | Due to aerial bombing in World War II the nave was demolished; only the spire remains. |
+| Notre-Dame Cathedral | France | Rouen | 151 / 500 | Church | 1876–1880 |  |
+| Cologne Cathedral | Germany | Cologne | 157.4 / 516 | Church | 1880–1884 |  |
+| Washington Monument | United States | Washington, D.C. | 169.3 / 555 | Monument | 1884–1889 |  |
+| Eiffel Tower | France | Paris | 300.6 / 986 | Tower | 1889–1930 | Currently stands at a height of 324 metres (1,063 ft). |
+| Chrysler Building | United States | New York City | 319 / 1,046 | Skyscraper | 1930–1931 |  |
+| Empire State Building | United States | New York City | 448 / 1,472 | Skyscraper | 1931–1967 |  |
+| Ostankino Tower | Russia | Moscow | 540 / 1,772 | Tower | 1967–1976 |  |
+| CN Tower | Canada | Toronto | 553 / 1,815 | Tower | 1976–2007 |  |
+| Burj Khalifa | United Arab Emirates | Dubai | 829.8 / 2,722 | Skyscraper | 2007–present | Topped-out on 17 January 2009 |
+===================Question===================
+which building held the record for tallest freestanding structure before the burj khalifa?
+===================Text===================
+~~~python~~~
+# Filter for the record held before Burj Khalifa, which started in 2007
+# The 'Held record' column indicates the years the structure held the record.
+# We need to find the structure whose record ended in 2007 (when Burj Khalifa's record started).
+# The 'Held record' values are in the format "start_year–end_year" or "start_year–present".
+# We'll look for the row where the 'Held record' ends with "2007" (since Burj Khalifa started in 2007).
+# We'll extract the end year from the 'Held record' string.
+def extract_end_year(record_str):
+    if isinstance(record_str, str):
+        # Split by '–' and take the second part
+        parts = record_str.split('–')
+        if len(parts) == 2:
+            end_part = parts[1]
+            # If end_part is a year (digits) or contains a year before any non-digit
+            # We'll extract the first 4-digit year from the end part
+            # But note: some end parts are like "1311–1549" (both are years), so second part is just the year.
+            # Also, some have additional text like "2570 BC–1311" (second part is just "1311").
+            # So we can try to get the second part and see if it's a year.
+            # However, for "2007–present", the second part is "present", not a year.
+            # We want the one that ends exactly with "2007" (as the end year).
+            # So we'll check if the second part starts with "2007" (since it could be "2007–present" for Burj Khalifa).
+            # Actually, we want the structure whose record ended in 2007, so the end year is "2007".
+            # So we'll check if the second part is exactly "2007" or starts with "2007" (like "2007–present" is for Burj Khalifa, but that's the current record holder, not the previous).
+            # Wait: Burj Khalifa has "2007–present", so its start year is 2007.
+            # The previous record holder would have an end year of 2007.
+            # So we look for rows where the end year is exactly "2007".
+            # But note: the end year might be followed by something? In the table, it's just the year.
+            # Let's check the data: for CN Tower, it's "1976–2007", so end year is "2007".
+            # So we can split and check if the second part is "2007".
+            return end_part.strip()
+    return None
+
+# Apply the function to get end years
+df['end_year'] = df['Held record'].apply(extract_end_year)
+
+# Find the row where end_year is "2007" and it's not Burj Khalifa (since Burj Khalifa also has end_year as "present"? Actually Burj Khalifa's end_year is "present", not "2007")
+# Actually, Burj Khalifa's Held record is "2007–present", so extract_end_year returns "present", not "2007".
+# So we can simply filter where end_year == "2007"
+previous_record_holder = df[df['end_year'] == "2007"]
+
+# Get the Name of the previous record holder
+if not previous_record_holder.empty:
+    answer = previous_record_holder['Name'].iloc[0]
+else:
+    answer = None
+~~~
+===================Answer===================
+['CN Tower']
+===================Execution Result===================
+"CN Tower"
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+CN Tower

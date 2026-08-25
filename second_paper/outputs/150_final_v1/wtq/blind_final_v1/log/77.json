@@ -1,0 +1,82 @@
+{
+  "question_id": "nu-1747",
+  "reviews": [
+    {
+      "perspective": "recompute",
+      "answer": 5,
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "row": "2008",
+          "column": "Notes",
+          "value": "Filmfare Award for Best Actress - Kannada\nKarnataka State Film Award for Best Actress"
+        },
+        {
+          "row": "2009",
+          "column": "Notes",
+          "value": "Innovative Film Award for Best Actress"
+        },
+        {
+          "row": "2009",
+          "column": "Notes",
+          "value": "Filmfare Award for Best Actress - Kannada"
+        },
+        {
+          "row": "2010",
+          "column": "Notes",
+          "value": "Filmfare Award for Best Actress - Kannada\nUdaya Award for Best Actress"
+        },
+        {
+          "row": "2011",
+          "column": "Notes",
+          "value": "Nominated, Filmfare Award for Best Actress – Kannada"
+        },
+        {
+          "row": "2012",
+          "column": "Notes",
+          "value": "Udaya Award for Best Actress\nNominated — SIIMA Award for Best Actress\nNominated — Filmfare Award for Best Actress – Kannada"
+        }
+      ],
+      "operations": [
+        "Filter rows where 'Notes' column contains 'Nominated' or 'Award' (excluding 'Announced' and 'Filming')",
+        "Count distinct 'Film' entries from filtered rows"
+      ],
+      "matched_row_count": 5,
+      "reason": "The question asks for films nominated for an award. Scanning the 'Notes' column, rows with 'Nominated' or any award mention (e.g., 'Award', 'Udaya Award', 'Filmfare Award') indicate nomination or award recognition. Excluding rows with only 'Announced' or 'Filming' (no award/nomination). Distinct films meeting this: Moggina Manasu (2008), Olave Jeevana Lekkachaara (2009), Love Guru (2009), Krishnan Love Story (2010), Hudugaru (2011), Addhuri (2012). That's 6 films, but Love Guru (2009) and Olave Jeevana Lekkachaara (2009) are separate films, both included. Re-check: All listed have award/nomination mentions. Count is 6, but verify: Gaana Bajaana (2010) has no notes, Alemari (2012) no notes, Breaking News (2012) no notes, 18th Cross (2012) no notes, Sagar (2012) no notes, Drama (2012) no notes, Kaddipudi (2013) no notes, Dilwala (2013) no notes, Bahaddoor (2013) 'Filming', Mr. & Mrs. Ramachari (2014) 'Announced', Endendigu (2014) 'Filming' – none qualify. So 6 films. Wait, question says 'nominated for an award', not necessarily won. Rows with only awards (no 'Nominated') might not count as nominated. Re-examine: Moggina Manasu (2008) – awards won, no 'Nominated' text, so not nominated. Olave Jeevana Lekkachaara (2009) – 'Innovative Film Award for Best Actress', no 'Nominated', so not nominated. Love Guru (2009) – 'Filmfare Award for Best Actress - Kannada', no 'Nominated', so not nominated. Krishnan Love Story (2010) – awards won, no 'Nominated', so not nominated. Hudugaru (2011) – explicitly 'Nominated, Filmfare Award for Best Actress – Kannada', so nominated. Addhuri (2012) – 'Nominated — SIIMA Award for Best Actress\nNominated — Filmfare Award for Best Actress – Kannada', so nominated. Only these two films have 'Nominated' in notes. But also check if any other rows have 'Nominated' synonym? No. So answer should be 2. However, question might interpret 'nominated for an award' as including films that were nominated or won awards (common in WTQ). But phrasing 'nominated' suggests only explicit nomination. To be safe, count rows with 'Nominated' in Notes: Hudugaru (2011) and Addhuri (2012) – 2 films. But Addhuri also has 'Udaya Award for Best Actress' which is an award won, but still has nomination text. So distinct films with 'Nominated' string: 2. Re-scan table: Only 2011 and 2012 (Addhuri) rows contain 'Nominated'. Thus matched_row_count = 2. Answer = 2.",
+      "parse_success": true
+    },
+    {
+      "perspective": "counterexample",
+      "answer": 3,
+      "confidence": 1.0,
+      "evidence": [
+        {
+          "row": "2011 | Hudugaru | Gayithri | Kannada | Nominated, Filmfare Award for Best Actress – Kannada",
+          "column": "Notes",
+          "value": "Nominated, Filmfare Award for Best Actress – Kannada"
+        },
+        {
+          "row": "2012 | Addhuri | Poorna | Kannada | Udaya Award for Best Actress\nNominated — SIIMA Award for Best Actress\nNominated — Filmfare Award for Best Actress – Kannada",
+          "column": "Notes",
+          "value": "Nominated — SIIMA Award for Best Actress\nNominated — Filmfare Award for Best Actress – Kannada"
+        },
+        {
+          "row": "2009 | Olave Jeevana Lekkachaara | Rukmini | Kannada | Innovative Film Award for Best Actress",
+          "column": "Notes",
+          "value": "Innovative Film Award for Best Actress"
+        }
+      ],
+      "operations": [
+        "Scan each row's 'Notes' column for mentions of 'Nominated' (case-insensitive).",
+        "Exclude rows where 'Nominated' appears only as part of an award name (e.g., 'Innovative Film Award' does not contain 'Nominated').",
+        "Count distinct films (by 'Film' column) where 'Notes' explicitly indicates a nomination."
+      ],
+      "matched_row_count": 3,
+      "reason": "Rows for 'Hudugaru' and 'Addhuri' explicitly contain 'Nominated' in Notes, indicating award nominations. 'Olave Jeevana Lekkachaara' has 'Innovative Film Award for Best Actress' but no 'Nominated' mention, so it is not counted. All other rows either have no nomination mention or are blank/other awards. Thus, exactly 2 films were nominated for an award.",
+      "parse_success": true
+    }
+  ],
+  "accepted": false,
+  "final_answer": "2",
+  "correct": false
+}

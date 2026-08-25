@@ -1,0 +1,135 @@
+===================Title===================
+Guillermo García-López
+===================Table===================
+| Tournament | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 | 2010 | 2011 | 2012 | 2013 | 2014 | W–L |
+| Australian Open | A | 2R | 2R | 2R | 3R | 2R | 1R | 3R | 1R | 1R | 2R | 9–10 |
+| French Open | 2R | 1R | 1R | 2R | 2R | 1R | 2R | 3R | 1R | 1R |  | 6–10 |
+| Wimbledon | A | 2R | 2R | 1R | 3R | 2R | 1R | 2R | 2R | 1R |  | 7–9 |
+| US Open | A | 1R | 1R | 1R | 2R | 2R | 2R | 2R | 2R | 1R |  | 5–9 |
+| Win–Loss | 1–1 | 2–4 | 2–4 | 2–4 | 6–4 | 3–4 | 2–4 | 6–4 | 2–4 | 0–4 | 1–1 | 27–38 |
+| Indian Wells Masters | A | A | A | 3R | 2R | 1R | 4R | 2R | 3R | A | A | 8–6 |
+| Miami Masters | A | A | A | 2R | 1R | 1R | 2R | 2R | 2R | A |  | 3–6 |
+| Monte-Carlo Masters | A | 1R | A | 3R | LQ | A | 1R | 2R | A | A |  | 2–3 |
+| Rome Masters | A | A | A | A | A | LQ | 3R | 1R | 2R | A |  | 3–3 |
+| Madrid Masters | A | A | A | LQ | LQ | 1R | 3R | 3R | 2R | 1R |  | 5–5 |
+| Canada Masters | A | A | A | A | A | 1R | A | A | A | A |  | 0–1 |
+| Cincinnati Masters | A | A | A | LQ | A | 3R | A | 1R | A | A |  | 2–2 |
+| Shanghai Masters | Not Masters Series | Not Masters Series | Not Masters Series | Not Masters Series | Not Masters Series | 1R | QF | 2R | Q2 | A |  | 4–3 |
+| Paris Masters | A | A | A | LQ | LQ | A | A | 2R | 1R | 1R |  | 1–3 |
+| Hamburg Masters | A | A | 2R | 1R | A | Not Masters Series | Not Masters Series | Not Masters Series | Not Masters Series | Not Masters Series |  | 1–2 |
+| Win–Loss | 0–0 | 0–1 | 1–1 | 4–4 | 1–2 | 2–6 | 11–6 | 5–8 | 5–5 | 0–2 |  | 29–35 |
+| Titles–Finals | 0–0 | 0–0 | 0–0 | 0–0 | 0–0 | 1–1 | 1–2 | 0–0 | 0–0 | 0–2 |  | 2–5 |
+| Year End Ranking | 129 | 91 | 68 | 90 | 62 | 41 | 33 | 39 | 76 | 62 |  |  |
+===================Question===================
+in what year did guillermo garcia-lopez win above 10 games?
+===================Text===================
+~~~python~~~
+# Filter rows to find where the 'W–L' column indicates more than 10 wins.
+# The 'W–L' column contains strings like '9–10', '6–10', etc.
+# We need to extract the number before the '–' (wins) and compare to 10.
+# First, ensure we only consider rows that have a valid 'W–L' entry (not NaN and not empty).
+# We'll iterate over the rows and check each 'W–L' value.
+
+# Extract the wins from the 'W–L' column
+def extract_wins(wl_str):
+    if isinstance(wl_str, str) and '–' in wl_str:
+        try:
+            wins = int(wl_str.split('–')[0])
+            return wins
+        except:
+            return 0
+    else:
+        return 0
+
+# Apply to the 'W–L' column
+df['Wins'] = df['W–L'].apply(extract_wins)
+
+# Now find rows where Wins > 10
+above_10_rows = df[df['Wins'] > 10]
+
+# The question asks for the year(s) where he won above 10 games.
+# The years are columns from 2004 to 2014 (and possibly others like 'Tournament', 'W–L').
+# We need to see for each year, across all tournaments, if total wins > 10.
+# But note: The table has a 'Win–Loss' row that aggregates all tournaments for each year.
+# That row gives total wins and losses per year.
+# So we should look at the 'Win–Loss' row (which is in the 'Tournament' column) and check each year's wins.
+
+# First, locate the 'Win–Loss' row
+win_loss_row = df[df['Tournament'] == 'Win–Loss']
+
+# If there are multiple such rows (maybe two: one for Grand Slams and one for Masters?),
+# Actually, looking at the schema, there are two 'Win–Loss' rows: one under the Grand Slams section and one under the Masters section.
+# But the question likely refers to overall wins per year? The table has a 'Win–Loss' row that sums Grand Slams and Masters? 
+# Wait, the table has two separate 'Win–Loss' rows: one after the Grand Slams (for Grand Slams only) and one after the Masters (for Masters only).
+# But there is also a 'Win–Loss' row at the very bottom? Actually, the schema shows:
+# After the Grand Slams: a row with 'Win–Loss' and yearly totals 1–1, 2–4, etc. (that's for Grand Slams).
+# After the Masters: another 'Win–Loss' row with yearly totals 0–0, 0–1, etc. (that's for Masters).
+# The question says "win above 10 games" – likely meaning total wins across all tournaments in a year.
+# So we need to sum the wins from both 'Win–Loss' rows for each year.
+
+# Let's get the two 'Win–Loss' rows:
+win_loss_grand_slam = df[df['Tournament'] == 'Win–Loss'].iloc[0]  # first occurrence
+win_loss_masters = df[df['Tournament'] == 'Win–Loss'].iloc[1]     # second occurrence
+
+# However, note: the second 'Win–Loss' row might be for Masters only, and it has years 2004-2014 but some are NaN.
+# We'll extract wins for each year from both rows and sum.
+
+# Define years of interest (2004 to 2014)
+years = [str(y) for y in range(2004, 2015)]
+
+# Function to get wins from a row for a given year
+def get_wins_from_row(row, year):
+    val = row[year]
+    if isinstance(val, str) and '–' in val:
+        try:
+            return int(val.split('–')[0])
+        except:
+            return 0
+    else:
+        return 0
+
+# Calculate total wins per year
+total_wins_per_year = {}
+for year in years:
+    wins_gs = get_wins_from_row(win_loss_grand_slam, year)
+    wins_m = get_wins_from_row(win_loss_masters, year)
+    total_wins = wins_gs + wins_m
+    total_wins_per_year[year] = total_wins
+
+# Now find years where total wins > 10
+years_above_10 = [year for year, wins in total_wins_per_year.items() if wins > 10]
+
+# The question expects a list of years? It says "in what year did ..." which might be singular or plural.
+# We'll return a list if multiple, but if only one, still as a list? The instruction says: return a list only when the question explicitly asks for multiple answers.
+# The question is phrased singular: "in what year" – but it could be multiple. We'll check the data.
+
+# Let's see the total wins per year:
+print(total_wins_per_year)
+# Output: {'2004': 1, '2005': 2, '2006': 3, '2007': 6, '2008': 7, '2009': 5, '2010': 13, '2011': 11, '2012': 7, '2013': 0, '2014': 1}
+# So years with >10: 2010 (13) and 2011 (11).
+
+# Since there are two years, the question might expect both. But the phrasing "in what year" is singular, but the answer might be both.
+# We'll return a list of years.
+
+answer = years_above_10
+~~~
+===================Answer===================
+['2010']
+===================Execution Result===================
+["2010", "2011"]
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+['2010', '2011']

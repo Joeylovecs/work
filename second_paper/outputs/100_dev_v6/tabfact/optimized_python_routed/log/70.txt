@@ -1,0 +1,142 @@
+===================Title===================
+1991 toronto blue jays season
+===================Table===================
+| date | opponent | score | loss | attendance | record |
+| may 1 | rangers | 3 - 0 | key (4 - 1) | 33439 | 12 - 10 |
+| may 2 | royals | 3 - 1 | appier (1 - 4) | 22896 | 13 - 10 |
+| may 3 | royals | 5 - 1 | davis (2 - 2) | 20809 | 14 - 10 |
+| may 4 | royals | 6 - 5 | boucher (0 - 2) | 22628 | 14 - 11 |
+| may 5 | royals | 3 - 0 | gordon (1 - 2) | 22588 | 15 - 11 |
+| may 7 | rangers | 3 - 2 | key (4 - 2) | 44622 | 15 - 12 |
+| may 8 | rangers | 4 - 2 | ryan (3 - 3) | 43211 | 16 - 12 |
+| may 9 | white sox | 2 - 0 | pãrez (1 - 2) | 47236 | 17 - 12 |
+| may 10 | white sox | 5 - 3 (12) | fraser (0 - 1) | 50198 | 17 - 13 |
+| may 11 | white sox | 5 - 2 | hough (0 - 2) | 50206 | 18 - 13 |
+| may 12 | white sox | 4 - 2 | hibbard (2 - 1) | 50108 | 19 - 13 |
+| may 13 | royals | 4 - 2 | davis (2 - 4) | 44275 | 20 - 13 |
+| may 14 | royals | 4 - 1 | gubicza (0 - 1) | 43357 | 21 - 13 |
+| may 15 | royals | 6 - 4 | boucher (0 - 3) | 50113 | 21 - 14 |
+| may 17 | white sox | 5 - 3 | timlin (3 - 1) | 30095 | 21 - 15 |
+| may 18 | white sox | 9 - 2 | hibbard (2 - 2) | 34861 | 22 - 15 |
+| may 19 | white sox | 5 - 4 | timlin (3 - 2) | 41015 | 22 - 16 |
+| may 20 | athletics | 1 - 0 | welch (4 - 3) | 24631 | 23 - 16 |
+| may 21 | athletics | 11 - 7 | dressendorfer (3 - 3) | 22738 | 24 - 16 |
+| may 22 | athletics | 2 - 1 | stieb (4 - 3) | 34028 | 24 - 17 |
+| may 24 | angels | 3 - 2 | finley (7 - 2) | 26408 | 25 - 17 |
+| may 25 | angels | 5 - 0 | stottlemyre (5 - 1) | 36732 | 25 - 18 |
+| may 26 | angels | 6 - 2 | wells (5 - 4) | 45307 | 25 - 19 |
+| may 28 | athletics | 8 - 4 | acker (1 - 2) | 50299 | 25 - 20 |
+| may 29 | athletics | 8 - 3 | slusarski (1 - 2) | 50262 | 26 - 20 |
+| may 30 | athletics | 8 - 6 | ward (0 - 2) | 50271 | 26 - 21 |
+| may 31 | angels | 5 - 1 | langston (6 - 2) | 50252 | 27 - 21 |
+===================Question===================
+the toronto blue jays won two of the last three games they played in may 1991
+===================Text===================
+```json
+{
+    "answer_type": "boolean",
+    "cardinality": "single",
+    "task_type": "verify",
+    "target_columns": ["date", "score"],
+    "filters": [
+        {
+            "column": "date",
+            "op": "in",
+            "value": ["may 29", "may 30", "may 31"]
+        }
+    ],
+    "operations": ["filter", "count"],
+    "aggregation": "count",
+    "ranking": null,
+    "arithmetic": null,
+    "boolean_polarity": "positive"
+}
+```
+---
+~~~python~~~
+# Extract the month from the date column (assuming date format is like 'may 1')
+df['month'] = df['date'].str.split().str[0].str.lower()
+
+# Filter for games in May 1991 (all rows are from May based on the provided data)
+may_games = df[df['month'] == 'may']
+
+# Get the last three games in May (assuming the table is sorted chronologically)
+last_three = may_games.tail(3)
+
+# Determine if the Blue Jays won each game
+# The 'score' column format is "blue jays score - opponent score"
+# Extract the two scores and compare
+def parse_score(score_str):
+    try:
+        home, away = score_str.split(' - ')
+        # Remove any extra characters like extra innings notation
+        home = home.split()[0] if ' ' in home else home
+        away = away.split()[0] if ' ' in away else away
+        return int(home), int(away)
+    except:
+        return None, None
+
+last_three['blue_jays_score'] = last_three['score'].apply(lambda x: parse_score(x)[0])
+last_three['opponent_score'] = last_three['score'].apply(lambda x: parse_score(x)[1])
+
+# Count wins (Blue Jays score > opponent score)
+wins = (last_three['blue_jays_score'] > last_three['opponent_score']).sum()
+
+# Check if exactly two wins
+answer = (wins == 2)
+~~~
+---
+~~~python~~~
+# Extract the month from the date column (assuming date format is like 'may 1')
+df['month'] = df['date'].str.split().str[0].str.lower()
+
+# Filter for games in May 1991 (all rows are from May based on the provided data)
+may_games = df[df['month'] == 'may']
+
+# Get the last three games in May (assuming the table is sorted chronologically)
+last_three = may_games.tail(3)
+
+# Determine if the Blue Jays won each game
+# The 'score' column format is "blue jays score - opponent score"
+# Extract the two scores and compare
+def parse_score(score_str):
+    try:
+        home, away = score_str.split(' - ')
+        # Remove any extra characters like extra innings notation
+        home = home.split()[0] if ' ' in home else home
+        away = away.split()[0] if ' ' in away else away
+        return int(home), int(away)
+    except:
+        return None, None
+
+# Apply parse_score to create new columns
+last_three[['blue_jays_score', 'opponent_score']] = last_three['score'].apply(
+    lambda x: pd.Series(parse_score(x))
+)
+
+# Count wins (Blue Jays score > opponent score)
+wins = (last_three['blue_jays_score'] > last_three['opponent_score']).sum()
+
+# Check if exactly two wins
+answer = (wins == 2)
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+null
+===================Execution Error===================
+NameError: name 'parse_score' is not defined
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"kind": "execution", "repair_count": 1, "execution_error": "NameError: name 'parse_score' is not defined", "repaired_code": "# Extract the month from the date column (assuming date format is like 'may 1')\ndf['month'] = df['date'].str.split().str[0].str.lower()\n\n# Filter for games in May 1991 (all rows are from May based on the provided data)\nmay_games = df[df['month'] == 'may']\n\n# Get the last three games in May (assuming the table is sorted chronologically)\nlast_three = may_games.tail(3)\n\n# Determine if the Blue Jays won each game\n# The 'score' column format is \"blue jays score - opponent score\"\n# Extract the two scores and compare\ndef parse_score(score_str):\n    try:\n        home, away = score_str.split(' - ')\n        # Remove any extra characters like extra innings notation\n        home = home.split()[0] if ' ' in home else home\n        away = away.split()[0] if ' ' in away else away\n        return int(home), int(away)\n    except:\n        return None, None\n\n# Apply parse_score to create new columns\nlast_three[['blue_jays_score', 'opponent_score']] = last_three['score'].apply(\n    lambda x: pd.Series(parse_score(x))\n)\n\n# Count wins (Blue Jays score > opponent score)\nwins = (last_three['blue_jays_score'] > last_three['opponent_score']).sum()\n\n# Check if exactly two wins\nanswer = (wins == 2)", "execution": {"success": false, "error": "NameError: name 'parse_score' is not defined", "result": null, "observed_output_type": "unknown", "observed_value": null, "evidence": {"stdout": "", "traceback": "Traceback (most recent call last):\n  File \"/root/shared-nvme/wangjie/second_paper/semantic_audit/runtime_trace.py\", line 84, in execute_code\n    exec(compile(ast.Module(body=body, type_ignores=[]), \"<generated>\", \"exec\"), glb, loc)\n  File \"<generated>\", line 24, in <module>\n  File \"/root/.conda/envs/work/lib/python3.10/site-packages/pandas/core/series.py\", line 4935, in apply\n    ).apply()\nNameError: name 'parse_score' is not defined\n", "operation_trace": [], "semantic_warnings": ["execution_exception"], "latency_seconds": 0.003577660769224167}, "memory": {}}, "accepted": false}]
+===================Final Answer===================
+None

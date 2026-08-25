@@ -1,0 +1,121 @@
+===================Title===================
+List of tallest freestanding structures in the world
+===================Table===================
+| Name | Country | Town | Height\nmetres / ft | Structural type | Held record | Notes |
+| Great Pyramid of Giza | Egypt | Giza | 146 / 480 | Mausoleum | 2570 BC–1311 | Due to erosion today it stands at the height of 138.8 metres (455 ft). |
+| Lincoln Cathedral | England | Lincoln | 159.7 / 524 | Church | 1311–1549 | Spire collapsed in 1549; today, stands at a height of 83 metres (272 ft). |
+| St. Mary's Church | Germany | Stralsund | 151 / 500 | Church | 1549–1647 | Spire destroyed by lightning in 1647; today stands at a height of 104 metres (341 ft). |
+| Strasbourg Cathedral | Germany and/or France (today France) | Strasbourg | 142 / 470 | Church | 1647–1874 |  |
+| St Nikolai | Germany | Hamburg | 147.3 / 483 | Church | 1874–1876 | Due to aerial bombing in World War II the nave was demolished; only the spire remains. |
+| Notre-Dame Cathedral | France | Rouen | 151 / 500 | Church | 1876–1880 |  |
+| Cologne Cathedral | Germany | Cologne | 157.4 / 516 | Church | 1880–1884 |  |
+| Washington Monument | United States | Washington, D.C. | 169.3 / 555 | Monument | 1884–1889 |  |
+| Eiffel Tower | France | Paris | 300.6 / 986 | Tower | 1889–1930 | Currently stands at a height of 324 metres (1,063 ft). |
+| Chrysler Building | United States | New York City | 319 / 1,046 | Skyscraper | 1930–1931 |  |
+| Empire State Building | United States | New York City | 448 / 1,472 | Skyscraper | 1931–1967 |  |
+| Ostankino Tower | Russia | Moscow | 540 / 1,772 | Tower | 1967–1976 |  |
+| CN Tower | Canada | Toronto | 553 / 1,815 | Tower | 1976–2007 |  |
+| Burj Khalifa | United Arab Emirates | Dubai | 829.8 / 2,722 | Skyscraper | 2007–present | Topped-out on 17 January 2009 |
+===================Question===================
+which building held the record for tallest freestanding structure before the burj khalifa?
+===================Text===================
+~~~python~~~
+# Extract the record holder before Burj Khalifa
+# First, find the row for Burj Khalifa
+burj_row = df[df['Name'] == 'Burj Khalifa']
+
+# Get the 'Held record' value for Burj Khalifa
+burj_record = burj_row['Held record'].iloc[0]
+
+# The record is in the format 'start_year–end_year' or 'start_year–present'
+# We need to find the structure whose record end_year matches the start_year of Burj Khalifa
+# Extract the start year from Burj Khalifa's record
+# Assuming the format is consistent: '2007–present'
+burj_start_year = burj_record.split('–')[0]
+
+# Now find the structure where the 'Held record' end_year equals burj_start_year
+# We need to handle cases where the record is 'start_year–end_year' or 'start_year–present'
+# For previous record holders, the end_year should be a specific year, not 'present'
+# We'll split the 'Held record' column and compare the second part (end_year) with burj_start_year
+# But note: some entries might have additional text or be empty, so we need to handle that
+
+# Create a function to extract end year from the 'Held record' string
+def get_end_year(record):
+    if pd.isna(record) or record == '':
+        return None
+    # Split by '–' and take the second part
+    parts = record.split('–')
+    if len(parts) < 2:
+        return None
+    end_part = parts[1]
+    # If the end part is 'present', return None as it's the current record
+    if 'present' in end_part.lower():
+        return None
+    # Otherwise, extract the year (might be with additional text, but in this table it's just the year)
+    # We'll take the first four digits if they exist
+    import re
+    year_match = re.search(r'\d{4}', end_part)
+    if year_match:
+        return year_match.group()
+    else:
+        return None
+
+# Apply the function to get end years
+df['end_year'] = df['Held record'].apply(get_end_year)
+
+# Now find the row where end_year equals burj_start_year
+previous_record_holder = df[df['end_year'] == burj_start_year]
+
+# Get the name of the building
+if not previous_record_holder.empty:
+    answer = previous_record_holder['Name'].iloc[0]
+else:
+    # If no match found, we might need to handle differently
+    # Alternatively, we can sort by the end year and find the one just before Burj Khalifa
+    # But given the table, it should be CN Tower
+    # Let's try a different approach: sort by the start year of the record
+    def get_start_year(record):
+        if pd.isna(record) or record == '':
+            return None
+        parts = record.split('–')
+        if len(parts) < 2:
+            return None
+        start_part = parts[0]
+        year_match = re.search(r'\d{4}', start_part)
+        if year_match:
+            return int(year_match.group())
+        else:
+            return None
+
+    df['start_year'] = df['Held record'].apply(get_start_year)
+    # Sort by start_year in descending order
+    df_sorted = df.sort_values('start_year', ascending=False)
+    # Find the index of Burj Khalifa
+    burj_index = df_sorted[df_sorted['Name'] == 'Burj Khalifa'].index[0]
+    # Get the previous record holder (the next row in the sorted dataframe)
+    previous_index = df_sorted.index[df_sorted.index.get_loc(burj_index) + 1]
+    answer = df_sorted.loc[previous_index, 'Name']
+
+# Clean up: remove the temporary columns
+df.drop(columns=['end_year', 'start_year'], inplace=True, errors='ignore')
+~~~
+===================Answer===================
+['CN Tower']
+===================Execution Result===================
+"CN Tower"
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+CN Tower

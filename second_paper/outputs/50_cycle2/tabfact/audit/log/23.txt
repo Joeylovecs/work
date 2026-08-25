@@ -1,0 +1,93 @@
+===================Title===================
+1971 south african grand prix
+===================Table===================
+| driver | constructor | laps | time / retired | grid |
+| mario andretti | ferrari | 79 | 1:47:35.5 | 4 |
+| jackie stewart | tyrrell - ford | 79 | + 20.9 | 1 |
+| clay regazzoni | ferrari | 79 | + 31.4 | 3 |
+| reine wisell | lotus - ford | 79 | + 1:09.4 | 14 |
+| chris amon | matra | 78 | + 1 lap | 2 |
+| denny hulme | mclaren - ford | 78 | + 1 lap | 7 |
+| brian redman | surtees - ford | 78 | + 1 lap | 17 |
+| jacky ickx | ferrari | 78 | + 1 lap | 8 |
+| graham hill | brabham - ford | 77 | + 2 laps | 19 |
+| ronnie peterson | march - ford | 77 | + 2 laps | 13 |
+| henri pescarolo | march - ford | 77 | + 2 laps | 18 |
+| rolf stommelen | surtees - ford | 77 | + 2 laps | 15 |
+| andrea de adamich | march - alfa romeo | 75 | + 4 laps | 22 |
+| emerson fittipaldi | lotus - ford | 58 | engine | 5 |
+| john surtees | surtees - ford | 56 | gearbox | 6 |
+| françois cevert | tyrrell - ford | 45 | accident | 9 |
+| howden ganley | brm | 42 | physical | 24 |
+| pedro rodríguez | brm | 33 | overheating | 10 |
+| dave charlton | brabham - ford | 31 | engine | 16 |
+| jo siffert | brm | 31 | overheating | 12 |
+| john love | march - ford | 30 | differential | 21 |
+| jackie pretorius | brabham - ford | 22 | engine | 20 |
+| peter gethin | mclaren - ford | 7 | fuel leak | 11 |
+| jo bonnier | mclaren - ford | 5 | suspension | 23 |
+| alex soler - roig | march - ford | 5 | engine | 25 |
+===================Question===================
+any driver below 75 laps care trouble of some kind thus no time listed
+in the table:
+12 drivers below 75 laps.
+===================Text===================
+~~~python
+# Filter rows where laps < 75
+below_75 = df[df['laps'] < 75]
+
+# Check if all such rows have a 'time / retired' value that does NOT contain a colon (indicating a time)
+# Times are in format like "1:47:35.5" or "+ 20.9", both contain colons or plus signs? Actually "+ 20.9" does not have a colon.
+# But the statement says "no time listed", meaning the 'time / retired' column does not show a finishing time.
+# In the data, finishing times have a colon (e.g., "1:47:35.5", "+ 20.9" does not have a colon, but it's still a time offset).
+# Actually "+ 20.9" is a time offset, but it's still a time. The statement likely means the entry is a retirement reason (like "engine", "accident") not a time.
+# Let's examine the data: rows with laps >= 75 have times (either absolute like "1:47:35.5" or offset like "+ 20.9").
+# Rows with laps < 75 have retirement reasons (like "engine", "accident") which are strings without colons.
+# So we can check: for all rows with laps < 75, does 'time / retired' contain a colon? If any contains a colon, then they have a time listed.
+# But note: "+ 20.9" does not contain a colon, but it's a time offset. However, in the data, "+ 20.9" appears for laps=79 (>=75).
+# So for laps < 75, all entries are retirement reasons without colons.
+# Let's verify: look at the sample: laps=58 -> "engine", laps=56 -> "gearbox", etc. None have colons.
+# Therefore, we can check if any row with laps < 75 has a 'time / retired' that contains a colon.
+# If none contain a colon, then no time is listed for those drivers.
+# Also, the statement says "any driver below 75 laps care trouble of some kind thus no time listed".
+# This is a bit ambiguous, but likely means: all drivers with laps < 75 have a retirement reason (trouble) and thus no finishing time is listed.
+# So we need to check: for all drivers with laps < 75, the 'time / retired' does not represent a finishing time (i.e., does not contain a colon).
+# Additionally, the statement says "in the table: 12 drivers below 75 laps." So we should also verify that count.
+
+# Count drivers with laps < 75
+count_below_75 = below_75.shape[0]
+
+# Check if all such rows have no time listed (i.e., 'time / retired' does not contain a colon)
+# We'll define a function to check if a string contains a colon (indicating a time).
+def has_colon(x):
+    return ':' in str(x)
+
+# Apply to the 'time / retired' column of below_75
+has_time = below_75['time / retired'].apply(has_colon)
+
+# If any has a colon, then some driver below 75 laps has a time listed -> statement false.
+# Also, if count is not 12, statement false.
+statement_true = (count_below_75 == 12) and (not has_time.any())
+
+answer = statement_true
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

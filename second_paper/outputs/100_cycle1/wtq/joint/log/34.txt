@@ -1,0 +1,110 @@
+===================Title===================
+Love (2011 film)
+===================Table===================
+| Date | Festival | Location | Awards | Link |
+| Feb 2–5, Feb 11 | Santa Barbara International Film Festival | Santa Barbara, California  USA | Top 11 "Best of the Fest" Selection | sbiff.org |
+| May 21–22, Jun 11 | Seattle International Film Festival | Seattle, Washington  USA |  | siff.net |
+| Jul 18, Jul 25 | Fantasia Festival | Montreal, Quebec  Canada | Special Mention\n"for the resourcefulness and unwavering determination by a director to realize his unique vision" | FanTasia |
+| Sep 16 | Athens International Film Festival | Athens, Attica\n Greece | Best Director | aiff.gr |
+| Sep 19 | Lund International Fantastic Film Festival | Lund, Skåne\n Sweden |  | fff.se |
+| Sep 28 | Fantastic Fest | Austin, Texas\n USA |  | FantasticFest.com |
+| Oct 9 | London Int. Festival of Science Fiction Film | London, England\n UK | Closing Night Film | Sci-Fi London |
+| Oct 9, Oct 11 | Sitges Film Festival | Sitges, Catalonia\n Spain |  | Sitges Festival |
+| Oct 1, Oct 15 | Gwacheon International SF Festival | Gwacheon, Gyeonggi-do\n South Korea |  | gisf.org |
+| Oct 17, Oct 20 | Icon TLV | Tel Aviv, Central\n Israel |  | icon.org.il |
+| Oct 23 | Toronto After Dark | Toronto, Ontario\n Canada | Best Special Effects\nBest Musical Score | torontoafterdark.com |
+| Nov 11 | Les Utopiales | Nantes, Pays de la Loire\n France |  | utopiales.org |
+| Nov 12, Nov 18 | Indonesia Fantastic Film Festival | Jakarta, Bandung\n Indonesia |  | inaff.com |
+| Nov 16–18 | AFF | Wrocław, Lower Silesia\n Poland |  | AFF Poland |
+===================Question===================
+what festival was the film show at before the fantasia festival?
+===================Text===================
+Let’s look at the table rows in order of date.  
+
+The Fantasia Festival is listed with dates **Jul 18, Jul 25**.  
+
+Checking earlier entries:  
+- Feb 2–5, Feb 11 → Santa Barbara International Film Festival  
+- May 21–22, Jun 11 → Seattle International Film Festival  
+
+The one immediately before Fantasia Festival in date order is **Seattle International Film Festival** (May/June), since there are no festivals listed between June 11 and July 18.  
+
+Final Answer: Seattle International Film Festival
+---
+Let’s look at the table rows in order of date.  
+
+The Fantasia Festival is listed with dates **Jul 18, Jul 25**.  
+
+Checking earlier entries:  
+- Feb 2–5, Feb 11 → Santa Barbara International Film Festival  
+- May 21–22, Jun 11 → Seattle International Film Festival  
+
+The one immediately before Fantasia Festival in date order is **Seattle International Film Festival** (May/June), since there are no festivals listed between June 11 and July 18.  
+
+Final Answer: Seattle International Film Festival
+---
+Let’s look at the table rows in order of date.  
+
+The Fantasia Festival is listed with dates **Jul 18, Jul 25**.  
+
+Checking earlier entries:  
+- Feb 2–5, Feb 11 → Santa Barbara International Film Festival  
+- May 21–22, Jun 11 → Seattle International Film Festival  
+
+The one immediately before Fantasia Festival in date order is **Seattle International Film Festival** (May/June), since there are no festivals listed between June 11 and July 18.  
+
+Final Answer: Seattle International Film Festival
+---
+~~~python
+# First, identify the date of the Fantasia Festival
+fantasia_date = df.loc[df['Festival'] == 'Fantasia Festival', 'Date'].iloc[0]
+
+# Convert date strings to a comparable format (using the first date if a range)
+def parse_first_date(date_str):
+    # Split by commas or dashes and take the first part, then strip whitespace
+    first_part = date_str.split(',')[0].split('–')[0].strip()
+    return first_part
+
+# Create a new column with the first date for comparison
+df['FirstDate'] = df['Date'].apply(parse_first_date)
+
+# Parse the Fantasia Festival's first date
+fantasia_first_date = parse_first_date(fantasia_date)
+
+# Convert dates to datetime objects for proper comparison
+# Assuming year is 2011 as per the film title
+df['FirstDate_dt'] = pd.to_datetime(df['FirstDate'] + ' 2011', format='%b %d %Y', errors='coerce')
+fantasia_dt = pd.to_datetime(fantasia_first_date + ' 2011', format='%b %d %Y')
+
+# Filter festivals that occurred before Fantasia Festival
+before_fantasia = df[df['FirstDate_dt'] < fantasia_dt]
+
+# Sort by date to get the one immediately before Fantasia
+before_fantasia_sorted = before_fantasia.sort_values('FirstDate_dt', ascending=False)
+
+# Get the festival name of the most recent one before Fantasia
+if not before_fantasia_sorted.empty:
+    answer = before_fantasia_sorted.iloc[0]['Festival']
+else:
+    answer = None
+~~~
+===================Answer===================
+['Seattle International Film Festival']
+===================Execution Result===================
+"Seattle International Film Festival"
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+Seattle International Film Festival

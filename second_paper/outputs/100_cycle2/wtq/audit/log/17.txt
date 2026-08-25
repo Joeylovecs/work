@@ -1,0 +1,92 @@
+===================Title===================
+Cheltenham Town F.C.
+===================Table===================
+| Year | Kit Manufacturer | Shirt Sponsor | Back of Shirt Sponsor | Short Sponsor |
+| 1977–1978 |  | National Express |  |  |
+| 1982–1985 | Umbro |  |  |  |
+| 1985–1986 | Umbro | Whitbread |  |  |
+| 1986–1988 | Henson | Duraflex |  |  |
+| 1988–1989 |  | Gulf Oil |  |  |
+| 1991–1993 | Technik | Gulf Oil |  |  |
+| 1993–1994 | Club Sport | Gulf Oil |  |  |
+| 1994–1995 | Klūb Sport | Empress |  |  |
+| 1995–1996 | Matchwinner | Empress |  |  |
+| 1996–1997 | UK | Endsleigh Insurance |  |  |
+| 1997–1999 | Errea | Endsleigh Insurance |  |  |
+| 1999–2004 | Errea | Towergate Insurance |  |  |
+| 2004–2008 | Errea | Bence Building Merchants |  |  |
+| 2008– | Errea | Mira Showers |  |  |
+| 2009–2011 | Errea | Mira Showers | PSU Technology Group |  |
+| 2011–2013 | Errea | Mira Showers | Barr Stadia | Gloucestershire Echo |
+| 2013– | Errea | Mira Showers | Gloucestershire College | Gloucestershire Echo |
+===================Question===================
+total years errea manufactured?
+===================Text===================
+~~~python~~~
+# Filter rows where Kit Manufacturer is exactly 'Errea'
+errea_rows = df[df['Kit Manufacturer'] == 'Errea']
+
+# Extract the Year column values for these rows
+years = errea_rows['Year']
+
+# Function to parse a year range string and compute the number of years covered
+def years_covered(year_str):
+    # Handle cases like '2008–' or '2013–' where end year is missing
+    if '–' not in year_str:
+        return 0
+    start, end = year_str.split('–')
+    # If end is empty (ongoing), we cannot count future years, so treat as single season? 
+    # But the question likely wants total seasons covered, so we count each season as one year.
+    # Since each row is a distinct season or range, we need to count each season in the range.
+    # However, the table lists ranges like '1997–1999' which covers 3 seasons: 1997-98, 1998-99, 1999-2000? 
+    # Actually, in football, '1997–1999' means two full seasons? Let's assume each entry is a distinct season.
+    # But the table has entries like '1997–1999' which likely means seasons 1997-98 and 1998-99, so 2 years.
+    # To be safe, we interpret the range as inclusive of start and end years, but in football seasons, it's typically start year to end year (end year is the next year).
+    # However, the simplest is to count each row as one season, so each row contributes 1 year.
+    # But the question says "total years errea manufactured?" – likely total number of seasons.
+    # Since each row is a distinct season or a range of seasons, we need to sum the number of seasons in each range.
+    # Let's parse start and end years.
+    try:
+        start_year = int(start)
+    except ValueError:
+        return 0
+    if end == '':
+        # Ongoing, we don't know end, so we cannot count. But for this dataset, we assume up to the last known season.
+        # Since we don't have the current year, we'll treat as 1 season (the start season).
+        return 1
+    else:
+        try:
+            end_year = int(end)
+        except ValueError:
+            return 1
+        # Number of seasons = end_year - start_year + 1? But in football, '1997–1999' usually means 2 seasons: 1997-98 and 1998-99.
+        # Looking at the table: '1997–1999' is followed by '1999–2004', so '1997–1999' likely means seasons 1997-98 and 1998-99 (2 seasons).
+        # Similarly, '1999–2004' likely means 5 seasons: 1999-2000, 2000-01, 2001-02, 2002-03, 2003-04.
+        # So the number of seasons = end_year - start_year.
+        return end_year - start_year
+
+# Apply the function to each year string and sum the results
+total_years = years.apply(years_covered).sum()
+
+answer = total_years
+~~~
+===================Answer===================
+['16']
+===================Execution Result===================
+17
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+17

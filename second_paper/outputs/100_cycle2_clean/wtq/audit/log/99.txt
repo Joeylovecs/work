@@ -1,0 +1,224 @@
+===================Title===================
+Kodachrome
+===================Table===================
+| Film | Film | Date |
+| Kodachrome film | 16 mm, daylight (ASA 10) & Type A (ASA 16) | 1935–1962 |
+| Kodachrome film | 8 mm, daylight (ASA 10) & Type A (ASA 16) | 1936–1962 |
+| Kodachrome film | 35 mm and 828, daylight & Type A | 1936–1962 |
+| Kodachrome Professional film (sheets) | daylight (ASA 8) and Type B (ASA 10) | 1938–1951 |
+| Kodachrome film | 35 mm and 828, Type F (ASA 12) | 1955–1962 |
+| Kodachrome Professional film | 35 mm, Type A (ASA 16) | 1956–1962 |
+| Kodak Color Print Material | Type D (slide duping film) | 1955–1957 |
+| Kodachrome II film | 16 mm, daylight (ASA 25) and Type A (ASA 40) | 1961–1974 |
+| Kodachrome II film | 8 mm, daylight (ASA 25) and Type A (ASA 40) | 1961–1974 |
+| Kodachrome II film | S-8, Type A (ASA 40) | 1965–1974 |
+| Kodachrome II film | 35 mm and 828, daylight (ASA 25/early) (ASA 64/late) | 1961–1974 |
+| Kodachrome II film | Professional, 35 mm, Type A (ASA 40) | 1962–1978 |
+| Kodachrome-X film | 35 mm (ASA 64) | 1962–1974 |
+| Kodachrome-X film | 126 format | 1963–1974 |
+| Kodachrome-X film | 110 format | 1972–1974 |
+| Kodachrome 25 film | 35 mm, daylight | 1974–2001 |
+| Kodachrome 25 film | Movie film, 16 mm, daylight | 1974–2002 |
+| Kodachrome 25 film | Movie film, 8 mm, daylight | 1974–1992 |
+| Kodachrome 25 film | Professional film, 35 mm, daylight | 1983–1999 |
+| Kodachrome 40 film | 35 mm, Type A | 1978–1997 |
+| Kodachrome 40 film | Movie film, 16 mm, Type A | 1974–2006 |
+| Kodachrome 40 film | Movie film, S-8, Type A | 1974–2005 |
+| Kodachrome 40 film | Sound Movie film, S-8, Type A | 1974–1998 |
+| Kodachrome 40 film | Movie film, 8 mm, Type A | 1974–1992 |
+| Kodachrome 64 | 35 mm, daylight | 1974–2009 |
+| Kodachrome 64 | 126 format, daylight | 1974–1993 |
+| Kodachrome 64 | 110 format, daylight | 1974–1987 |
+| Kodachrome 64 | Professional film, 35 mm, daylight | 1983–2009 |
+| Kodachrome 64 | Professional film, daylight, 120 format | 1986–1996 |
+| Kodachrome 200 | Professional film, 35 mm, daylight | 1986–2004 |
+| Kodachrome 200 | 35 mm, daylight | 1988–2007 |
+| Cine-Chrome 40A | Double Regular 8 mm, tungsten | 2003–2006 |
+===================Question===================
+when was the kodachrome professional 35mm film first released?
+===================Text===================
+~~~python~~~
+# Filter rows where the 'Film' column contains 'Kodachrome Professional' and '35 mm'
+# Note: The exact text in the table uses "Kodachrome Professional film (sheets)" and "Kodachrome Professional film" and "Professional film"
+# We need to find the earliest release date for any Kodachrome Professional 35mm film.
+# The 'Date' column contains date ranges like "1938–1951". We need the start year.
+
+# First, filter rows that are Kodachrome Professional and mention 35 mm in the second column.
+# The second column contains details like "35 mm, Type A (ASA 16)".
+# We'll use case-insensitive matching for '35 mm' to capture variations (e.g., "35 mm" vs "35mm").
+# The table uses "35 mm" with a space, so we'll look for that.
+
+# Create a mask for rows where 'Film' contains 'Kodachrome Professional' (or similar) and the second column contains '35 mm'
+# The 'Film' column has entries like "Kodachrome Professional film (sheets)" and "Kodachrome Professional film".
+# We'll use str.contains with regex to capture variations.
+mask_professional = df['Film'].str.contains('Kodachrome Professional', case=False, na=False)
+mask_35mm = df['Film'].str.contains('35 mm', case=False, na=False)  # Actually, the second column is named 'Film' as well? Wait, the schema shows two columns both named 'Film'? That seems odd.
+
+# Looking at the schema: the columns are named 'Film', 'Film', 'Date'. This is ambiguous.
+# But from the values, the first column is the film name (e.g., "Kodachrome film"), the second column is the format/details (e.g., "16 mm, daylight (ASA 10) & Type A (ASA 16)"), and the third is 'Date'.
+# However, the column names are duplicated. In pandas, when loading such a table, the columns might be named 'Film', 'Film.1', 'Date' or something similar.
+# We need to inspect the actual column names in df. Since we cannot run code outside the block, we'll assume the executor has loaded df with appropriate column names.
+# A common way is to rename columns for clarity. But the instruction says not to recreate df. However, we can check column names.
+# Let's assume the columns are named 'Film', 'Format', 'Date' for clarity. But the schema says both are 'Film'. 
+# Actually, the table in the problem statement has two columns both labeled 'Film', but the second one contains format details.
+# In practice, when reading such a table, pandas will assign duplicate column names, and we can access them by position or rename.
+# Since we cannot assume, we'll use the column indices: the first column is film name, second is format, third is date.
+# We can refer to them as df.columns[0], df.columns[1], df.columns[2].
+# Let's get the column names:
+col0 = df.columns[0]
+col1 = df.columns[1]
+col2 = df.columns[2]
+
+# Now filter rows where col0 contains 'Kodachrome Professional' and col1 contains '35 mm'
+mask = df[col0].str.contains('Kodachrome Professional', case=False, na=False) & df[col1].str.contains('35 mm', case=False, na=False)
+
+# Apply the mask
+filtered = df[mask]
+
+# If no rows found, try a broader search: maybe 'Professional' is in the film name and '35 mm' in format.
+# Also, there is a row: "Kodachrome Professional film" with format "35 mm, Type A (ASA 16)".
+# And "Kodachrome Professional film (sheets)" is not 35 mm, so it should be excluded by the 35 mm condition.
+
+# Extract the start years from the date range in col2.
+# Date format is like "1938–1951". We need the first year (before the dash).
+# Split on non-digit or specifically on '–' (en dash) or '-' (hyphen).
+# The table uses an en dash, but we can split on any non-digit or use regex.
+def get_start_year(date_str):
+    if isinstance(date_str, str):
+        # Split on any non-digit character, take the first part.
+        import re
+        parts = re.split(r'[^\d]+', date_str)
+        # parts might have empty strings, so filter.
+        numbers = [p for p in parts if p.isdigit()]
+        if numbers:
+            return int(numbers[0])
+    return None
+
+# Apply to filtered rows
+start_years = filtered[col2].apply(get_start_year)
+
+# Find the minimum start year
+if not start_years.empty:
+    earliest_year = start_years.min()
+else:
+    # If no rows found with the exact mask, try alternative: look for rows where col0 contains 'Professional' and col1 contains '35 mm'
+    mask2 = df[col0].str.contains('Professional', case=False, na=False) & df[col1].str.contains('35 mm', case=False, na=False)
+    filtered2 = df[mask2]
+    start_years2 = filtered2[col2].apply(get_start_year)
+    if not start_years2.empty:
+        earliest_year = start_years2.min()
+    else:
+        # If still no rows, maybe the film is listed as "Kodachrome 25 film" with "Professional film, 35 mm, daylight" in col1?
+        # Actually, there is a row: "Kodachrome 25 film" with format "Professional film, 35 mm, daylight".
+        # And "Kodachrome 64" with "Professional film, 35 mm, daylight".
+        # And "Kodachrome 200" with "Professional film, 35 mm, daylight".
+        # But the question asks for "kodachrome professional 35mm film", which might refer to any of these.
+        # Let's search for rows where col1 contains 'Professional' and '35 mm'.
+        mask3 = df[col1].str.contains('Professional', case=False, na=False) & df[col1].str.contains('35 mm', case=False, na=False)
+        filtered3 = df[mask3]
+        start_years3 = filtered3[col2].apply(get_start_year)
+        if not start_years3.empty:
+            earliest_year = start_years3.min()
+        else:
+            earliest_year = None
+
+# The earliest year found is the first release date.
+answer = earliest_year
+~~~
+---
+~~~python~~~
+# Filter rows where the 'Film' column contains 'Kodachrome Professional' and '35 mm'
+# Note: The exact text in the table uses "Kodachrome Professional film (sheets)" and "Kodachrome Professional film" and "Professional film"
+# We need to find the earliest release date for any Kodachrome Professional 35mm film.
+# The 'Date' column contains date ranges like "1938–1951". We need the start year.
+
+# First, filter rows that are Kodachrome Professional and mention 35 mm in the second column.
+# The second column contains details like "35 mm, Type A (ASA 16)".
+# We'll use case-insensitive matching for '35 mm' to capture variations (e.g., "35 mm" vs "35mm").
+# The table uses "35 mm" with a space, so we'll look for that.
+
+# Create a mask for rows where 'Film' contains 'Kodachrome Professional' (or similar) and the second column contains '35 mm'
+# The 'Film' column has entries like "Kodachrome Professional film (sheets)" and "Kodachrome Professional film".
+# We'll use str.contains with regex to capture variations.
+col0 = df.columns[0]
+col1 = df.columns[1]
+col2 = df.columns[2]
+
+mask_professional = df[col0].str.contains('Kodachrome Professional', case=False, na=False)
+mask_35mm = df[col1].str.contains('35 mm', case=False, na=False)
+
+mask = mask_professional & mask_35mm
+
+# Apply the mask
+filtered = df[mask]
+
+# If no rows found, try a broader search: maybe 'Professional' is in the film name and '35 mm' in format.
+# Also, there is a row: "Kodachrome Professional film" with format "35 mm, Type A (ASA 16)".
+# And "Kodachrome Professional film (sheets)" is not 35 mm, so it should be excluded by the 35 mm condition.
+
+# Extract the start years from the date range in col2.
+# Date format is like "1938–1951". We need the first year (before the dash).
+# Split on non-digit or specifically on '–' (en dash) or '-' (hyphen).
+# The table uses an en dash, but we can split on any non-digit or use regex.
+def get_start_year(date_str):
+    if isinstance(date_str, str):
+        # Split on any non-digit character, take the first part.
+        import re
+        parts = re.split(r'[^\d]+', date_str)
+        # parts might have empty strings, so filter.
+        numbers = [p for p in parts if p.isdigit()]
+        if numbers:
+            return int(numbers[0])
+    return None
+
+# Apply to filtered rows
+start_years = filtered[col2].apply(get_start_year)
+
+# Find the minimum start year
+if not start_years.empty:
+    earliest_year = start_years.min()
+else:
+    # If no rows found with the exact mask, try alternative: look for rows where col0 contains 'Professional' and col1 contains '35 mm'
+    mask2 = df[col0].str.contains('Professional', case=False, na=False) & df[col1].str.contains('35 mm', case=False, na=False)
+    filtered2 = df[mask2]
+    start_years2 = filtered2[col2].apply(get_start_year)
+    if not start_years2.empty:
+        earliest_year = start_years2.min()
+    else:
+        # If still no rows, maybe the film is listed as "Kodachrome 25 film" with "Professional film, 35 mm, daylight" in col1?
+        # Actually, there is a row: "Kodachrome 25 film" with format "Professional film, 35 mm, daylight".
+        # And "Kodachrome 64" with "Professional film, 35 mm, daylight".
+        # And "Kodachrome 200" with "Professional film, 35 mm, daylight".
+        # But the question asks for "kodachrome professional 35mm film", which might refer to any of these.
+        # Let's search for rows where col1 contains 'Professional' and '35 mm'.
+        mask3 = df[col1].str.contains('Professional', case=False, na=False) & df[col1].str.contains('35 mm', case=False, na=False)
+        filtered3 = df[mask3]
+        start_years3 = filtered3[col2].apply(get_start_year)
+        if not start_years3.empty:
+            earliest_year = start_years3.min()
+        else:
+            earliest_year = None
+
+# The earliest year found is the first release date.
+answer = earliest_year
+~~~
+===================Answer===================
+['1956']
+===================Execution Result===================
+1956
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "entity", "actual": "number", "evidence": ["filter:Film contains 'Kodachrome Professional'", "column_access:Film", "filter:Film contains '35 mm'", "column_access:Film", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "aggregation:min", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "aggregation:min", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "aggregation:min"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "entity", "actual": "number", "evidence": ["filter:Film contains 'Kodachrome Professional'", "column_access:Film", "filter:Film contains '35 mm'", "column_access:Film", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "aggregation:min", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "aggregation:min", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "aggregation:min"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object.", "confidence": 0.98, "mode": "hybrid"}
+===================Repair Hint===================
+Return the requested answer type, not an intermediate numeric or table object.
+===================Repair Trace===================
+[{"repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "entity", "actual": "number", "evidence": ["filter:Film contains 'Kodachrome Professional'", "column_access:Film", "filter:Film contains '35 mm'", "column_access:Film", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "aggregation:min", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "aggregation:min", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "dynamic_column_access", "aggregation:min"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object.", "confidence": 0.98, "mode": "hybrid"}, "repaired_code": "# Filter rows where the 'Film' column contains 'Kodachrome Professional' and '35 mm'\n# Note: The exact text in the table uses \"Kodachrome Professional film (sheets)\" and \"Kodachrome Professional film\" and \"Professional film\"\n# We need to find the earliest release date for any Kodachrome Professional 35mm film.\n# The 'Date' column contains date ranges like \"1938–1951\". We need the start year.\n\n# First, filter rows that are Kodachrome Professional and mention 35 mm in the second column.\n# The second column contains details like \"35 mm, Type A (ASA 16)\".\n# We'll use case-insensitive matching for '35 mm' to capture variations (e.g., \"35 mm\" vs \"35mm\").\n# The table uses \"35 mm\" with a space, so we'll look for that.\n\n# Create a mask for rows where 'Film' contains 'Kodachrome Professional' (or similar) and the second column contains '35 mm'\n# The 'Film' column has entries like \"Kodachrome Professional film (sheets)\" and \"Kodachrome Professional film\".\n# We'll use str.contains with regex to capture variations.\ncol0 = df.columns[0]\ncol1 = df.columns[1]\ncol2 = df.columns[2]\n\nmask_professional = df[col0].str.contains('Kodachrome Professional', case=False, na=False)\nmask_35mm = df[col1].str.contains('35 mm', case=False, na=False)\n\nmask = mask_professional & mask_35mm\n\n# Apply the mask\nfiltered = df[mask]\n\n# If no rows found, try a broader search: maybe 'Professional' is in the film name and '35 mm' in format.\n# Also, there is a row: \"Kodachrome Professional film\" with format \"35 mm, Type A (ASA 16)\".\n# And \"Kodachrome Professional film (sheets)\" is not 35 mm, so it should be excluded by the 35 mm condition.\n\n# Extract the start years from the date range in col2.\n# Date format is like \"1938–1951\". We need the first year (before the dash).\n# Split on non-digit or specifically on '–' (en dash) or '-' (hyphen).\n# The table uses an en dash, but we can split on any non-digit or use regex.\ndef get_start_year(date_str):\n    if isinstance(date_str, str):\n        # Split on any non-digit character, take the first part.\n        import re\n        parts = re.split(r'[^\\d]+', date_str)\n        # parts might have empty strings, so filter.\n        numbers = [p for p in parts if p.isdigit()]\n        if numbers:\n            return int(numbers[0])\n    return None\n\n# Apply to filtered rows\nstart_years = filtered[col2].apply(get_start_year)\n\n# Find the minimum start year\nif not start_years.empty:\n    earliest_year = start_years.min()\nelse:\n    # If no rows found with the exact mask, try alternative: look for rows where col0 contains 'Professional' and col1 contains '35 mm'\n    mask2 = df[col0].str.contains('Professional', case=False, na=False) & df[col1].str.contains('35 mm', case=False, na=False)\n    filtered2 = df[mask2]\n    start_years2 = filtered2[col2].apply(get_start_year)\n    if not start_years2.empty:\n        earliest_year = start_years2.min()\n    else:\n        # If still no rows, maybe the film is listed as \"Kodachrome 25 film\" with \"Professional film, 35 mm, daylight\" in col1?\n        # Actually, there is a row: \"Kodachrome 25 film\" with format \"Professional film, 35 mm, daylight\".\n        # And \"Kodachrome 64\" with \"Professional film, 35 mm, daylight\".\n        # And \"Kodachrome 200\" with \"Professional film, 35 mm, daylight\".\n        # But the question asks for \"kodachrome professional 35mm film\", which might refer to any of these.\n        # Let's search for rows where col1 contains 'Professional' and '35 mm'.\n        mask3 = df[col1].str.contains('Professional', case=False, na=False) & df[col1].str.contains('35 mm', case=False, na=False)\n        filtered3 = df[mask3]\n        start_years3 = filtered3[col2].apply(get_start_year)\n        if not start_years3.empty:\n            earliest_year = start_years3.min()\n        else:\n            earliest_year = None\n\n# The earliest year found is the first release date.\nanswer = earliest_year", "execution": {"success": true, "error": null, "result": "1956", "observed_output_type": "number", "observed_value": 1956, "evidence": {"final_object_type": "number", "final_value": 1956, "dataframes": [{"name": "df", "shape": [32, 3], "columns": ["Film", "Film .1", "Date"]}, {"name": "filtered", "shape": [1, 3], "columns": ["Film", "Film .1", "Date"]}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.001895492896437645}, "memory": {}}, "accepted": false}]
+===================Final Answer===================
+1956

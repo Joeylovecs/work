@@ -1,0 +1,75 @@
+===================Title===================
+1971 african cup of champions clubs
+===================Table===================
+| team 1 | agg | team 2 | 1st leg | 2nd leg |
+| al - merrikh | 2 - 2 (5 - 4 pen) | tele sc asmara | 2 - 1 | 0 - 1 |
+| abaluhya united | 1 - 3 | great olympics | 0 - 0 | 1 - 3 |
+| asc diaraf | 3 - 4 | stade malien | 3 - 0 | 0 - 4 |
+| maseru united | 3 - 5 | mmm tamatave | 1 - 2 | 2 - 3 |
+| as porto novo | 0 - 3 | victoria club mokanda | 0 - 1 | 0 - 2 |
+| canon yaoundé | 9 - 4 | as solidarité | 7 - 3 | 2 - 1 |
+| espérance | 1 - 0 | al - ahly (benghazi) | 0 - 0 | 1 - 0 |
+| secteur 6 | 1 - 2 | enugu rangers | 1 - 1 | 0 - 1 |
+| young africans | 2 - 0 | lavori publici | 2 - 0 | 0 - 0 |
+===================Question===================
+secteur 6 lost by one against the enugu rangers
+in the table:
+secteur 6 lost by -1 against the enugu rangers.
+===================Text===================
+```json
+{
+    "answer_type": "boolean",
+    "cardinality": "single",
+    "task_type": "verify",
+    "target_columns": ["team 1", "agg", "team 2"],
+    "filters": [
+        {"column": "team 1", "op": "=", "value": "secteur 6"},
+        {"column": "team 2", "op": "=", "value": "enugu rangers"}
+    ],
+    "operations": [],
+    "aggregation": null,
+    "ranking": null,
+    "arithmetic": null,
+    "boolean_polarity": "positive"
+}
+```
+---
+~~~python
+# Check the row where 'team 1' is 'secteur 6' and 'team 2' is 'enugu rangers'
+row = df[(df['team 1'] == 'secteur 6') & (df['team 2'] == 'enugu rangers')]
+
+# If the row exists, extract the aggregate score
+if not row.empty:
+    agg_score = row['agg'].iloc[0]
+    # Parse the aggregate score to get the goal difference for secteur 6
+    # The format is "1 - 2", where the first number is team 1's total goals, second is team 2's total goals
+    try:
+        team1_goals, team2_goals = map(int, agg_score.split(' - ')[:2])
+        goal_diff = team1_goals - team2_goals
+        # Check if secteur 6 lost by exactly one goal (goal_diff = -1)
+        answer = (goal_diff == -1)
+    except:
+        answer = False
+else:
+    answer = False
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+True

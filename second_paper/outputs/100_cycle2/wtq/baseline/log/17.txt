@@ -1,0 +1,83 @@
+===================Title===================
+Cheltenham Town F.C.
+===================Table===================
+| Year | Kit Manufacturer | Shirt Sponsor | Back of Shirt Sponsor | Short Sponsor |
+| 1977–1978 |  | National Express |  |  |
+| 1982–1985 | Umbro |  |  |  |
+| 1985–1986 | Umbro | Whitbread |  |  |
+| 1986–1988 | Henson | Duraflex |  |  |
+| 1988–1989 |  | Gulf Oil |  |  |
+| 1991–1993 | Technik | Gulf Oil |  |  |
+| 1993–1994 | Club Sport | Gulf Oil |  |  |
+| 1994–1995 | Klūb Sport | Empress |  |  |
+| 1995–1996 | Matchwinner | Empress |  |  |
+| 1996–1997 | UK | Endsleigh Insurance |  |  |
+| 1997–1999 | Errea | Endsleigh Insurance |  |  |
+| 1999–2004 | Errea | Towergate Insurance |  |  |
+| 2004–2008 | Errea | Bence Building Merchants |  |  |
+| 2008– | Errea | Mira Showers |  |  |
+| 2009–2011 | Errea | Mira Showers | PSU Technology Group |  |
+| 2011–2013 | Errea | Mira Showers | Barr Stadia | Gloucestershire Echo |
+| 2013– | Errea | Mira Showers | Gloucestershire College | Gloucestershire Echo |
+===================Question===================
+total years errea manufactured?
+===================Text===================
+~~~python~~~
+# Filter rows where Kit Manufacturer is exactly 'Errea'
+errea_rows = df[df['Kit Manufacturer'] == 'Errea']
+
+# Extract the Year column values for these rows
+years = errea_rows['Year'].tolist()
+
+# Function to convert a year range string like '1997–1999' into a list of individual years
+def year_range_to_list(year_str):
+    # Split by the en dash (or hyphen) and handle potential spaces
+    parts = year_str.split('–')
+    if len(parts) != 2:
+        # If not a range, assume it's a single year (though not present in this data)
+        return [year_str]
+    start, end = parts[0], parts[1]
+    # Convert to integers if possible
+    try:
+        start_int = int(start)
+        # If end is empty (like '2008–'), treat as single year
+        if end == '':
+            return [start_int]
+        end_int = int(end)
+        # Generate list of years from start to end inclusive
+        return list(range(start_int, end_int + 1))
+    except ValueError:
+        # If conversion fails, return the original string as a list
+        return [year_str]
+
+# Convert each year range to a list of individual years and flatten
+all_years = []
+for year_range in years:
+    all_years.extend(year_range_to_list(year_range))
+
+# Count unique years
+unique_years = set(all_years)
+total_unique_years = len(unique_years)
+
+answer = total_unique_years
+~~~
+===================Answer===================
+['16']
+===================Execution Result===================
+17
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+17

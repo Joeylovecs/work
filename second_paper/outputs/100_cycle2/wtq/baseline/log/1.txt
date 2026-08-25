@@ -1,0 +1,60 @@
+===================Title===================
+2008 Clásica de San Sebastián
+===================Table===================
+| Rank | Cyclist | Team | Time | UCI ProTour\nPoints |
+| 1 | Alejandro Valverde (ESP) | Caisse d'Epargne | 5h 29' 10" | 40 |
+| 2 | Alexandr Kolobnev (RUS) | Team CSC Saxo Bank | s.t. | 30 |
+| 3 | Davide Rebellin (ITA) | Gerolsteiner | s.t. | 25 |
+| 4 | Paolo Bettini (ITA) | Quick Step | s.t. | 20 |
+| 5 | Franco Pellizotti (ITA) | Liquigas | s.t. | 15 |
+| 6 | Denis Menchov (RUS) | Rabobank | s.t. | 11 |
+| 7 | Samuel Sánchez (ESP) | Euskaltel-Euskadi | s.t. | 7 |
+| 8 | Stéphane Goubert (FRA) | Ag2r-La Mondiale | + 2" | 5 |
+| 9 | Haimar Zubeldia (ESP) | Euskaltel-Euskadi | + 2" | 3 |
+| 10 | David Moncoutié (FRA) | Cofidis | + 2" | 1 |
+===================Question===================
+which country had the most cyclists finish within the top 10?
+===================Text===================
+~~~python~~~
+# Extract country from the 'Cyclist' column (format: "Name (COUNTRY_CODE)")
+df['Country'] = df['Cyclist'].str.extract(r'\(([A-Z]{3})\)')
+
+# Filter for top 10 (Rank 1 to 10)
+top10 = df[df['Rank'] <= 10]
+
+# Count unique cyclists per country in top 10 (though each row is a unique cyclist, we use value_counts for frequency)
+country_counts = top10['Country'].value_counts()
+
+# Get the country with the highest count
+most_country = country_counts.index[0]
+
+# If there is a tie, we need to return all tied countries
+max_count = country_counts.max()
+most_countries = country_counts[country_counts == max_count].index.tolist()
+
+# Determine answer: if single country, return the string; if multiple, return list
+if len(most_countries) == 1:
+    answer = most_countries[0]
+else:
+    answer = most_countries
+~~~
+===================Answer===================
+['Italy']
+===================Execution Result===================
+["ESP", "ITA"]
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+['ESP', 'ITA']

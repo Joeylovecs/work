@@ -1,0 +1,59 @@
+===================Title===================
+Ralph Jones
+===================Table===================
+| School | Season | Record | Conference Record | Place | Postseason |
+| Illinois | 1912–13 | 10–6 | 7–6 | 5th |  |
+| Illinois | 1913–14 | 9–4 | 7–3 | 3rd |  |
+| Illinois | 1914–15 | 16–0 | 12–0 | T1st | National Champions |
+| Illinois | 1915–16 | 13–3 | 9–3 | T2nd |  |
+| Illinois | 1916–17 | 13–3 | 10–2 | T1st | Big Ten Champions |
+| Illinois | 1917–18 | 9–6 | 6–6 | T4th |  |
+| Illinois | 1918–19 | 6–8 | 5–7 | 5th |  |
+| Illinois | 1919–20 | 9–4 | 8–4 | 3rd |  |
+| Illinois | 1912–20 | 85–34 | 64–31 | – |  |
+===================Question===================
+how many seasons did they lose no more than 3 conference games?
+===================Text===================
+~~~python~~~
+# Filter rows where the 'Season' column does not contain a dash in the middle (to exclude the summary row)
+df_seasons = df[~df['Season'].str.contains('–', na=False)]
+
+# Extract the number of conference losses from the 'Conference Record' column
+# Conference Record format is "wins–losses"
+def get_conference_losses(record):
+    if pd.isna(record):
+        return None
+    parts = record.split('–')
+    if len(parts) == 2:
+        return int(parts[1])
+    else:
+        return None
+
+df_seasons['Conference Losses'] = df_seasons['Conference Record'].apply(get_conference_losses)
+
+# Filter seasons where conference losses are no more than 3 (i.e., <= 3)
+filtered = df_seasons[df_seasons['Conference Losses'] <= 3]
+
+# Count the number of such seasons
+answer = len(filtered)
+~~~
+===================Answer===================
+['4']
+===================Execution Result===================
+0
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+0

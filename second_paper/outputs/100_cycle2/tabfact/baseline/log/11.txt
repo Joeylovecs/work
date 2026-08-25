@@ -1,0 +1,55 @@
+===================Title===================
+1972 vfl season
+===================Table===================
+| home team | home team score | away team | away team score | venue | crowd | date |
+| footscray | 14.7 (91) | st kilda | 9.11 (65) | western oval | 18655 | 15 july 1972 |
+| fitzroy | 16.14 (110) | north melbourne | 9.12 (66) | junction oval | 7007 | 15 july 1972 |
+| essendon | 13.12 (90) | richmond | 17.9 (111) | windy hill | 22251 | 15 july 1972 |
+| carlton | 20.8 (128) | south melbourne | 8.15 (63) | princes park | 14465 | 15 july 1972 |
+| hawthorn | 19.14 (128) | geelong | 15.8 (98) | glenferrie oval | 12425 | 15 july 1972 |
+| collingwood | 10.13 (73) | melbourne | 8.10 (58) | vfl park | 30883 | 15 july 1972 |
+===================Question===================
+1 / 3 of the away teams had a score greater than 10
+===================Text===================
+~~~python~~~
+# Extract away team scores and convert to numeric values
+# The score format is like "9.11 (65)" where the number in parentheses is the total points
+# We need to extract the numeric total from parentheses
+df['away_score_numeric'] = df['away team score'].str.extract(r'\((\d+)\)').astype(int)
+
+# Get unique away teams
+unique_away_teams = df['away team'].unique()
+
+# Count how many unique away teams have at least one game with score > 10
+teams_with_score_gt_10 = set()
+for team in unique_away_teams:
+    team_scores = df[df['away team'] == team]['away_score_numeric']
+    if (team_scores > 10).any():
+        teams_with_score_gt_10.add(team)
+
+# Calculate the fraction
+fraction = len(teams_with_score_gt_10) / len(unique_away_teams)
+
+# Check if fraction is exactly 1/3 (within floating point tolerance)
+answer = abs(fraction - 1/3) < 1e-10
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+False

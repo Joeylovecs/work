@@ -1,0 +1,88 @@
+===================Title===================
+Radhika Pandit
+===================Table===================
+| Year | Film | Role | Language | Notes |
+| 2008 | Moggina Manasu | Chanchala | Kannada | Filmfare Award for Best Actress - Kannada\nKarnataka State Film Award for Best Actress |
+| 2009 | Olave Jeevana Lekkachaara | Rukmini | Kannada | Innovative Film Award for Best Actress |
+| 2009 | Love Guru | Kushi | Kannada | Filmfare Award for Best Actress - Kannada |
+| 2010 | Krishnan Love Story | Geetha | Kannada | Filmfare Award for Best Actress - Kannada\nUdaya Award for Best Actress |
+| 2010 | Gaana Bajaana | Radhey | Kannada |  |
+| 2011 | Hudugaru | Gayithri | Kannada | Nominated, Filmfare Award for Best Actress – Kannada |
+| 2012 | Alemari | Neeli | Kannada |  |
+| 2012 | Breaking News | Shraddha | Kannada |  |
+| 2012 | Addhuri | Poorna | Kannada | Udaya Award for Best Actress\nNominated — SIIMA Award for Best Actress\nNominated — Filmfare Award for Best Actress – Kannada |
+| 2012 | 18th Cross | Punya | Kannada |  |
+| 2012 | Sagar | Kajal | Kannada |  |
+| 2012 | Drama | Nandini | Kannada |  |
+| 2013 | Kaddipudi | Uma | Kannada |  |
+| 2013 | Dilwala | Preethi | Kannada |  |
+| 2013 | Bahaddoor | Anjali | Kannada | Filming |
+| 2014 | Mr. & Mrs. Ramachari |  |  | Announced |
+| 2014 | Endendigu |  |  | Filming |
+===================Question===================
+how many total films have they already appeared in?
+===================Text===================
+```json
+{
+    "answer_type": "scalar",
+    "cardinality": "single",
+    "task_type": "count",
+    "target_columns": ["Film"],
+    "filters": [
+        {
+            "column": "Role",
+            "op": "!=",
+            "value": ""
+        }
+    ],
+    "operations": ["filter", "count"],
+    "aggregation": "count",
+    "ranking": null,
+    "arithmetic": null,
+    "boolean_polarity": "positive"
+}
+```
+---
+~~~python~~~
+# Count the number of films where the 'Film' column is not empty and the 'Year' is not a future year (assuming 2014 is the latest year in the table)
+# Since the question asks for films they have already appeared in, we exclude rows where 'Notes' indicates "Announced" or "Filming"
+# We'll filter out rows where 'Notes' contains "Announced" or "Filming" (case-insensitive)
+# Also ensure the film name is not empty
+appeared_films = df[
+    df['Film'].notna() & 
+    df['Film'].astype(str).str.strip().ne('') &
+    ~df['Notes'].astype(str).str.contains('Announced|Filming', case=False, na=False)
+]
+# Count the number of unique films (distinct film titles)
+answer = appeared_films['Film'].nunique()
+~~~
+---
+~~~python
+~~~
+appeared_films = df[
+    df['Film'].notna() & 
+    df['Film'].astype(str).str.strip().ne('') &
+    ~df['Notes'].astype(str).str.contains('Announced|Filming', case=False, na=False)
+]
+answer = int(appeared_films['Film'].nunique())
+~~~
+===================Answer===================
+['17']
+===================Execution Result===================
+14
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "scalar", "actual": "number", "evidence": ["column_access:Film", "column_access:Film", "filter:Notes contains 'Announced|Filming'", "column_access:Notes", "aggregation:count", "column_access:Film", "select:Film"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "scalar", "actual": "number", "evidence": ["column_access:Film", "column_access:Film", "filter:Notes contains 'Announced|Filming'", "column_access:Notes", "aggregation:count", "column_access:Film", "select:Film"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object.", "confidence": 0.98, "mode": "hybrid"}
+===================Repair Hint===================
+Return the requested answer type, not an intermediate numeric or table object.
+===================Repair Trace===================
+[{"kind": "semantic", "repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "scalar", "actual": "number", "evidence": ["column_access:Film", "column_access:Film", "filter:Notes contains 'Announced|Filming'", "column_access:Notes", "aggregation:count", "column_access:Film", "select:Film"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object.", "confidence": 0.98, "mode": "hybrid"}, "repaired_code": "", "execution": {"success": true, "error": null, "result": null, "observed_output_type": "null", "observed_value": null, "evidence": {"final_object_type": "null", "final_value": null, "dataframes": [{"name": "df", "shape": [17, 5], "columns": ["Year", "Film", "Role", "Language", "Notes"]}], "operation_trace": [{"operation": "input_table", "name": "df", "rows": 17, "columns": ["Year", "Film", "Role", "Language", "Notes"]}, {"operation": "return", "output_type": "null", "value": null}], "semantic_warnings": ["null_final_answer"], "stdout": "", "latency_seconds": 0.00022030901163816452}, "memory": {}}, "candidate_audit": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "scalar", "actual": "null", "evidence": [], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "filter", "actual": [], "evidence": [], "confidence": 0.93, "repair_hint": "Add the missing filter operation before returning the answer."}, {"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "count", "actual": [], "evidence": [], "confidence": 0.93, "repair_hint": "Add the missing count operation before returning the answer."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object. Add the missing filter operation before returning the answer. Add the missing count operation before returning the answer.", "confidence": 0.93, "mode": "hybrid"}, "candidate_error_count": 3, "previous_error_count": 1, "answer_changed": true, "safe_change": true, "accepted": false, "rejection_reason": "no_verified_improvement"}]
+===================Final Answer===================
+14

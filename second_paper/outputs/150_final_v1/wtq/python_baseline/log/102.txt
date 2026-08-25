@@ -1,0 +1,89 @@
+===================Title===================
+Cheltenham Town F.C.
+===================Table===================
+| Year | Kit Manufacturer | Shirt Sponsor | Back of Shirt Sponsor | Short Sponsor |
+| 1977–1978 |  | National Express |  |  |
+| 1982–1985 | Umbro |  |  |  |
+| 1985–1986 | Umbro | Whitbread |  |  |
+| 1986–1988 | Henson | Duraflex |  |  |
+| 1988–1989 |  | Gulf Oil |  |  |
+| 1991–1993 | Technik | Gulf Oil |  |  |
+| 1993–1994 | Club Sport | Gulf Oil |  |  |
+| 1994–1995 | Klūb Sport | Empress |  |  |
+| 1995–1996 | Matchwinner | Empress |  |  |
+| 1996–1997 | UK | Endsleigh Insurance |  |  |
+| 1997–1999 | Errea | Endsleigh Insurance |  |  |
+| 1999–2004 | Errea | Towergate Insurance |  |  |
+| 2004–2008 | Errea | Bence Building Merchants |  |  |
+| 2008– | Errea | Mira Showers |  |  |
+| 2009–2011 | Errea | Mira Showers | PSU Technology Group |  |
+| 2011–2013 | Errea | Mira Showers | Barr Stadia | Gloucestershire Echo |
+| 2013– | Errea | Mira Showers | Gloucestershire College | Gloucestershire Echo |
+===================Question===================
+how long did psu technology group serve as back of shirt sponsor?
+===================Text===================
+```python
+# First, let's check the structure of the dataframe
+print(df.columns.tolist())
+print(df.head())
+
+# Now, let's find the rows where "Back of Shirt Sponsor" is "PSU Technology Group"
+psu_rows = df[df['Back of Shirt Sponsor'] == 'PSU Technology Group']
+
+# Extract the years from these rows
+psu_years = psu_rows['Year'].tolist()
+
+# Calculate the duration
+if len(psu_years) == 1:
+    # Single year entry
+    year_str = psu_years[0]
+    if '–' in year_str:
+        start_year, end_year = year_str.split('–')
+        # Handle cases where end_year might be empty or current
+        if end_year == '' or end_year == ' ':
+            duration = 1  # Single season
+        else:
+            duration = int(end_year) - int(start_year)
+    else:
+        duration = 1
+elif len(psu_years) > 1:
+    # Multiple entries, need to find the range
+    all_years = []
+    for year_str in psu_years:
+        if '–' in year_str:
+            start_year, end_year = year_str.split('–')
+            if end_year == '' or end_year == ' ':
+                all_years.append(int(start_year))
+            else:
+                all_years.extend([int(start_year), int(end_year)])
+        else:
+            all_years.append(int(year_str))
+    
+    min_year = min(all_years)
+    max_year = max(all_years)
+    duration = max_year - min_year
+else:
+    duration = 0
+
+answer = duration
+```
+===================Answer===================
+['2 years']
+===================Execution Result===================
+2
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+2

@@ -1,0 +1,94 @@
+===================Title===================
+Radhika Pandit
+===================Table===================
+| Year | Film | Role | Language | Notes |
+| 2008 | Moggina Manasu | Chanchala | Kannada | Filmfare Award for Best Actress - Kannada\nKarnataka State Film Award for Best Actress |
+| 2009 | Olave Jeevana Lekkachaara | Rukmini | Kannada | Innovative Film Award for Best Actress |
+| 2009 | Love Guru | Kushi | Kannada | Filmfare Award for Best Actress - Kannada |
+| 2010 | Krishnan Love Story | Geetha | Kannada | Filmfare Award for Best Actress - Kannada\nUdaya Award for Best Actress |
+| 2010 | Gaana Bajaana | Radhey | Kannada |  |
+| 2011 | Hudugaru | Gayithri | Kannada | Nominated, Filmfare Award for Best Actress – Kannada |
+| 2012 | Alemari | Neeli | Kannada |  |
+| 2012 | Breaking News | Shraddha | Kannada |  |
+| 2012 | Addhuri | Poorna | Kannada | Udaya Award for Best Actress\nNominated — SIIMA Award for Best Actress\nNominated — Filmfare Award for Best Actress – Kannada |
+| 2012 | 18th Cross | Punya | Kannada |  |
+| 2012 | Sagar | Kajal | Kannada |  |
+| 2012 | Drama | Nandini | Kannada |  |
+| 2013 | Kaddipudi | Uma | Kannada |  |
+| 2013 | Dilwala | Preethi | Kannada |  |
+| 2013 | Bahaddoor | Anjali | Kannada | Filming |
+| 2014 | Mr. & Mrs. Ramachari |  |  | Announced |
+| 2014 | Endendigu |  |  | Filming |
+===================Question===================
+name a year in which no films are listed in the table.
+===================Text===================
+```json
+{
+    "answer_type": "year",
+    "cardinality": "single",
+    "task_type": "filter",
+    "target_columns": ["Year"],
+    "filters": [],
+    "operations": ["find_missing"],
+    "aggregation": null,
+    "ranking": null,
+    "arithmetic": null,
+    "boolean_polarity": "negative"
+}
+```
+---
+~~~python~~~
+# Identify years that appear in the 'Year' column
+years_with_films = df['Year'].dropna().unique()
+
+# Determine the range of years that might be considered (from min to max year in the data)
+min_year = int(df['Year'].min())
+max_year = int(df['Year'].max())
+
+# Generate a list of all integer years in that range
+all_years_in_range = list(range(min_year, max_year + 1))
+
+# Find years in the range that are not present in the data
+years_without_films = [year for year in all_years_in_range if year not in years_with_films]
+
+# Select one such year (the first one for definiteness)
+answer = years_without_films[0] if years_without_films else None
+~~~
+---
+~~~python~~~
+# Identify years that appear in the 'Year' column
+years_with_films = df['Year'].dropna().astype(int).unique()
+
+# Determine the range of years that might be considered (from min to max year in the data)
+min_year = int(df['Year'].min())
+max_year = int(df['Year'].max())
+
+# Generate a list of all integer years in that range
+all_years_in_range = list(range(min_year, max_year + 1))
+
+# Find years in the range that are not present in the data
+years_without_films = [year for year in all_years_in_range if year not in years_with_films]
+
+# Select one such year (the first one for definiteness)
+answer = years_without_films[0] if years_without_films else None
+~~~
+===================Answer===================
+['2007']
+===================Execution Result===================
+null
+===================Execution Error===================
+NameError: name 'years_with_films' is not defined
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"kind": "execution", "repair_count": 1, "execution_error": "NameError: name 'years_with_films' is not defined", "repaired_code": "# Identify years that appear in the 'Year' column\nyears_with_films = df['Year'].dropna().astype(int).unique()\n\n# Determine the range of years that might be considered (from min to max year in the data)\nmin_year = int(df['Year'].min())\nmax_year = int(df['Year'].max())\n\n# Generate a list of all integer years in that range\nall_years_in_range = list(range(min_year, max_year + 1))\n\n# Find years in the range that are not present in the data\nyears_without_films = [year for year in all_years_in_range if year not in years_with_films]\n\n# Select one such year (the first one for definiteness)\nanswer = years_without_films[0] if years_without_films else None", "execution": {"success": false, "error": "NameError: name 'years_with_films' is not defined", "result": null, "observed_output_type": "unknown", "observed_value": null, "evidence": {"stdout": "", "traceback": "Traceback (most recent call last):\n  File \"/root/shared-nvme/wangjie/second_paper/semantic_audit/runtime_trace.py\", line 84, in execute_code\n    exec(compile(ast.Module(body=body, type_ignores=[]), \"<generated>\", \"exec\"), glb, loc)\n  File \"<generated>\", line 12, in <module>\n  File \"<generated>\", line 12, in <listcomp>\nNameError: name 'years_with_films' is not defined\n", "operation_trace": [], "semantic_warnings": ["execution_exception"], "latency_seconds": 0.004879743792116642}, "memory": {}}, "accepted": false}]
+===================Final Answer===================
+None

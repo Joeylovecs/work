@@ -1,0 +1,89 @@
+===================Title===================
+Love (2011 film)
+===================Table===================
+| Date | Festival | Location | Awards | Link |
+| Feb 2–5, Feb 11 | Santa Barbara International Film Festival | Santa Barbara, California  USA | Top 11 "Best of the Fest" Selection | sbiff.org |
+| May 21–22, Jun 11 | Seattle International Film Festival | Seattle, Washington  USA |  | siff.net |
+| Jul 18, Jul 25 | Fantasia Festival | Montreal, Quebec  Canada | Special Mention\n"for the resourcefulness and unwavering determination by a director to realize his unique vision" | FanTasia |
+| Sep 16 | Athens International Film Festival | Athens, Attica\n Greece | Best Director | aiff.gr |
+| Sep 19 | Lund International Fantastic Film Festival | Lund, Skåne\n Sweden |  | fff.se |
+| Sep 28 | Fantastic Fest | Austin, Texas\n USA |  | FantasticFest.com |
+| Oct 9 | London Int. Festival of Science Fiction Film | London, England\n UK | Closing Night Film | Sci-Fi London |
+| Oct 9, Oct 11 | Sitges Film Festival | Sitges, Catalonia\n Spain |  | Sitges Festival |
+| Oct 1, Oct 15 | Gwacheon International SF Festival | Gwacheon, Gyeonggi-do\n South Korea |  | gisf.org |
+| Oct 17, Oct 20 | Icon TLV | Tel Aviv, Central\n Israel |  | icon.org.il |
+| Oct 23 | Toronto After Dark | Toronto, Ontario\n Canada | Best Special Effects\nBest Musical Score | torontoafterdark.com |
+| Nov 11 | Les Utopiales | Nantes, Pays de la Loire\n France |  | utopiales.org |
+| Nov 12, Nov 18 | Indonesia Fantastic Film Festival | Jakarta, Bandung\n Indonesia |  | inaff.com |
+| Nov 16–18 | AFF | Wrocław, Lower Silesia\n Poland |  | AFF Poland |
+===================Question===================
+what festival was the film show at before the fantasia festival?
+===================Text===================
+~~~python~~~
+# Filter rows to find the Fantasia Festival date
+fantasia_row = df[df['Festival'] == 'Fantasia Festival']
+if not fantasia_row.empty:
+    fantasia_date = fantasia_row['Date'].iloc[0]
+    # Extract the first date part (assuming format like "Jul 18, Jul 25")
+    fantasia_first_date_str = fantasia_date.split(',')[0].strip()
+    # Convert to datetime for comparison (assuming year 2011 from context)
+    import datetime
+    try:
+        fantasia_first_date = datetime.datetime.strptime(fantasia_first_date_str + " 2011", "%b %d %Y")
+    except ValueError:
+        # Handle date ranges like "Feb 2–5"
+        if '–' in fantasia_first_date_str:
+            start_part = fantasia_first_date_str.split('–')[0].strip()
+            fantasia_first_date = datetime.datetime.strptime(start_part + " 2011", "%b %d %Y")
+        else:
+            fantasia_first_date = None
+else:
+    fantasia_first_date = None
+
+# If we have a valid Fantasia date, find festivals with earlier dates
+if fantasia_first_date:
+    earlier_festivals = []
+    for idx, row in df.iterrows():
+        festival_date_str = row['Date']
+        # Extract first date part
+        first_date_part = festival_date_str.split(',')[0].strip()
+        try:
+            festival_first_date = datetime.datetime.strptime(first_date_part + " 2011", "%b %d %Y")
+        except ValueError:
+            if '–' in first_date_part:
+                start_part = first_date_part.split('–')[0].strip()
+                festival_first_date = datetime.datetime.strptime(start_part + " 2011", "%b %d %Y")
+            else:
+                festival_first_date = None
+        if festival_first_date and festival_first_date < fantasia_first_date:
+            earlier_festivals.append((festival_first_date, row['Festival']))
+    
+    # Sort by date descending to get the one immediately before Fantasia
+    if earlier_festivals:
+        earlier_festivals.sort(key=lambda x: x[0], reverse=True)
+        answer = earlier_festivals[0][1]
+    else:
+        answer = None
+else:
+    answer = None
+~~~
+===================Answer===================
+['Seattle International Film Festival']
+===================Execution Result===================
+"Seattle International Film Festival"
+===================Execution Error===================
+None
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[]
+===================Final Answer===================
+Seattle International Film Festival

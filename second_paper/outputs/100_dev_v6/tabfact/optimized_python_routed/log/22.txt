@@ -1,0 +1,73 @@
+===================Title===================
+ai miyazato
+===================Table===================
+| no | date | tournament | winning score | to par | margin of victory | runner (s) - up |
+| 1 | 28 sep 2003 | miyagi tv cup dunlop ladies open (as an amateur ) | 70 + 70 + 71 = 211 | - 5 | 1 stroke | mari katayama hiroko yamaguchi |
+| 2 | 7 mar 2004 | daikin orchid ladies | 70 + 66 + 70 = 206 | - 10 | 3 strokes | kaori higo |
+| 3 | 13 jun 2004 | suntory ladies open | 69 + 70 + 70 + 68 = 277 | - 11 | 6 strokes | hiroko yamaguchi toshimi kimura |
+| 4 | 20 jun 2004 | apita circle k sunkus ladies | 69 + 69 + 72 = 210 | - 6 | 1 stroke | yuri fudoh |
+| 5 | 24 oct 2004 | masters gc ladies | 69 + 68 + 68 = 205 | - 11 | 1 stroke | miho koga |
+| 6 | 21 nov 2004 | daio paper elleair ladies open | 66 + 67 + 69 = 202 | - 14 | 3 strokes | chieko amanuma rui kitada |
+| 7 | 15 may 2005 | vernal ladies | 69 + 64 + 70 = 203 | - 13 | 8 strokes | akiko fukushima |
+| 8 | 22 may 2005 | chukyo tv bridgestone ladies open | 65 + 74 + 70 = 209 | - 7 | playoff | nikki campbell |
+| 9 | 21 aug 2005 | new catapillar mitsubishi ladies | 66 + 75 + 68 = 209 | - 10 | 3 strokes | mi - jeong jeon hiromi mogi |
+| 10 | 2 oct 2005 | japan women 's open golf championship | 69 + 69 + 72 + 73 = 283 | - 5 | 5 strokes | akiko fukushima |
+| 12 | 20 nov 2005 | daio paper elleair ladies open | 69 + 70 + 65 = 204 | - 12 | 5 strokes | shiho oyama woo - soon ko kasumi fujii |
+| 13 | 10 sep 2006 | jlpga championship konica minolta cup | 70 + 68 + 74 + 70 = 282 | - 6 | 3 strokes | hyun - ju shin |
+| 14 | 24 sep 2006 | miyagi tv cup dunlop ladies open | 70 + 73 + 71 = 214 | - 2 | 3 strokes | shiho oyama |
+===================Question===================
+the winner of the miyagi tv cup donlop ladies open ended two point under par ( - 2)
+===================Text===================
+~~~python~~~
+# Filter rows where the tournament column contains "miyagi tv cup dunlop ladies open"
+filtered = df[df['tournament'].str.contains('miyagi tv cup dunlop ladies open', case=False, na=False)]
+
+# Extract the 'to par' value for the filtered row(s)
+# The question states "ended two point under par ( - 2)", so we check if the 'to par' equals -2
+# The 'to par' column contains strings like "- 5", "- 10", etc. We need to parse them to integers.
+# Remove spaces and convert to integer
+filtered['to par numeric'] = filtered['to par'].str.replace(' ', '').astype(int)
+
+# Check if any row has 'to par numeric' equal to -2
+answer = (filtered['to par numeric'] == -2).any()
+
+# Ensure answer is a Python bool
+answer = bool(answer)
+~~~
+---
+~~~python
+# Filter rows where the tournament column contains "miyagi tv cup dunlop ladies open"
+filtered = df[df['tournament'].str.contains('miyagi tv cup dunlop ladies open', case=False, na=False)]
+
+# Extract the 'to par' value for the filtered row(s)
+# The question states "ended two point under par ( - 2)", so we check if the 'to par' equals -2
+# The 'to par' column contains strings like "- 5", "- 10", etc. We need to parse them to integers.
+# Remove spaces and convert to integer directly without creating a new column
+to_par_numeric = filtered['to par'].str.replace(' ', '').astype(int)
+
+# Check if any row has 'to par numeric' equal to -2
+answer = (to_par_numeric == -2).any()
+
+# Ensure answer is a Python bool
+answer = bool(answer)
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"kind": "semantic", "repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "UNKNOWN_COLUMN", "expected": null, "actual": "to par numeric", "evidence": [{"kind": "column", "requested": "tournament", "matched": "tournament", "match_type": "exact", "passed": true}, {"kind": "column", "requested": "to par numeric", "matched": null, "passed": false}, {"kind": "column", "requested": "to par", "matched": "to par", "match_type": "exact", "passed": true}, {"kind": "entity", "column": "tournament", "value": "miyagi tv cup dunlop ladies open", "op": "contains", "matched_cell": "miyagi tv cup dunlop ladies open (as an amateur )", "match_type": "normalized_substring", "passed": true}, {"kind": "entity", "column": "to par numeric", "value": -2, "op": "=", "matched_cell": null, "passed": false}], "confidence": 0.99, "repair_hint": "Use an existing table column."}], "confidence": 0.99}, "repair_hint": "Use an existing table column.", "confidence": 0.99, "mode": "hybrid"}, "repaired_code": "# Filter rows where the tournament column contains \"miyagi tv cup dunlop ladies open\"\nfiltered = df[df['tournament'].str.contains('miyagi tv cup dunlop ladies open', case=False, na=False)]\n\n# Extract the 'to par' value for the filtered row(s)\n# The question states \"ended two point under par ( - 2)\", so we check if the 'to par' equals -2\n# The 'to par' column contains strings like \"- 5\", \"- 10\", etc. We need to parse them to integers.\n# Remove spaces and convert to integer directly without creating a new column\nto_par_numeric = filtered['to par'].str.replace(' ', '').astype(int)\n\n# Check if any row has 'to par numeric' equal to -2\nanswer = (to_par_numeric == -2).any()\n\n# Ensure answer is a Python bool\nanswer = bool(answer)", "execution": {"success": true, "error": null, "result": true, "observed_output_type": "boolean", "observed_value": true, "evidence": {"final_object_type": "boolean", "final_value": true, "dataframes": [{"name": "df", "shape": [13, 7], "columns": ["no", "date", "tournament", "winning score", "to par", "margin of victory", "runner (s) - up"]}, {"name": "filtered", "shape": [2, 7], "columns": ["no", "date", "tournament", "winning score", "to par", "margin of victory", "runner (s) - up"]}], "operation_trace": [{"operation": "input_table", "name": "df", "rows": 13, "columns": ["no", "date", "tournament", "winning score", "to par", "margin of victory", "runner (s) - up"]}, {"operation": "filter", "name": "filtered", "rows_before": 13, "rows_after": 2, "columns": ["no", "date", "tournament", "winning score", "to par", "margin of victory", "runner (s) - up"]}, {"operation": "series_state", "name": "to_par_numeric", "length": 2, "column": "to par"}, {"operation": "return", "output_type": "boolean", "value": true}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.0007440159097313881}, "memory": {}}, "candidate_audit": {"passed": true, "semantic_exception": false, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "", "confidence": 1.0, "mode": "hybrid"}, "candidate_error_count": 0, "previous_error_count": 1, "answer_changed": false, "safe_change": true, "accepted": true}]
+===================Final Answer===================
+True
