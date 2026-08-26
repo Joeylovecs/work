@@ -49,35 +49,26 @@ try {
     while ($true) {
         Start-Sleep -Seconds 5
 
-        if (-not $pendingSync) {
-            continue
-        }
+        if ($pendingSync -and ((Get-Date) - $lastChange).TotalSeconds -ge $debounceSeconds) {
+            $pendingSync = $false
+            $status = Get-GitStatus
 
-        if (((Get-Date) - $lastChange).TotalSeconds -lt $debounceSeconds) {
-            continue
-        }
-
-        $pendingSync = $false
-        $status = Get-GitStatus
-        if ($status.Count -eq 0) {
-            continue
-        }
-
-        try {
-            Invoke-Git @('-c', 'core.autocrlf=false', 'add', '-f', '--all', '.')
-            & git -C $repoPath diff --cached --quiet
-            if ($LASTEXITCODE -eq 0) {
-                continue
+            if ($status.Count -gt 0) {
+                try {
+                    Invoke-Git @('-c', 'core.autocrlf=false', 'add', '-f', '--all', '.')
+                    & git -C $repoPath diff --cached --quiet
+                    if ($LASTEXITCODE -ne 0) {
+                        $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+                        Invoke-Git @('commit', '-m', "Auto-sync: $timestamp")
+                        Invoke-Git @('push', 'origin', 'main')
+                    }
+                }
+                catch {
+                    $pendingSync = $true
+                    $lastChange = (Get-Date).AddSeconds(-$debounceSeconds + $retrySeconds)
+                    Start-Sleep -Seconds $retrySeconds
+                }
             }
-
-            $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-            Invoke-Git @('commit', '-m', "Auto-sync: $timestamp")
-            Invoke-Git @('push', 'origin', 'main')
-        }
-        catch {
-            $pendingSync = $true
-            $lastChange = (Get-Date).AddSeconds(-$debounceSeconds + $retrySeconds)
-            Start-Sleep -Seconds $retrySeconds
         }
     }
 }
