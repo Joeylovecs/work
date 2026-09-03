@@ -6,7 +6,7 @@ set "DATASET=wtq"
 set "START_INDEX=0"
 set "END_INDEX=2"
 REM Relative output path below second_paper\outputs\.
-set "OUTPUT_SUBDIR=windows_local_0_5/wtq_baseline"
+set "OUTPUT_SUBDIR=windows_local_0_2/wtq_baseline"
 
 if "%PARATERA_API_KEY%"=="" (
   echo PARATERA_API_KEY is not set in this terminal session.
