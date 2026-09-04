@@ -3,7 +3,7 @@ REM Windows configuration for the Linux run_150_frozen.sh pipeline.
 REM END_INDEX is exclusive: 0 and 2 means indices 0 and 1.
 set "DATASET=wtq"
 set "START_INDEX=0"
-set "END_INDEX=2"
+set "END_INDEX=50"
 set "EXPERIMENT_ROOT=windows_full_0_2"
 set "MODEL_ID=DeepSeek-V3.2"
 set "REQUEST_TIMEOUT=60"
