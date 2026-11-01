@@ -73,3 +73,32 @@ def test_cache_hit_does_not_call_api(tmp_path, capsys):
     result = client.chat(messages)
     assert result["cached"] is True and result["text"] == "cached answer" and client.calls == 0
     assert "缓存" in capsys.readouterr().out
+
+
+def test_wtq_runner_writes_sample_progress_with_offline_model(tmp_path, capsys, monkeypatch):
+    import sys
+
+    runner_path = SOURCE.parents[1] / "scripts" / "run_paper1.py"
+    runner_spec = importlib.util.spec_from_file_location("offline_progress_runner", runner_path)
+    runner = importlib.util.module_from_spec(runner_spec)
+    runner_spec.loader.exec_module(runner)
+
+    def fake_client(cache_dir, timeout):
+        def create(**kwargs):
+            return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(
+                content="```python\ndef solve(df):\n    return 1\n```"))], usage=None)
+        return make_client(tmp_path, create)
+
+    monkeypatch.setattr(runner, "ParateraClient", fake_client)
+    output = tmp_path / "offline_wtq"
+    monkeypatch.setattr(sys, "argv", ["run_paper1.py", "--dataset", "wtq", "--mode", "baseline",
+                                   "--start", "0", "--end", "1", "--all-questions",
+                                   "--experiment", str(output)])
+    with pytest.raises(SystemExit) as stopped:
+        runner.main()
+    assert stopped.value.code == 0
+    console = capsys.readouterr().out
+    assert "样本1/1" in console and "完成 1/1 (100%)" in console
+    assert "预计剩余=" in console
+    assert (output / "log" / "0.txt").is_file()
+    assert len((output / "result.jsonl").read_text(encoding="utf-8").splitlines()) == 1
