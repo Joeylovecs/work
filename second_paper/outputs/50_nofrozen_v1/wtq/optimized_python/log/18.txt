@@ -1,0 +1,82 @@
+===================Title===================
+World War II casualties of Poland
+===================Table===================
+| Description Losses | 1939/40 | 1940/41 | 1941/42 | 1942/43 | 1943/44 | 1944/45 | Total |
+| Direct War Losses | 360,000 |  |  |  |  | 183,000 | 543,000 |
+| Murdered | 75,000 | 100,000 | 116,000 | 133,000 | 82,000 |  | 506,000 |
+| Deaths In Prisons & Camps | 69,000 | 210,000 | 220,000 | 266,000 | 381,000 |  | 1,146,000 |
+| Deaths Outside of Prisons & Camps |  | 42,000 | 71,000 | 142,000 | 218,000 |  | 473,000 |
+| Murdered in Eastern Regions |  |  |  |  |  | 100,000 | 100,000 |
+| Deaths other countries |  |  |  |  |  |  | 2,000 |
+| Total | 504,000 | 352,000 | 407,000 | 541,000 | 681,000 | 270,000 | 2,770,000 |
+===================Question===================
+which year has the most deaths outside of prisons & camps?
+===================Text===================
+```json
+{
+  "answer_type": "column",
+  "cardinality": "single",
+  "task_type": "argmax",
+  "target_columns": ["1939/40", "1940/41", "1941/42", "1942/43", "1943/44", "1944/45"],
+  "filters": [
+    {"column": "Description Losses", "op": "=", "value": "Deaths Outside of Prisons & Camps"}
+  ],
+  "operations": ["max"],
+  "aggregation": null,
+  "ranking": {"direction": "max", "count": 1},
+  "arithmetic": null,
+  "boolean_polarity": "positive"
+}
+```
+---
+~~~python
+import pandas as pd
+
+# Locate the row for "Deaths Outside of Prisons & Camps"
+row = df[df.iloc[:, 0].astype(str).str.strip().str.lower() == "deaths outside of prisons & camps"]
+
+# Year columns are all columns except the first (Description) and last (Total)
+year_cols = df.columns[1:-1]
+
+# Convert year columns to numeric
+vals = row[year_cols].apply(pd.to_numeric, errors="coerce").iloc[0]
+
+# Find the year with the maximum value
+answer = vals.idxmax()
+~~~
+---
+~~~python
+import pandas as pd
+
+# Locate the row for "Deaths Outside of Prisons & Camps"
+row = df[df.iloc[:, 0].astype(str).str.strip().str.lower() == "deaths outside of prisons & camps"]
+
+# Year columns are all columns except the first (Description) and last (Total)
+year_cols = df.columns[1:-1]
+
+# Convert year columns to numeric
+vals = row[year_cols].apply(pd.to_numeric, errors="coerce").iloc[0]
+
+# Find the year with the maximum value
+answer = str(vals.idxmax())
+~~~
+===================Answer===================
+['1943/44']
+===================Execution Result===================
+"1943/44"
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "column", "actual": "string", "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_FILTER", "expected": {"column": "Description Losses", "op": "=", "value": "Deaths Outside of Prisons & Camps"}, "actual": [], "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.96, "repair_hint": "Add filter Description Losses = Deaths Outside of Prisons & Camps before the aggregation."}, {"level": "OPERATOR", "error_type": "WRONG_RANKING_DIRECTION", "expected": "max", "actual": "desc", "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.96, "repair_hint": "Reverse the ranking direction to match highest/lowest."}], "confidence": 0.96}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "MISSING_FILTER_PARAMETER", "expected": {"column": "Description Losses", "op": "=", "value": "Deaths Outside of Prisons & Camps"}, "actual": null, "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.9, "repair_hint": "Ground the filter column and value in the question and table."}], "confidence": 0.9}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "column", "actual": "string", "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_FILTER", "expected": {"column": "Description Losses", "op": "=", "value": "Deaths Outside of Prisons & Camps"}, "actual": [], "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.96, "repair_hint": "Add filter Description Losses = Deaths Outside of Prisons & Camps before the aggregation."}, {"level": "OPERATOR", "error_type": "WRONG_RANKING_DIRECTION", "expected": "max", "actual": "desc", "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.96, "repair_hint": "Reverse the ranking direction to match highest/lowest."}], "confidence": 0.96}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "MISSING_FILTER_PARAMETER", "expected": {"column": "Description Losses", "op": "=", "value": "Deaths Outside of Prisons & Camps"}, "actual": null, "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.9, "repair_hint": "Ground the filter column and value in the question and table."}], "confidence": 0.9}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object. Add filter Description Losses = Deaths Outside of Prisons & Camps before the aggregation. Reverse the ranking direction to match highest/lowest. Ground the filter column and value in the question and table.", "confidence": 0.9, "mode": "hybrid"}
+===================Repair Hint===================
+Return the requested answer type, not an intermediate numeric or table object. Add filter Description Losses = Deaths Outside of Prisons & Camps before the aggregation. Reverse the ranking direction to match highest/lowest. Ground the filter column and value in the question and table.
+===================Repair Trace===================
+[{"kind": "semantic", "repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "column", "actual": "string", "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_FILTER", "expected": {"column": "Description Losses", "op": "=", "value": "Deaths Outside of Prisons & Camps"}, "actual": [], "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.96, "repair_hint": "Add filter Description Losses = Deaths Outside of Prisons & Camps before the aggregation."}, {"level": "OPERATOR", "error_type": "WRONG_RANKING_DIRECTION", "expected": "max", "actual": "desc", "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.96, "repair_hint": "Reverse the ranking direction to match highest/lowest."}], "confidence": 0.96}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "MISSING_FILTER_PARAMETER", "expected": {"column": "Description Losses", "op": "=", "value": "Deaths Outside of Prisons & Camps"}, "actual": null, "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.9, "repair_hint": "Ground the filter column and value in the question and table."}], "confidence": 0.9}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object. Add filter Description Losses = Deaths Outside of Prisons & Camps before the aggregation. Reverse the ranking direction to match highest/lowest. Ground the filter column and value in the question and table.", "confidence": 0.9, "mode": "hybrid"}, "repaired_code": "import pandas as pd\n\n# Locate the row for \"Deaths Outside of Prisons & Camps\"\nrow = df[df.iloc[:, 0].astype(str).str.strip().str.lower() == \"deaths outside of prisons & camps\"]\n\n# Year columns are all columns except the first (Description) and last (Total)\nyear_cols = df.columns[1:-1]\n\n# Convert year columns to numeric\nvals = row[year_cols].apply(pd.to_numeric, errors=\"coerce\").iloc[0]\n\n# Find the year with the maximum value\nanswer = str(vals.idxmax())", "execution": {"success": true, "error": null, "result": "1943/44", "observed_output_type": "string", "observed_value": "1943/44", "evidence": {"final_object_type": "string", "final_value": "1943/44", "dataframes": [{"name": "df", "shape": [7, 8], "columns": ["Description Losses", "1939/40", "1940/41", "1941/42", "1942/43", "1943/44", "1944/45", "Total"]}, {"name": "row", "shape": [1, 8], "columns": ["Description Losses", "1939/40", "1940/41", "1941/42", "1942/43", "1943/44", "1944/45", "Total"]}], "operation_trace": [{"operation": "input_table", "name": "df", "rows": 7, "columns": ["Description Losses", "1939/40", "1940/41", "1941/42", "1942/43", "1943/44", "1944/45", "Total"]}, {"operation": "filter", "name": "row", "rows_before": 7, "rows_after": 1, "columns": ["Description Losses", "1939/40", "1940/41", "1941/42", "1942/43", "1943/44", "1944/45", "Total"]}, {"operation": "series_state", "name": "vals", "length": 6, "column": "3"}, {"operation": "return", "output_type": "string", "value": "1943/44"}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.004339421167969704}, "memory": {}}, "candidate_audit": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": false, "errors": [{"level": "GLOBAL", "error_type": "ANSWER_TYPE_MISMATCH", "expected": "column", "actual": "string", "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.98, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object."}], "confidence": 0.98}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_FILTER", "expected": {"column": "Description Losses", "op": "=", "value": "Deaths Outside of Prisons & Camps"}, "actual": [], "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.96, "repair_hint": "Add filter Description Losses = Deaths Outside of Prisons & Camps before the aggregation."}, {"level": "OPERATOR", "error_type": "WRONG_RANKING_DIRECTION", "expected": "max", "actual": "desc", "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.96, "repair_hint": "Reverse the ranking direction to match highest/lowest."}], "confidence": 0.96}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "MISSING_FILTER_PARAMETER", "expected": {"column": "Description Losses", "op": "=", "value": "Deaths Outside of Prisons & Camps"}, "actual": null, "evidence": ["scalar_compare:df.iloc[:, 0].astype(str).str.strip().str.lower() == 'deaths outside of prisons & camps'", "dynamic_column_access", "ranking:idxmax"], "confidence": 0.9, "repair_hint": "Ground the filter column and value in the question and table."}], "confidence": 0.9}, "repair_hint": "Return the requested answer type, not an intermediate numeric or table object. Add filter Description Losses = Deaths Outside of Prisons & Camps before the aggregation. Reverse the ranking direction to match highest/lowest. Ground the filter column and value in the question and table.", "confidence": 0.9, "mode": "hybrid"}, "candidate_error_count": 4, "previous_error_count": 4, "answer_changed": false, "safe_change": true, "accepted": false, "rejection_reason": "no_verified_improvement"}]
+===================Final Answer===================
+1943/44

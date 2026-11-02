@@ -1,0 +1,63 @@
+===================Title===================
+World War II casualties of Poland
+===================Table===================
+| Description Losses | 1939/40 | 1940/41 | 1941/42 | 1942/43 | 1943/44 | 1944/45 | Total |
+| Direct War Losses | 360,000 |  |  |  |  | 183,000 | 543,000 |
+| Murdered | 75,000 | 100,000 | 116,000 | 133,000 | 82,000 |  | 506,000 |
+| Deaths In Prisons & Camps | 69,000 | 210,000 | 220,000 | 266,000 | 381,000 |  | 1,146,000 |
+| Deaths Outside of Prisons & Camps |  | 42,000 | 71,000 | 142,000 | 218,000 |  | 473,000 |
+| Murdered in Eastern Regions |  |  |  |  |  | 100,000 | 100,000 |
+| Deaths other countries |  |  |  |  |  |  | 2,000 |
+| Total | 504,000 | 352,000 | 407,000 | 541,000 | 681,000 | 270,000 | 2,770,000 |
+===================Question===================
+during what year was the largest number of deaths recorded for ethnic poles outside of prisons & camps?
+===================Text===================
+```json
+{
+  "answer_type": "value",
+  "cardinality": 1,
+  "task_type": "max_lookup",
+  "target_columns": ["Deaths Outside of Prisons & Camps"],
+  "filters": [],
+  "operations": ["max"],
+  "aggregation": null,
+  "ranking": {"direction": "max", "column": "Deaths Outside of Prisons & Camps", "scope_columns": ["1939/40", "1940/41", "1941/42", "1942/43", "1943/44", "1944/45"]},
+  "arithmetic": null,
+  "boolean_polarity": "positive"
+}
+```
+---
+~~~python
+row = df[df['Description Losses'].str.strip() == 'Deaths Outside of Prisons & Camps'].iloc[0]
+cols = ['1939/40', '1940/41', '1941/42', '1942/43', '1943/44', '1944/45']
+vals = {c: row[c] for c in cols if pd.notna(row[c])}
+answer = max(vals, key=vals.get)
+~~~
+---
+```python
+row = df[df['Description Losses'].astype(str).str.strip().str.contains('Outside of Prisons', case=False, na=False)].iloc[0]
+cols = ['1939/40', '1940/41', '1941/42', '1942/43', '1943/44', '1944/45']
+vals = {c: pd.to_numeric(row[c], errors='coerce') for c in cols}
+vals = {c: v for c, v in vals.items() if pd.notna(v)}
+answer = max(vals, key=vals.get)
+```
+===================Answer===================
+['1943/44']
+===================Execution Result===================
+null
+===================Execution Error===================
+NameError: name 'row' is not defined
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"kind": "execution", "repair_count": 1, "execution_error": "NameError: name 'row' is not defined", "repaired_code": "row = df[df['Description Losses'].astype(str).str.strip().str.contains('Outside of Prisons', case=False, na=False)].iloc[0]\ncols = ['1939/40', '1940/41', '1941/42', '1942/43', '1943/44', '1944/45']\nvals = {c: pd.to_numeric(row[c], errors='coerce') for c in cols}\nvals = {c: v for c, v in vals.items() if pd.notna(v)}\nanswer = max(vals, key=vals.get)", "execution": {"success": false, "error": "NameError: name 'row' is not defined", "result": null, "observed_output_type": "unknown", "observed_value": null, "evidence": {"stdout": "", "traceback": "Traceback (most recent call last):\n  File \"/data/amax/home/E23101002/wangjie/work2/second_paper/semantic_audit/runtime_trace.py\", line 86, in execute_code\n    exec(compile(ast.Module(body=body, type_ignores=[]), \"<generated>\", \"exec\"), glb, loc)\n  File \"<generated>\", line 3, in <module>\n  File \"<generated>\", line 3, in <dictcomp>\nNameError: name 'row' is not defined. Did you mean: 'pow'?\n", "operation_trace": [], "semantic_warnings": ["execution_exception"], "latency_seconds": 0.00237932987511158}, "memory": {}}, "accepted": false}]
+===================Final Answer===================
+None

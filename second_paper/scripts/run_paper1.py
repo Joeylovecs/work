@@ -168,8 +168,13 @@ def run(args: argparse.Namespace) -> int:
     except APIConfigError as exc:
         print(str(exc), file=sys.stderr); return 2
     records = []
-    for sample in samples:
+    run_started = time.perf_counter()
+    correct_count = 0
+    client.progress(f"开始 dataset={dataset} mode={args.mode} 共{len(samples)}条 model={client.model} 输出={output}")
+    for position, sample in enumerate(samples, 1):
         started = time.perf_counter()
+        client.progress_context = f"{args.mode} 样本{position}/{len(samples)} idx={sample.flat_index}"
+        client.progress("开始处理；完成样本后写入 log 和 result.jsonl")
         usage, calls = {}, 0
         raw_outputs, repair_trace = [], []
         execution = {"success": False, "error": "not_run", "observed_value": None}
@@ -226,6 +231,7 @@ def run(args: argparse.Namespace) -> int:
             dp_value = initial_dp_value
             previous_review = ""
             for review_index in range(args.max_dp_repairs):
+                client.progress(f"文本复审 {review_index + 1}/{args.max_dp_repairs}")
                 review_text, response = ask(
                     client,
                     dp_review_prompt(
@@ -294,11 +300,13 @@ def run(args: argparse.Namespace) -> int:
             initial_generated_code = extract_code(code_text)
             code = initial_generated_code
             initial_execution = execute_code(code, sample.df)
+            client.progress(f"初始代码执行 success={initial_execution.get('success')}")
             execution = initial_execution
 
             execution_repairs = 0
             execution_budget = 0 if route in {"baseline", "agent"} else args.max_execution_repairs
             while not execution.get("success") and execution_repairs < execution_budget:
+                client.progress(f"执行修复 {execution_repairs + 1}/{execution_budget}")
                 execution_text, response = ask(
                     client,
                     execution_repair_prompt(dataset, sample.table_md, sample.question, code, str(execution.get("error"))),
@@ -347,6 +355,7 @@ def run(args: argparse.Namespace) -> int:
                 }
 
                 while audit and audit.semantic_exception and semantic_repairs < args.max_repairs:
+                    client.progress(f"语义修复 {semantic_repairs + 1}/{args.max_repairs}")
                     previous_errors = audit_error_count(audit)
                     repair_text, response = ask(
                         client,
@@ -501,12 +510,23 @@ def run(args: argparse.Namespace) -> int:
         with result_path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
         records.append(record)
+        correct_count += int(bool(final_correct))
+        elapsed = time.perf_counter() - run_started
+        eta = elapsed / position * (len(samples) - position)
+        client.progress(
+            f"完成 {position}/{len(samples)} ({position / len(samples):.0%}) "
+            f"本条={time.perf_counter() - started:.1f}s 累计={elapsed:.1f}s "
+            f"预计剩余={eta:.1f}s 正确={correct_count}/{position} "
+            f"correct={bool(final_correct)} exec={execution.get('success')} API调用={calls}"
+        )
         print(
             f"{sample.flat_index}	{sample.sample_id}	method={selected_method}	correct={final_correct}	exec={execution.get('success')}",
             flush=True,
         )
     from second_paper.evaluation.metrics import summarize_records
     (output / "summary.json").write_text(json.dumps(summarize_records(records), ensure_ascii=False, indent=2), encoding="utf-8")
+    client.progress_context = args.mode
+    client.progress(f"阶段完成 {len(samples)}/{len(samples)} 准确率={correct_count / len(samples):.2%} summary={output / 'summary.json'}")
     return 0
 
 def main() -> None:

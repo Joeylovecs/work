@@ -98,7 +98,7 @@
 
 ```bash
 cd /root/shared-nvme/wangjie/second_paper
-conda activate work
+conda activate work2
 bash scripts/run_150_frozen.sh wtq
 bash scripts/run_150_frozen.sh tabfact
 ```

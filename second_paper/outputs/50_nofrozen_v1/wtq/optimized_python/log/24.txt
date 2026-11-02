@@ -1,0 +1,57 @@
+===================Title===================
+World War II casualties of Poland
+===================Table===================
+| Description Losses | 1939/40 | 1940/41 | 1941/42 | 1942/43 | 1943/44 | 1944/45 | Total |
+| Direct War Losses | 360,000 |  |  |  |  | 183,000 | 543,000 |
+| Murdered | 75,000 | 100,000 | 116,000 | 133,000 | 82,000 |  | 506,000 |
+| Deaths In Prisons & Camps | 69,000 | 210,000 | 220,000 | 266,000 | 381,000 |  | 1,146,000 |
+| Deaths Outside of Prisons & Camps |  | 42,000 | 71,000 | 142,000 | 218,000 |  | 473,000 |
+| Murdered in Eastern Regions |  |  |  |  |  | 100,000 | 100,000 |
+| Deaths other countries |  |  |  |  |  |  | 2,000 |
+| Total | 504,000 | 352,000 | 407,000 | 541,000 | 681,000 | 270,000 | 2,770,000 |
+===================Question===================
+what is the only years that total losses were below 350,000?
+===================Text===================
+~~~python
+import pandas as pd
+
+# Identify the Total row
+total_row = df[df.iloc[:, 0].astype(str).str.strip().str.lower() == 'total']
+
+# Year columns (all except the last 'Total' column)
+year_cols = df.columns[1:-1]
+
+# Find years where total losses < 350,000
+below = [col for col in year_cols if pd.to_numeric(total_row[col].iloc[0], errors='coerce') < 350000]
+
+answer = below[0] if below else None
+~~~
+---
+```python
+import pandas as pd
+
+total_row = df[df.iloc[:, 0].astype(str).str.strip().str.lower() == 'total']
+year_cols = df.columns[1:-1]
+below = [col for col in year_cols if pd.to_numeric(total_row[col].iloc[0], errors='coerce') < 350000]
+answer = below[0] if below else None
+```
+===================Answer===================
+['1944/45']
+===================Execution Result===================
+null
+===================Execution Error===================
+NameError: name 'total_row' is not defined
+===================Global Audit===================
+null
+===================Operator Audit===================
+null
+===================Parameter Audit===================
+null
+===================Semantic Logic Exception===================
+null
+===================Repair Hint===================
+
+===================Repair Trace===================
+[{"kind": "execution", "repair_count": 1, "execution_error": "NameError: name 'total_row' is not defined", "repaired_code": "import pandas as pd\n\ntotal_row = df[df.iloc[:, 0].astype(str).str.strip().str.lower() == 'total']\nyear_cols = df.columns[1:-1]\nbelow = [col for col in year_cols if pd.to_numeric(total_row[col].iloc[0], errors='coerce') < 350000]\nanswer = below[0] if below else None", "execution": {"success": false, "error": "NameError: name 'total_row' is not defined", "result": null, "observed_output_type": "unknown", "observed_value": null, "evidence": {"stdout": "", "traceback": "Traceback (most recent call last):\n  File \"/data/amax/home/E23101002/wangjie/work2/second_paper/semantic_audit/runtime_trace.py\", line 86, in execute_code\n    exec(compile(ast.Module(body=body, type_ignores=[]), \"<generated>\", \"exec\"), glb, loc)\n  File \"<generated>\", line 5, in <module>\n  File \"<generated>\", line 5, in <listcomp>\nNameError: name 'total_row' is not defined\n", "operation_trace": [], "semantic_warnings": ["execution_exception"], "latency_seconds": 0.008020902052521706}, "memory": {}}, "accepted": false}]
+===================Final Answer===================
+None

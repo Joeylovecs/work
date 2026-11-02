@@ -214,14 +214,19 @@ def run(args: argparse.Namespace) -> int:
     )
 
     records: list[dict[str, Any]] = []
+    run_started = time.perf_counter()
+    client.progress(f"双验证器开始 共{len(primary_rows)}条 输出={output}")
     for index, primary in enumerate(primary_rows):
         started = time.perf_counter()
+        client.progress_context = f"blind 样本{index + 1}/{len(primary_rows)} idx={primary['idx']}"
+        client.progress("开始处理")
         primary_answer = primary.get("final_answer")
         alternatives = [rows[index].get("final_answer") for rows in candidate_rows]
         primary_norm = norm(adapter, primary_answer)
         alternative_norms = [norm(adapter, value) for value in alternatives]
         disagreement = any(value and value != primary_norm for value in alternative_norms)
         should_verify = disagreement or invalid(primary_answer)
+        client.progress("存在分歧或主答案无效，启动双验证" if should_verify else "候选一致，跳过API验证")
         reviews: list[dict[str, Any]] = []
         raw_outputs: list[str] = []
         calls = 0
@@ -230,6 +235,7 @@ def run(args: argparse.Namespace) -> int:
         if should_verify:
             labeled = [(args.primary_label, primary_answer), *list(zip(args.label, alternatives))]
             for perspective in ("recompute", "counterexample"):
+                client.progress(f"验证角度={perspective}")
                 response = client.chat(
                     [{"role": "user", "content": verifier_prompt(
                         args.dataset,
@@ -332,6 +338,13 @@ def run(args: argparse.Namespace) -> int:
             encoding="utf-8",
         )
         records.append(record)
+        elapsed = time.perf_counter() - run_started
+        client.progress(
+            f"完成 {index + 1}/{len(primary_rows)} ({(index + 1) / len(primary_rows):.0%}) "
+            f"本条={time.perf_counter() - started:.1f}s 累计={elapsed:.1f}s "
+            f"预计剩余={elapsed / (index + 1) * (len(primary_rows) - index - 1):.1f}s "
+            f"correct={bool(correct)} mode={mode}"
+        )
         print(primary["idx"], primary["question_id"], mode, "support=", support_count, "correct=", bool(correct), flush=True)
 
     (output / "summary.json").write_text(

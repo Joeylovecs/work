@@ -1,0 +1,48 @@
+===================Title===================
+lukáš melich
+===================Table===================
+| year | competition | venue | position | notes |
+| 1998 | world junior championships | annecy , france | 10th | 61.51 m |
+| 1999 | european junior championships | riga , latvia | 5th | 64.20 m |
+| 2001 | european u23 championships | amsterdam , netherlands | 11th | 66.41 m |
+| 2003 | universiade | daegu , south korea | 4th | 71.26 m |
+| 2005 | world championships | helsinki , finland | 14th | 74.53 m |
+| 2006 | european championships | gothenburg , sweden | 15th | 73.77 m |
+| 2008 | olympic games | beijing , pr china | 29th | 70.56 m |
+| 2009 | world championships | berlin , germany | 14th | 74.47 m |
+| 2012 | olympic games | london , great britain | 6th | 77.17 m |
+| 2013 | world championships | moscow , russia | 3rd | 79.36 m |
+===================Question===================
+in lukáš melich 's last two competitions he threw an average distance of 78.27 m
+===================Text===================
+~~~python
+notes = df['notes'].astype(str)
+last_two = df.sort_values('year')['notes'].astype(str).str.extract(r'([\d.]+)')[0].astype(float).tail(2)
+answer = abs(last_two.mean() - 78.27) < 1e-9
+~~~
+---
+~~~python
+notes = df['notes'].astype(str)
+last_two = df.sort_values('year')['notes'].astype(str).str.extract(r'([\d.]+)')[0].astype(float).tail(2)
+answer = bool(round(last_two.mean(), 2) == 78.27)
+~~~
+===================Answer===================
+1
+===================Execution Result===================
+false
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "WRONG_TARGET_COLUMN", "expected": "competition", "actual": ["notes"], "evidence": ["column_access:notes", "column_access:notes", "ranking:sort_values", "scalar_compare:abs(last_two.mean() - 78.27) < 1e-09", "aggregation:mean"], "confidence": 0.94, "repair_hint": "Use the target column named in the question."}], "confidence": 0.94}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "WRONG_TARGET_COLUMN", "expected": "competition", "actual": ["notes"], "evidence": ["column_access:notes", "column_access:notes", "ranking:sort_values", "scalar_compare:abs(last_two.mean() - 78.27) < 1e-09", "aggregation:mean"], "confidence": 0.94, "repair_hint": "Use the target column named in the question."}], "confidence": 0.94}, "repair_hint": "Use the target column named in the question.", "confidence": 0.94, "mode": "hybrid"}
+===================Repair Hint===================
+Use the target column named in the question.
+===================Repair Trace===================
+[{"kind": "semantic", "repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "WRONG_TARGET_COLUMN", "expected": "competition", "actual": ["notes"], "evidence": ["column_access:notes", "column_access:notes", "ranking:sort_values", "scalar_compare:abs(last_two.mean() - 78.27) < 1e-09", "aggregation:mean"], "confidence": 0.94, "repair_hint": "Use the target column named in the question."}], "confidence": 0.94}, "repair_hint": "Use the target column named in the question.", "confidence": 0.94, "mode": "hybrid"}, "repaired_code": "notes = df['notes'].astype(str)\nlast_two = df.sort_values('year')['notes'].astype(str).str.extract(r'([\\d.]+)')[0].astype(float).tail(2)\nanswer = bool(round(last_two.mean(), 2) == 78.27)", "execution": {"success": true, "error": null, "result": false, "observed_output_type": "boolean", "observed_value": false, "evidence": {"final_object_type": "boolean", "final_value": false, "dataframes": [{"name": "df", "shape": [10, 5], "columns": ["year", "competition", "venue", "position", "notes"]}], "operation_trace": [{"operation": "input_table", "name": "df", "rows": 10, "columns": ["year", "competition", "venue", "position", "notes"]}, {"operation": "series_state", "name": "notes", "length": 10, "column": "notes"}, {"operation": "series_state", "name": "last_two", "length": 2, "column": "0"}, {"operation": "return", "output_type": "boolean", "value": false}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.0017523029819130898}, "memory": {}}, "candidate_audit": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": true, "errors": [], "confidence": 1.0}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "WRONG_TARGET_COLUMN", "expected": "competition", "actual": ["notes"], "evidence": ["column_access:notes", "column_access:notes", "ranking:sort_values", "scalar_compare:round(last_two.mean(), 2) == 78.27", "aggregation:mean"], "confidence": 0.94, "repair_hint": "Use the target column named in the question."}], "confidence": 0.94}, "repair_hint": "Use the target column named in the question.", "confidence": 0.94, "mode": "hybrid"}, "candidate_error_count": 1, "previous_error_count": 1, "answer_changed": false, "safe_change": true, "accepted": false, "rejection_reason": "no_verified_improvement"}]
+===================Final Answer===================
+False

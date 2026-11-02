@@ -1,0 +1,67 @@
+===================Title===================
+lukáš melich
+===================Table===================
+| year | competition | venue | position | notes |
+| 1998 | world junior championships | annecy , france | 10th | 61.51 m |
+| 1999 | european junior championships | riga , latvia | 5th | 64.20 m |
+| 2001 | european u23 championships | amsterdam , netherlands | 11th | 66.41 m |
+| 2003 | universiade | daegu , south korea | 4th | 71.26 m |
+| 2005 | world championships | helsinki , finland | 14th | 74.53 m |
+| 2006 | european championships | gothenburg , sweden | 15th | 73.77 m |
+| 2008 | olympic games | beijing , pr china | 29th | 70.56 m |
+| 2009 | world championships | berlin , germany | 14th | 74.47 m |
+| 2012 | olympic games | london , great britain | 6th | 77.17 m |
+| 2013 | world championships | moscow , russia | 3rd | 79.36 m |
+===================Question===================
+lukáš melich never threw for greater than 78 m
+in the table:
+lukáš melich never threw for greater than 79.36 m.
+===================Text===================
+```json
+{
+  "answer_type": "boolean",
+  "cardinality": "single",
+  "task_type": "verification",
+  "target_columns": ["notes"],
+  "filters": [
+    {"column": "notes", "op": ">", "value": 78.0}
+  ],
+  "operations": ["compare", "filter"],
+  "aggregation": null,
+  "ranking": null,
+  "arithmetic": null,
+  "boolean_polarity": "negative"
+}
+```
+---
+~~~python
+import pandas as pd
+m = df['notes'].str.extract(r'([\d.]+)\s*m')[0].astype(float)
+answer = bool(m.max() == 79.36)
+~~~
+---
+~~~python
+import pandas as pd
+m = df['notes'].str.extract(r'([\d.]+)\s*m')[0].astype(float)
+answer = bool((m > 79.36).sum() == 0)
+~~~
+===================Answer===================
+0
+===================Execution Result===================
+true
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "filter", "actual": ["compare", "aggregate"], "evidence": ["column_access:notes", "scalar_compare:m.max() == 79.36", "aggregation:max"], "confidence": 0.93, "repair_hint": "Add the missing filter operation before returning the answer."}], "confidence": 0.93}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "filter", "actual": ["compare", "aggregate"], "evidence": ["column_access:notes", "scalar_compare:m.max() == 79.36", "aggregation:max"], "confidence": 0.93, "repair_hint": "Add the missing filter operation before returning the answer."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Add the missing filter operation before returning the answer.", "confidence": 0.93, "mode": "hybrid"}
+===================Repair Hint===================
+Add the missing filter operation before returning the answer.
+===================Repair Trace===================
+[{"kind": "semantic", "repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "filter", "actual": ["compare", "aggregate"], "evidence": ["column_access:notes", "scalar_compare:m.max() == 79.36", "aggregation:max"], "confidence": 0.93, "repair_hint": "Add the missing filter operation before returning the answer."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Add the missing filter operation before returning the answer.", "confidence": 0.93, "mode": "hybrid"}, "repaired_code": "import pandas as pd\nm = df['notes'].str.extract(r'([\\d.]+)\\s*m')[0].astype(float)\nanswer = bool((m > 79.36).sum() == 0)", "execution": {"success": true, "error": null, "result": true, "observed_output_type": "boolean", "observed_value": true, "evidence": {"final_object_type": "boolean", "final_value": true, "dataframes": [{"name": "df", "shape": [10, 5], "columns": ["year", "competition", "venue", "position", "notes"]}], "operation_trace": [{"operation": "input_table", "name": "df", "rows": 10, "columns": ["year", "competition", "venue", "position", "notes"]}, {"operation": "series_state", "name": "m", "length": 10, "column": "0"}, {"operation": "return", "output_type": "boolean", "value": true}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.0021590720862150192}, "memory": {}}, "candidate_audit": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "filter", "actual": ["compare", "aggregate"], "evidence": ["column_access:notes", "scalar_compare:(m > 79.36).sum() == 0", "aggregation:sum", "scalar_compare:m > 79.36"], "confidence": 0.93, "repair_hint": "Add the missing filter operation before returning the answer."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Add the missing filter operation before returning the answer.", "confidence": 0.93, "mode": "hybrid"}, "candidate_error_count": 1, "previous_error_count": 1, "answer_changed": false, "safe_change": true, "accepted": false, "rejection_reason": "no_verified_improvement"}]
+===================Final Answer===================
+True

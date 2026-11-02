@@ -1,0 +1,47 @@
+===================Title===================
+World War II casualties of Poland
+===================Table===================
+| Description Losses | 1939/40 | 1940/41 | 1941/42 | 1942/43 | 1943/44 | 1944/45 | Total |
+| Direct War Losses | 360,000 |  |  |  |  | 183,000 | 543,000 |
+| Murdered | 75,000 | 100,000 | 116,000 | 133,000 | 82,000 |  | 506,000 |
+| Deaths In Prisons & Camps | 69,000 | 210,000 | 220,000 | 266,000 | 381,000 |  | 1,146,000 |
+| Deaths Outside of Prisons & Camps |  | 42,000 | 71,000 | 142,000 | 218,000 |  | 473,000 |
+| Murdered in Eastern Regions |  |  |  |  |  | 100,000 | 100,000 |
+| Deaths other countries |  |  |  |  |  |  | 2,000 |
+| Total | 504,000 | 352,000 | 407,000 | 541,000 | 681,000 | 270,000 | 2,770,000 |
+===================Question===================
+what is the total numbers of losses not including direct war losses?
+===================Text===================
+~~~python
+total = df.loc[df['Description Losses'] == 'Total', 'Total'].iloc[0]
+direct = df.loc[df['Description Losses'] == 'Direct War Losses', 'Total'].iloc[0]
+answer = total - direct
+~~~
+---
+~~~python
+import pandas as pd
+
+mask = (~df['Description Losses'].isin(['Total', 'Direct War Losses']))
+vals = pd.to_numeric(df.loc[mask, 'Total'].astype(str).str.replace(',', ''), errors='coerce')
+answer = vals.sum()
+~~~
+===================Answer===================
+['2,227,000']
+===================Execution Result===================
+2227000
+===================Execution Error===================
+None
+===================Global Audit===================
+{"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}
+===================Operator Audit===================
+{"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "aggregate", "actual": ["filter", "arithmetic"], "evidence": ["column_access:Total", "filter:Description Losses = 'Total'", "column_access:Description Losses", "column_access:Total", "filter:Description Losses = 'Direct War Losses'", "column_access:Description Losses"], "confidence": 0.93, "repair_hint": "Add the missing aggregate operation before returning the answer."}, {"level": "OPERATOR", "error_type": "MISSING_AGGREGATION", "expected": "sum", "actual": null, "evidence": ["column_access:Total", "filter:Description Losses = 'Total'", "column_access:Description Losses", "column_access:Total", "filter:Description Losses = 'Direct War Losses'", "column_access:Description Losses"], "confidence": 0.96, "repair_hint": "Apply sum to the requested target column."}], "confidence": 0.93}
+===================Parameter Audit===================
+{"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}
+===================Semantic Logic Exception===================
+{"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "aggregate", "actual": ["filter", "arithmetic"], "evidence": ["column_access:Total", "filter:Description Losses = 'Total'", "column_access:Description Losses", "column_access:Total", "filter:Description Losses = 'Direct War Losses'", "column_access:Description Losses"], "confidence": 0.93, "repair_hint": "Add the missing aggregate operation before returning the answer."}, {"level": "OPERATOR", "error_type": "MISSING_AGGREGATION", "expected": "sum", "actual": null, "evidence": ["column_access:Total", "filter:Description Losses = 'Total'", "column_access:Description Losses", "column_access:Total", "filter:Description Losses = 'Direct War Losses'", "column_access:Description Losses"], "confidence": 0.96, "repair_hint": "Apply sum to the requested target column."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Add the missing aggregate operation before returning the answer. Apply sum to the requested target column.", "confidence": 0.93, "mode": "hybrid"}
+===================Repair Hint===================
+Add the missing aggregate operation before returning the answer. Apply sum to the requested target column.
+===================Repair Trace===================
+[{"kind": "semantic", "repair_count": 1, "diagnostic": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_OPERATOR", "expected": "aggregate", "actual": ["filter", "arithmetic"], "evidence": ["column_access:Total", "filter:Description Losses = 'Total'", "column_access:Description Losses", "column_access:Total", "filter:Description Losses = 'Direct War Losses'", "column_access:Description Losses"], "confidence": 0.93, "repair_hint": "Add the missing aggregate operation before returning the answer."}, {"level": "OPERATOR", "error_type": "MISSING_AGGREGATION", "expected": "sum", "actual": null, "evidence": ["column_access:Total", "filter:Description Losses = 'Total'", "column_access:Description Losses", "column_access:Total", "filter:Description Losses = 'Direct War Losses'", "column_access:Description Losses"], "confidence": 0.96, "repair_hint": "Apply sum to the requested target column."}], "confidence": 0.93}, "parameter": {"level": "PARAMETER", "passed": true, "errors": [], "confidence": 1.0}, "repair_hint": "Add the missing aggregate operation before returning the answer. Apply sum to the requested target column.", "confidence": 0.93, "mode": "hybrid"}, "repaired_code": "import pandas as pd\n\nmask = (~df['Description Losses'].isin(['Total', 'Direct War Losses']))\nvals = pd.to_numeric(df.loc[mask, 'Total'].astype(str).str.replace(',', ''), errors='coerce')\nanswer = vals.sum()", "execution": {"success": true, "error": null, "result": "2227000", "observed_output_type": "number", "observed_value": 2227000, "evidence": {"final_object_type": "number", "final_value": 2227000, "dataframes": [{"name": "df", "shape": [7, 8], "columns": ["Description Losses", "1939/40", "1940/41", "1941/42", "1942/43", "1943/44", "1944/45", "Total"]}], "operation_trace": [{"operation": "input_table", "name": "df", "rows": 7, "columns": ["Description Losses", "1939/40", "1940/41", "1941/42", "1942/43", "1943/44", "1944/45", "Total"]}, {"operation": "series_state", "name": "mask", "length": 7, "column": "Description Losses"}, {"operation": "series_state", "name": "vals", "length": 5, "column": "Total"}, {"operation": "return", "output_type": "number", "value": 2227000}], "semantic_warnings": [], "stdout": "", "latency_seconds": 0.0017236860003322363}, "memory": {}}, "candidate_audit": {"passed": false, "semantic_exception": true, "global": {"level": "GLOBAL", "passed": true, "errors": [], "confidence": 1.0}, "operator": {"level": "OPERATOR", "passed": false, "errors": [{"level": "OPERATOR", "error_type": "MISSING_FILTER", "expected": {"column": "Description Losses", "op": "=", "value": "direct war losses"}, "actual": [], "evidence": ["column_access:Description Losses", "column_access:Total", "aggregation:sum"], "confidence": 0.96, "repair_hint": "Add filter Description Losses = direct war losses before the aggregation."}], "confidence": 0.96}, "parameter": {"level": "PARAMETER", "passed": false, "errors": [{"level": "PARAMETER", "error_type": "MISSING_FILTER_PARAMETER", "expected": {"column": "Description Losses", "op": "=", "value": "direct war losses"}, "actual": null, "evidence": ["column_access:Description Losses", "column_access:Total", "aggregation:sum"], "confidence": 0.9, "repair_hint": "Ground the filter column and value in the question and table."}], "confidence": 0.9}, "repair_hint": "Add filter Description Losses = direct war losses before the aggregation. Ground the filter column and value in the question and table.", "confidence": 0.9, "mode": "hybrid"}, "candidate_error_count": 2, "previous_error_count": 2, "answer_changed": false, "safe_change": true, "accepted": false, "rejection_reason": "no_verified_improvement"}]
+===================Final Answer===================
+2227000

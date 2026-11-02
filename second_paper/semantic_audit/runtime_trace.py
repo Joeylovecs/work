@@ -75,6 +75,8 @@ def execute_code(code: str, df: pd.DataFrame) -> Dict[str, Any]:
     result = None
     try:
         tree = ast.parse(code)
+        if not tree.body:
+            raise ValueError("EMPTY_GENERATED_CODE: no executable Python statements")
         glb = {"pd": pd, "np": np, "df": df.copy(deep=True), "__builtins__": __builtins__}
         loc: dict[str, Any] = {}
         body = list(tree.body)

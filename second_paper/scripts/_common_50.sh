@@ -6,20 +6,47 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 WORKSPACE_DIR="$(dirname "$PROJECT_DIR")"
 cd "$PROJECT_DIR"
 
-if command -v conda >/dev/null 2>&1; then
-  CONDA_BASE="$(conda info --base 2>/dev/null || true)"
-  if [[ -n "$CONDA_BASE" && -f "$CONDA_BASE/etc/profile.d/conda.sh" ]]; then
-    # shellcheck disable=SC1091
-    source "$CONDA_BASE/etc/profile.d/conda.sh"
-    conda activate work
-  fi
+CONDA_BASE="/data/amax/home/E23101002/anaconda3"
+WORK2_PREFIX="/data/amax/home/E23101002/.conda/envs/work2"
+
+if [[ ! -x "$WORK2_PREFIX/bin/python" ]]; then
+  echo "work2 python not found: $WORK2_PREFIX/bin/python" >&2
+  exit 4
 fi
-export PYTHONPATH="$WORKSPACE_DIR${PYTHONPATH:+:$PYTHONPATH}"
+
+# Conda's initialization code expects interactive-shell variables such as PS1.
+# Temporarily disable nounset while sourcing it, then restore strict mode.
+set +u
+# shellcheck disable=SC1091
+source "$CONDA_BASE/etc/profile.d/conda.sh"
+conda activate "$WORK2_PREFIX"
+set -u
+
+# A stale shell can claim work2 is active while still pointing at base Python.
+# Force this project's interpreter to the front even when Conda activation is a no-op.
+export PATH="$WORK2_PREFIX/bin:$PATH"
+hash -r
+
+# Do not inherit Python paths from the caller (for example, base Python 3.8).
+export PYTHONNOUSERSITE=1
+export PYTHONPATH="$WORKSPACE_DIR"
+
+if [[ "$(python -c 'import sys; print(sys.prefix)')" != "$WORK2_PREFIX" ]]; then
+  echo "failed to activate work2; actual python: $(command -v python)" >&2
+  exit 5
+fi
 if [[ -f "$PROJECT_DIR/.secrets/paratera.env" ]]; then
   set -a
   # shellcheck disable=SC1091
   source "$PROJECT_DIR/.secrets/paratera.env"
   set +a
+fi
+
+# The campus host reaches Paratera directly. Keep proxies for other endpoints.
+if [[ "${PARATERA_BASE_URL:-https://ai.paratera.com/v1/}" == https://ai.paratera.com/* ]]; then
+  project_no_proxy="${no_proxy:-},${NO_PROXY:-},ai.paratera.com"
+  export no_proxy="$project_no_proxy" NO_PROXY="$project_no_proxy"
+  unset project_no_proxy
 fi
 
 run_experiment() {
@@ -33,6 +60,8 @@ run_experiment() {
   local semantic_repairs=0
   local execution_repairs=0
   local dp_votes=1
+  local default_tokens=1800
+  if [[ "${MODEL_ID:-}" == "GLM-5.3" ]]; then default_tokens=4096; fi
   if [[ "$mode" == "audit" || "$mode" == "joint" ]]; then
     semantic_repairs=2
     execution_repairs=1
@@ -49,6 +78,8 @@ run_experiment() {
     --max-repairs "$semantic_repairs" \
     --max-execution-repairs "$execution_repairs" \
     --dp-votes "$dp_votes"     --max-dp-repairs "${MAX_DP_REPAIRS:-2}"     --dp-revise-threshold "${DP_REVISE_THRESHOLD:-0.8}" \
+    --max-code-tokens "${MAX_CODE_TOKENS:-$default_tokens}" \
+    --max-dp-tokens "${MAX_DP_TOKENS:-$default_tokens}" \
     --model "${MODEL_ID:-DeepSeek-V3.2}" \
     --temperature 0.0 \
     --timeout "${REQUEST_TIMEOUT:-60}" \
